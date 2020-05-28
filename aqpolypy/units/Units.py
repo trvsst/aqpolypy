@@ -1,10 +1,14 @@
 """
-Created on Wed May 13 11:12:25 2020
+:module: Units
+:platform: Unix, Windows, OS
+:synopsis: Relevant constants and functions used for unit conversion
 
-@author: trvsst
-
-General constants
+.. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
+.. history::
+..                Kevin Marin <marink2@tcnj.edu>, May2020
+..                  - describe changes
 """
+
 
 import numpy as np
 
@@ -21,7 +25,7 @@ def k_boltzmann():
 
 def avogadro():
     """
-    Avogradro number
+    Avogadro number
 
     :return: Avogadro number
     :rtype: float
@@ -63,11 +67,18 @@ def atm_2_bar():
     return atm_2_pascal() * 1e-5
 
 
-def celsius_2_kelvin():
-    return 273.15
+def celsius_2_kelvin(t):
+    """
+
+    :param t: temperature in celsius
+    :return: temperature in Kelvin
+    :rtype : float
+    """
+
+    return 273.15 + t
 
 
-def m2angstrom():
+def m_2_angstrom():
     """
     Conversion from meters to Angstrom
 
@@ -80,7 +91,7 @@ def m2angstrom():
 
 def mol_lit_2_mol_angstrom():
     """
-    Conversion from meters to Angstrom
+    Conversion from mols/litre to molecules/Angstrom3
 
     :return: conversion factor
     :rtype: float
@@ -88,7 +99,7 @@ def mol_lit_2_mol_angstrom():
 
     # 1l in Angstrom^3
     vol_unit = 1e-3 * (m2angstrom()) ** 3
-    # cocentration in molecules/Angstrom^3
+    # concentration in molecules/Angstrom^3
     conv = avogadro() / vol_unit
 
     return conv
@@ -98,7 +109,7 @@ def one_over4pi_epsilon0():
     """
     value of math:`\frac{1}{\4\pi\varepsilon_0}`
 
-    :return: electrostatic constant SI units
+    :return: electrostatic constant (SI units)
     :rtype: float
     """
 
@@ -109,7 +120,7 @@ def e_charge():
     """
     electron charge
 
-    :return: electron charge SI units
+    :return: electron charge (SI units)
     :rtype: float
     """
 
@@ -120,7 +131,7 @@ def e_square():
     """
     value of math:`\frac{e^2}{\4\pi\varepsilon_0}`
 
-    :return: given in SI units
+    :return: value of constant (SI units)
     :rtype: float
     """
 
