@@ -1,0 +1,15 @@
+"""
+Example file on how to use units
+"""
+
+
+
+
+import aqpolypy.units.Units as un
+
+
+
+print('Boltzmann constant is', un.k_boltzmann())
+
+press = 1
+print('Convert %1.5f atm to %1.5f P'%(press, press*un.atm_2_pascal()))
