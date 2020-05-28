@@ -45,30 +45,33 @@ def r_gas():
     return avogadro() * k_boltzmann()
 
 
-def atm_2_pascal():
+def atm_2_pascal(p):
     """
     conversion of atmosphere to pascal
 
-    :return: Atmosphere to Pascal conversion
-    :rtype: float
+    :param p: pressure in atmospheres
+    :return: pressure in pascals
+    :rtype : float
     """
 
-    return 101325.0
+    return 101325.0 * p
 
 
-def atm_2_bar():
+def atm_2_bar(p):
     """
     conversion of atmosphere to bar
 
-    :return: Atmosphere to bar conversion
-    :rtype: float
+    :param p: pressure in atmospheres
+    :return: pressure in bar
+    :rtype : float
     """
 
-    return atm_2_pascal() * 1e-5
+    return atm_2_pascal(p) * 1e-5
 
 
 def celsius_2_kelvin(t):
     """
+    conversion of celsius to kelvin
 
     :param t: temperature in celsius
     :return: temperature in Kelvin
@@ -78,29 +81,31 @@ def celsius_2_kelvin(t):
     return 273.15 + t
 
 
-def m_2_angstrom():
+def m_2_angstrom(x):
     """
     Conversion from meters to Angstrom
 
-    :return: conversion factor
-    :rtype: float
+    :param x: length in meters
+    :return: length in angstroms
+    :rtype : float
     """
 
-    return 1e10
+    return 1e10 * x
 
 
-def mol_lit_2_mol_angstrom():
+def mol_lit_2_mol_angstrom(c):
     """
     Conversion from mols/litre to molecules/Angstrom3
 
-    :return: conversion factor
-    :rtype: float
+    :param c: concentration in mols/litre
+    :return: concentration in molecules/Angstrom3
+    :rtype : float
     """
 
     # 1l in Angstrom^3
-    vol_unit = 1e-3 * (m2angstrom()) ** 3
+    vol_unit = 1e-3 * (m_2_angstrom(1)) ** 3
     # concentration in molecules/Angstrom^3
-    conv = avogadro() / vol_unit
+    conv = (c * avogadro()) / vol_unit
 
     return conv
 
