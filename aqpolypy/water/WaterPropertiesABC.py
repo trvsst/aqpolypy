@@ -14,19 +14,18 @@ from abc import ABC, abstractmethod
 
 
 class WaterProperties(ABC):
-    def __init__(self, p, t):
+    def __init__(self, tk, pa=1):
         """
         constructor
 
-        :param p: pressure in atmospheres
-        :param t: temperature in celsius
-        :instantiate: molecular weight, pressure, and temperature
+        :param tk: temperature in kelvin
+        :param pa: pressure in atmospheres
+        :instantiate: molecular weight, temperature, and pressure
         :itype : float
         """
         self.MolecularWeight = 18.01534
-        self.pressure = p
-        self.temperature = t
-
+        self.tk = tk
+        self.pa = pa
 
     @abstractmethod
     def density(self):
