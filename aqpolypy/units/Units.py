@@ -53,6 +53,8 @@ def atm_2_pascal(p):
     :return: pressure in pascals
     :rtype : float
     """
+    if p < 0:
+        raise ValueError("Atm cannot be negative")
 
     return 101325.0 * p
 
@@ -65,6 +67,8 @@ def atm_2_bar(p):
     :return: pressure in bar
     :rtype : float
     """
+    if p < 0:
+        raise ValueError("Atm cannot be negative")
 
     return atm_2_pascal(p) * 1e-5
 
@@ -89,6 +93,8 @@ def m_2_angstrom(x):
     :return: length in angstroms
     :rtype : float
     """
+    if x < 0:
+        raise ValueError("Meters cannot be negative")
 
     return 1e10 * x
 
@@ -101,6 +107,8 @@ def mol_lit_2_mol_angstrom(c):
     :return: concentration in molecules/Angstrom3
     :rtype : float
     """
+    if c < 0:
+        raise ValueError("Mols/L cannot be negative")
 
     # 1l in Angstrom^3
     vol_unit = 1e-3 * (m_2_angstrom(1)) ** 3
