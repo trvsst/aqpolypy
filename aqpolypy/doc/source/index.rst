@@ -11,10 +11,27 @@ Welcome to aqpolypy's documentation!
    :caption: Contents:
 
 
+aqpolypy
+********
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Purpose
+=======
+
+aqpolypy is a program initially developed to compute phase diagrams of polymers in aqueous solutions. Currently it
+includes:
+
+* Thermodynamic functions for water at any temperature and pressure.
+
+* Thermodynamic functions for salts at any temperature, pressure and concentration.
+
+* Phase diagrams for hydrogen bonding polymers
+
+
+Core functions
+==============
+
+.. toctree::
+   :maxdepth: 2
+
+   aqpolypy
