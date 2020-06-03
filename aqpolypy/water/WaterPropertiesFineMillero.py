@@ -8,6 +8,7 @@
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added constructor with temperature and pressure parameters.
 ..                  - Updated member methods to use attributes and functions from Units.
+..                  - Moved calculations from member methods into the constructor
 """
 
 import numpy as np
@@ -26,9 +27,79 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         :instantiate: molecular weight, temperature, and pressure
         :itype : float
         """
-        self.MolecularWeight = 18.01534
-        self.tk = tk
-        self.pa = pa
+        super().__init__(tk, pa)
+
+        """
+        Calculations for density
+        """
+        self.t = self.tk - un.celsius_2_kelvin(0)
+        self. y = un.atm_2_bar(self.pa) * (self.pa - 1)
+
+        self.den1 = 0.9998396 + self.t * 18.224944e-3 - 7.922210e-6 * self.t ** 2 - 55.44846e-9 * self.t ** 3
+        self.den2 = 149.7562e-12 * self.t ** 4 - 393.2952e-15 * self.t ** 5
+
+        self.V0 = (1 + self.t * 18.159725e-3) / (self.den1 + self.den2)
+
+        self.t_4 = self.t ** 4
+        self.B = 19654.320 + 147.037 * self.t - 2.21554 * self.t ** 2 + 1.0478e-2 * self.t ** 3 - 2.2789e-5 * self.t_4
+        self.a1 = 3.2891 - 2.3910e-3 * self.t + 2.8446e-4 * self.t ** 2 - 2.82e-6 * self.t ** 3 + 8.477e-9 * self.t_4
+        self.a2 = 6.245e-5 - 3.913e-6 * self.t - 3.499e-8 * self.t ** 2 + 7.942e-10 * self.t ** 3 - 3.299e-12 * self.t_4
+
+        # this in cm^3/gram
+        self.vol = self.V0 * (1 - self.y / (self.B + self.a1 * self.y + self.a2 * self.y ** 2))
+
+        # density in kg/m^3
+        self.rt = 1e3 / self.vol
+
+        """
+        Calculations for molar volume
+        """
+        self.molVol = 1e-3 * self.MolecularWeight / self.rt
+
+        """
+        Calculations for dielectric constant
+        """
+        # water polarizability
+        self.alpha = 18.1458392e-30
+        # dipole water magnitude
+        self.mu = 6.1375776e-30
+        # water molecular weight
+        self.m_w = 0.01801528
+
+        # convert from atmospheres to MPa
+        self.p_mpa = 1e6 * un.atm_2_pascal(self.pa)
+
+        # coefficients
+        self.b = np.zeros(9)
+        self.b[0] = -4.044525e-2
+        self.b[1] = 103.6180
+        self.b[2] = 75.32165
+        self.b[3] = -23.23778
+        self.b[4] = -3.548184
+        self.b[5] = -1246.311
+        self.b[6] = 263307.7
+        self.b[7] = -6.928953e-1
+        self.b[8] = -204.4473
+
+        def g(x, y):
+            t1 = self.b[0] * y / x + self.b[1] / np.sqrt(x) + self.b[2] / (x - 215) + self.b[3] / np.sqrt(x - 215)
+            t2 = self.b[4] / (self.tk - 215) ** 0.25
+            t3 = np.exp(self.b[5] / x + self.b[6] / x ** 2 + self.b[7] * y / x + self.b[8] * y / x ** 2)
+            return 1 + 1e-3 * self.rt * (t1 + t2 + t3)
+
+        self.fac = un.one_over4pi_epsilon0() * 4 * np.pi * self.mu ** 2 / (3 * un.k_boltzmann() * self.tk)
+        self.b_fac_0 = self.fac * g(self.tk, self.p_mpa)
+        self.b_fac_1 = self.alpha + self.b_fac_0
+        self.b_fac = self.rt * un.avogadro() * self.b_fac_1 / (3.0 * self.m_w)
+
+        self.dielectricConstant = 0.25 * (1 + 9 * self.b_fac + 3 * np.sqrt(1 + 2 * self.b_fac + 9 * self.b_fac ** 2))
+
+        """
+        Calculations for compressibility
+        """
+        self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
+        self.comp = self.beta * un.atm_2_bar(self.pa)
+
 
     def density(self):
         """
@@ -48,30 +119,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         # if (self.tk > 100 or self.tk < 0):
         #    return print("Temperature out of allowable range: [0, 100]")
 
-        t = self.tk - un.celsius_2_kelvin(0)
-        y = un.atm_2_bar(self.pa) * (self.pa - 1)
-
-        den1 = 0.9998396 + t * 18.224944e-3 - 7.922210e-6 * t ** 2 - 55.44846e-9 * t ** 3
-        den2 = 149.7562e-12 * t ** 4 - 393.2952e-15 * t ** 5
-
-        V0 = (1 + t * 18.159725e-3) / (den1 + den2)
-
-        B = 19654.320 + 147.037 * t - 2.21554 * t ** 2 + 1.0478e-2 * t ** 3 - 2.2789e-5 * t ** 4
-
-        a1 = 3.2891 - 2.3910e-3 * t + 2.8446e-4 * t ** 2 - 2.82e-6 * t ** 3 + 8.477e-9 * t ** 4
-        a2 = 6.245e-5 - 3.913e-6 * t - 3.499e-8 * t ** 2 + 7.942e-10 * t ** 3 - 3.299e-12 * t ** 4
-
-        # this in cm^3/gram
-        vol = V0 * (1 - y / (B + a1 * y + a2 * y ** 2))
-
-        # density in kg/m^3
-        rt = 1e3 / vol
-
-        if self.compressibility():
-            beta = V0 * (B - a2 * y ** 2) / (vol * (B + a1 * y + a2 * y ** 2) ** 2)
-            rt = beta * un.atm_2_bar(self.pa)
-
-        return rt
+        return self.rt
 
     def molar_volume(self):
         """
@@ -90,7 +138,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         # if (T > 100 or T < 0):
         #    return print("Temperature out of allowable range: [0, 100]")
 
-        return 1e-3 * self.MolecularWeight / self.density()
+        return self.molVol
 
     def dielectric_constant(self):
         """
@@ -105,41 +153,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
             :rtype: float
             """
 
-        # water polarizability
-        alpha = 18.1458392e-30
-        # dipole water magntidue
-        mu = 6.1375776e-30
-        # water molecular weight
-        m_w = 0.01801528
-
-        # convert from atmospheres to MPa
-        p_mpa = 1e6 * un.atm_2_pascal(self.pa)
-
-        # coefficients
-        b = np.zeros(9)
-        b[0] = -4.044525e-2
-        b[1] = 103.6180
-        b[2] = 75.32165
-        b[3] = -23.23778
-        b[4] = -3.548184
-        b[5] = -1246.311
-        b[6] = 263307.7
-        b[7] = -6.928953e-1
-        b[8] = -204.4473
-
-        def g(x, y):
-            t1 = b[0] * y / x + b[1] / np.sqrt(x) + b[2] / (x - 215) + b[3] / np.sqrt(x - 215)
-            t2 = b[4] / (self.tk - 215) ** 0.25
-            t3 = np.exp(b[5] / x + b[6] / x ** 2 + b[7] * y / x + b[8] * y / x ** 2)
-            return 1 + 1e-3 * self.density() * (t1 + t2 + t3)
-
-        fac = un.one_over4pi_epsilon0() * 4 * np.pi * mu ** 2 / (3 * un.k_boltzmann() * self.tk)
-        b_fac_0 = fac * g(self.tk, p_mpa)
-        b_fac_1 = alpha + b_fac_0
-        b_fac = self.density() * un.avogadro() * b_fac_1 / (3.0 * m_w)
-
-        return 0.25 * (1 + 9 * b_fac + 3 * np.sqrt(1 + 2 * b_fac + 9 * b_fac ** 2))
+        return self.dielectricConstant
 
     def compressibility(self):
-        compute_beta = True
-        return compute_beta
+        return self.comp
