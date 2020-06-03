@@ -68,7 +68,7 @@ class TestWaterMilleroAW(unittest.TestCase):
         # converting param to [temperature(K), pressure(atm), compressibility (atm-1)]
         param[:, 0] = 273.15 + param[:, 0]
         param[:, 1] = param[:, 1] / 1.01325
-        param[:, 2] = (param[:, 2] * 1e6) / 1.01325
+        param[:, 2] = (param[:, 2] * 1e6) * 1.01325
         # testing compressibility up to a precision of 10^-6
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.compressibility(), param[:, 2], 0, 1e-6)
