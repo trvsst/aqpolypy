@@ -3,7 +3,7 @@ Unit Test for WaterPropertiesFineMillero
 """
 import numpy as np
 import unittest
-import aqpolypy.water.WaterPropertiesFineMillero as fm
+import aqpolypy.water.WaterMilleroAW as fm
 
 
 class TestWaterMilleroAW(unittest.TestCase):
