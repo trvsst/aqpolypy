@@ -24,6 +24,8 @@ class WaterProperties(ABC):
         :itype : float
         """
         self.MolecularWeight = 18.01534
+        self.alpha = 18.1458392e-30
+        self.mu = 6.1375776e-30
         self.tk = tk
         self.pa = pa
 
