@@ -12,7 +12,7 @@
 """
 
 import numpy as np
-import aqpolypy.units.Units as un
+import aqpolypy.units.units as un
 import aqpolypy.water.WaterPropertiesABC as wp
 
 
