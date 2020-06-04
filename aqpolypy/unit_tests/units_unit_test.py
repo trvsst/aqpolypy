@@ -3,7 +3,7 @@ Unit Test for Units file
 """
 import unittest
 import numpy as np
-import aqpolypy.units.Units as un
+import aqpolypy.units.units as un
 
 
 class TestUnits(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestUnits(unittest.TestCase):
     # Testing r gas
     def test_r_gas(self):
         # r gas constant = boltzmann * avogadro
-        self.assertEqual(un.r_gas(), un.k_boltzmann()*un.avogadro())
+        self.assertEqual(un.r_gas(), un.k_boltzmann() * un.avogadro())
 
     # Testing atm to pascal & atm to bar
     def test_atm_conversion(self):
@@ -43,13 +43,14 @@ class TestUnits(unittest.TestCase):
     # Testing mol/litre to molecule/A^3 conversion
     def test_mol_lit_conversion(self):
         # 1 Mol/litre = to Molecule /A^3
-        self.assertEqual(un.mol_lit_2_mol_angstrom(1), un.avogadro()/(1e-3*un.m_2_angstrom(1)**3))
+        self.assertEqual(un.mol_lit_2_mol_angstrom(1), un.avogadro() / (1e-3 * un.m_2_angstrom(1) ** 3))
 
     # Testing 1/4pieps0, e charge, e charge squared
     def test_electrostatic_constants(self):
         self.assertEqual(un.one_over4pi_epsilon0(), 1 / (4 * np.pi * 8.8541878128e-12))
         self.assertEqual(un.e_charge(), 1.60218e-19)
         self.assertEqual(un.e_square(), un.one_over4pi_epsilon0() * (un.e_charge()) ** 2)
+
 
 if __name__ == '__main__':
     unittest.main()
