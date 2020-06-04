@@ -33,7 +33,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         Calculations for density
         """
         self.t = self.tk - un.celsius_2_kelvin(0)
-        self. y = un.atm_2_bar(self.pa) * (self.pa - 1)
+        self.y = un.atm_2_bar(self.pa) * (self.pa - 1)
 
         self.den1 = 0.9998396 + self.t * 18.224944e-3 - 7.922210e-6 * self.t ** 2 - 55.44846e-9 * self.t ** 3
         self.den2 = 149.7562e-12 * self.t ** 4 - 393.2952e-15 * self.t ** 5
@@ -58,13 +58,6 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         """
         Calculations for dielectric constant
         """
-        # water polarizability
-        self.alpha = 18.1458392e-30
-        # dipole water magnitude
-        self.mu = 6.1375776e-30
-        # water molecular weight
-        self.m_w = 0.01801528
-
         # convert from atmospheres to MPa
         self.p_mpa = 1e6 * un.atm_2_pascal(self.pa)
 
@@ -89,16 +82,16 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         self.fac = un.one_over4pi_epsilon0() * 4 * np.pi * self.mu ** 2 / (3 * un.k_boltzmann() * self.tk)
         self.b_fac_0 = self.fac * g(self.tk, self.p_mpa)
         self.b_fac_1 = self.alpha + self.b_fac_0
-        self.b_fac = self.rt * un.avogadro() * self.b_fac_1 / (3.0 * self.m_w)
+        self.b_fac = self.rt * un.avogadro() * self.b_fac_1 / (3.0 * self.MolecularWeight / 1000)
 
         self.dielectricConstant = 0.25 * (1 + 9 * self.b_fac + 3 * np.sqrt(1 + 2 * self.b_fac + 9 * self.b_fac ** 2))
 
         """
         Calculations for compressibility
         """
-        self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
+        self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (
+                    self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
         self.comp = self.beta * un.atm_2_bar(self.pa)
-
 
     def density(self):
         """
