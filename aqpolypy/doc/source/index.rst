@@ -11,10 +11,6 @@ Welcome to aqpolypy's documentation!
    :caption: Contents:
 
 
-aqpolypy
-********
-
-
 Purpose
 =======
 

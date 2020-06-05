@@ -1,0 +1,33 @@
+.. aqpolypy documentation master file, created by
+   sphinx-quickstart on Mon Jun  1 10:31:00 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to aqpolypy's documentation!
+====================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+
+Purpose
+=======
+
+aqpolypy is a program initially developed to compute phase diagrams of polymers in aqueous solutions. Currently it
+includes:
+
+* Thermodynamic functions for water at any temperature and pressure.
+
+* Thermodynamic functions for salts at any temperature, pressure and concentration.
+
+* Phase diagrams for hydrogen bonding polymers
+
+
+Core functions
+==============
+
+.. toctree::
+   :maxdepth: 2
+
+   aqpolypy

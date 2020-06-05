@@ -3,14 +3,16 @@
 Units
 =====
 
-The units are used throughout the process of modeling system calculations.
-
-Units provides general constants as well as unit conversion functions.
-
-Full list of unit conversion and general constant systems currently available:
+The following units and unit conversions are defined:
 
 .. toctree::
     :maxdepth: 1
 
-    aqpolypy.units.general_constants
+units
+-----
+
+.. automodule:: aqpolypy.units.units
+    :members:
+    :undoc-members:
+    :show-inheritance:
 

@@ -1,20 +1,20 @@
-List of all UnitTests
-=====================
+Unit Tests
+==========
 
-
+This is the entire list of unit tests
 
 units_unit_test
--------------------
+---------------
 
 .. automodule:: aqpolypy.unit_tests.units_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
 
-waterMilleroAW_unit_test
--------------------
+water_millero_aw_unit_test
+--------------------------
 
-.. automodule:: aqpolypy.unit_tests.waterMilleroAW_unit_test
+.. automodule:: aqpolypy.unit_tests.water_millero_aw_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
