@@ -1,3 +1,5 @@
+.. _aqpolypy-unit_tests:
+
 Unit Tests
 ==========
 

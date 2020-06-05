@@ -1,3 +1,5 @@
+.. _water:
+
 Water
 =====
 
@@ -9,7 +11,7 @@ Abstract class
     :undoc-members:
     :show-inheritance:
 
-Derived classes
+WaterMilleroAW
 ---------------
 
 .. automodule:: aqpolypy.water.WaterMilleroAW

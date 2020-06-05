@@ -17,6 +17,11 @@ import aqpolypy.water.WaterPropertiesABC as wp
 
 
 class WaterPropertiesFineMillero(wp.WaterProperties):
+    """
+    Water Properties following the work of Fine and Millero :cite:`Fine1973`
+    Dilectric constant from Archer and Wang :cite:`Archer1990`
+
+    """
 
     def __init__(self, tk, pa=1):
         """
@@ -87,8 +92,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def density(self):
         """
-            Water density according to Fine Millero
-            Journal of Chemical Physics 59, 5529 (1973)
+            Water density according to Fine Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
@@ -105,8 +109,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def molar_volume(self):
         """
-            molar water according to Fine Millero
-            Journal of Chemical Physics 59, 5529 (1973)
+            molar water according to Fine and Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
@@ -122,10 +125,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def dielectric_constant(self):
         """
-            Water dielectric constant according to
-
-            Archer & Wang
-            Journal of Physical and Chemical Reference Data 19, 371 (1990)
+            dielectric constant according to Archer and Wang :cite:`Archer1990`
 
             :param tk: absolute temperature
             :param pa: Pressure (in atm)
@@ -136,7 +136,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def compressibility(self):
         """
-            Water compressibility
+            Water compressibility according to Fine and Millero :cite:`Fine1973`
             
             :return: compressibility of water (float)
         """

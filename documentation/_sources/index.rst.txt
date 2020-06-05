@@ -24,6 +24,10 @@ includes:
 * Phase diagrams for hydrogen bonding polymers
 
 
+*To generate references requires* **sphinxcontrib-bibtex** *available from* `here`_
+
+.. _here: https://anaconda.org/conda-forge/sphinxcontrib-bibtex
+
 Core functions
 ==============
 

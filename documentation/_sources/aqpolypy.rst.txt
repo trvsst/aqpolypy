@@ -1,3 +1,5 @@
+.. _aqpolypy-intro:
+
 Stable Python Packages
 ======================
 
@@ -9,3 +11,5 @@ Stable Python Packages
     aqpolypy.units
     aqpolypy.water
     aqpolypy.unit_tests
+
+.. bibliography:: refs.bib
