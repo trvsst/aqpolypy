@@ -20,12 +20,16 @@ class WaterProperties(ABC):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: molecular weight, temperature, and pressure
-        :itype : float
+        :instantiate: temperature, pressure, molecular weight, polarizability, dipole moment
         """
+
+        # water molecular weight
         self.MolecularWeight = 18.01534
+        # water polarizability
         self.alpha = 18.1458392e-30
+        # water dipole moment
         self.mu = 6.1375776e-30
+        # temperature and pressure
         self.tk = tk
         self.pa = pa
 
@@ -36,18 +40,21 @@ class WaterProperties(ABC):
         """
         pass
 
+    @abstractmethod
     def molar_volume(self):
         """
         Abstract method: calculates the molar volume
         """
         pass
 
+    @abstractmethod
     def dielectric_constant(self):
         """
         Abstract method: calculates the dielectric constant
         """
         pass
 
+    @abstractmethod
     def compressibility(self):
         """
         Abstract method: calculates the compressibility of water

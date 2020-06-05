@@ -1,7 +1,7 @@
 """
-:module: WaterPropertiesABC
+:module: WaterMilleroAW
 :platform: Unix, Windows, OS
-:synopsis: Abstract class used for deriving child classes
+:synopsis: Contains density, compressibility and dielectric constant of water
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
@@ -24,14 +24,12 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: molecular weight, temperature, and pressure
-        :itype : float
+        :instantiate: density, compressibility, dielectric constant
         """
         super().__init__(tk, pa)
 
-        """
-        Calculations for density
-        """
+
+        # Calculations for density
         self.t = self.tk - un.celsius_2_kelvin(0)
         self.y = un.atm_2_bar(self.pa) * (self.pa - 1)
 
@@ -50,14 +48,10 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         # density in kg/m^3
         self.rt = 1e3 / self.vol
 
-        """
-        Calculations for molar volume
-        """
+        # Calculations for molar volume
         self.molVol = 1e-3 * self.MolecularWeight / self.rt
 
-        """
-        Calculations for dielectric constant
-        """
+        # Calculations for dielectric constant
         # convert from atmospheres to MPa
         self.p_mpa = 1e6 * un.atm_2_pascal(self.pa)
 
@@ -86,9 +80,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
         self.dielectricConstant = 0.25 * (1 + 9 * self.b_fac + 3 * np.sqrt(1 + 2 * self.b_fac + 9 * self.b_fac ** 2))
 
-        """
-        Calculations for compressibility
-        """
+        # Calculations for compressibility
         self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (
                     self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
         self.comp = self.beta * un.atm_2_bar(self.pa)
@@ -102,9 +94,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
             :param tk: absolute temperature
             :param pa: pressure in atmosphere
-            :return: water density in SI
-            :rtype: float
-
+            :return: water density in SI (float)
 
             TODO: include warning if the temperature is outside [0,100]
             """
@@ -121,9 +111,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
             restricted to temperatures in range [0, 100]
 
             :param tk: absolute temperature
-            :return: water density in SI
-            :rtype: float
-
+            :return: water density (float)
 
             TODO: include warning if the temperature is outside [0,100]
             """
@@ -141,11 +129,15 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
             :param tk: absolute temperature
             :param pa: Pressure (in atm)
-            :return: dielectric constant
-            :rtype: float
+            :return: dielectric constant (float)
             """
 
         return self.dielectricConstant
 
     def compressibility(self):
+        """
+            Water compressibility
+            
+            :return: compressibility of water (float)
+        """
         return self.comp
