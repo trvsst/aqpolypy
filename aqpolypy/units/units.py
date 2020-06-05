@@ -1,5 +1,5 @@
 """
-:module: Units
+:module: units
 :platform: Unix, Windows, OS
 :synopsis: Relevant constants and functions used for unit conversion
 
@@ -17,8 +17,7 @@ def k_boltzmann():
     """
     Boltzmann Constant
 
-    :return: Boltzman constant SI units
-    :rtype: float
+    :return: Boltzman constant (SI units)
     """
     return 1.380649e-23
 
@@ -29,6 +28,7 @@ def avogadro():
 
     :return: Avogadro number
     :rtype: float
+
     """
 
     return 6.0221365e23
@@ -36,10 +36,10 @@ def avogadro():
 
 def r_gas():
     """
-    Ideal gas constant
+
+    Ideal gas constant (SI units)
 
     :return: Ideal gas constant R
-    :rtype: float
     """
 
     return avogadro() * k_boltzmann()
@@ -47,11 +47,11 @@ def r_gas():
 
 def atm_2_pascal(p):
     """
+
     conversion of atmosphere to pascal
 
     :param p: pressure in atmospheres
     :return: pressure in pascals
-    :rtype : float
     """
 
     return 101325.0 * p
@@ -59,11 +59,11 @@ def atm_2_pascal(p):
 
 def atm_2_bar(p):
     """
+
     conversion of atmosphere to bar
 
     :param p: pressure in atmospheres
     :return: pressure in bar
-    :rtype : float
     """
 
     return atm_2_pascal(p) * 1e-5
@@ -71,11 +71,11 @@ def atm_2_bar(p):
 
 def celsius_2_kelvin(t):
     """
-    conversion of celsius to kelvin
+
+    conversion of celsius to Kelvin
 
     :param t: temperature in celsius
     :return: temperature in Kelvin
-    :rtype : float
     """
 
     return 273.15 + t
@@ -83,11 +83,11 @@ def celsius_2_kelvin(t):
 
 def m_2_angstrom(x):
     """
+
     Conversion from meters to Angstrom
 
     :param x: length in meters
     :return: length in angstroms
-    :rtype : float
     """
 
     return 1e10 * x
@@ -95,11 +95,11 @@ def m_2_angstrom(x):
 
 def mol_lit_2_mol_angstrom(c):
     """
-    Conversion from mols/litre to molecules/Angstrom3
+
+    Conversion from mols/litre to molecules/Angstrom\ :sup:`3`
 
     :param c: concentration in mols/litre
-    :return: concentration in molecules/Angstrom3
-    :rtype : float
+    :return: concentration in molecules/Angstrom\ :sup:`3`
     """
 
     # 1l in Angstrom^3
@@ -112,10 +112,11 @@ def mol_lit_2_mol_angstrom(c):
 
 def one_over4pi_epsilon0():
     """
-    value of math:`\frac{1}{\4\pi\varepsilon_0}`
+
+    value of :math:`\\frac{1}{4\\pi\\varepsilon_0}` (SI units)
 
     :return: electrostatic constant (SI units)
-    :rtype: float
+
     """
 
     return 1 / (4 * np.pi * 8.8541878128e-12)
@@ -123,10 +124,10 @@ def one_over4pi_epsilon0():
 
 def e_charge():
     """
+
     electron charge
 
     :return: electron charge (SI units)
-    :rtype: float
     """
 
     return 1.60218e-19
@@ -134,10 +135,10 @@ def e_charge():
 
 def e_square():
     """
-    value of math:`\frac{e^2}{\4\pi\varepsilon_0}`
+
+    value of :math:`\\frac{e^2}{4\\pi\\varepsilon_0}` (SI units)
 
     :return: value of constant (SI units)
-    :rtype: float
     """
 
     return one_over4pi_epsilon0() * (e_charge()) ** 2
