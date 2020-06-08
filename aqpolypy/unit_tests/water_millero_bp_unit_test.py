@@ -61,7 +61,7 @@ class TestWaterMilleroAW(unittest.TestCase):
         # testing dielectric constant up to a precision of 10^-1
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.dielectric_constant(), param[:, 2], 0, 1e-1)
-        self.assertTrue(test_vals, msg =wfm.dielectric_constant())
+        self.assertTrue(test_vals)
 
     # Testing compressibility (Fine Millero)
     def test_compressibility(self):
@@ -78,6 +78,38 @@ class TestWaterMilleroAW(unittest.TestCase):
         # testing compressibility up to a precision of 10^-6
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.compressibility(), param[:, 2], 0, 1e-6)
+        self.assertTrue(test_vals)
+
+    # Testing osmotic coefficient (Bradley Pitzer)
+    def test_a_phi(self):
+        # osmotic coefficient of water [temperature(C), Pressure(bar), osmotic coefficient] Bradley & Pitzer TABLE II
+        param = np.array([[10, 100, 3.80e-1],
+                          [60, 100, 4.17e-1],
+                          [120, 100, 4.82e-1],
+                          [70, 400, 4.19e-1],
+                          [25, 600, 3.81e-1]])
+        # converting param to [temperature(K), pressure(atm), osmotic coefficient]
+        param[:, 0] = 273.15 + param[:, 0]
+        param[:, 1] = param[:, 1] / 1.01325
+        # testing osmotic coefficient up to a precision of 10^-3
+        wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
+        test_vals = np.allclose(wfm.a_phi(), param[:, 2], 0, 1e-3)
+        self.assertTrue(test_vals)
+
+    # Testing apparent molal volume (Bradley Pitzer)
+    def test_a_v(self):
+        # apparent molal volume [temperature(C), Pressure(bar), molal vol (cc/mol)] Bradley & Pitzer TABLE IV
+        param = np.array([[10, 100, 1.61],
+                          [60, 100, 2.55],
+                          [120, 100, 4.91],
+                          [70, 400, 2.59],
+                          [25, 600, 1.66]])
+        # converting param to [temperature(K), pressure(atm), molal vol (cc/mol)]
+        param[:, 0] = 273.15 + param[:, 0]
+        param[:, 1] = param[:, 1] / 1.01325
+        # testing apparent molal volume up to a precision of 10^-2
+        wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
+        test_vals = np.allclose(wfm.a_v(), param[:, 2], 0, 1e-2)
         self.assertTrue(test_vals)
 
 
