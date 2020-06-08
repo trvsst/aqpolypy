@@ -20,3 +20,11 @@ water_millero_aw_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
+
+water_millero_bp_unit_test
+--------------------------
+
+.. automodule:: aqpolypy.unit_tests.water_millero_bp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
