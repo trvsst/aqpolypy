@@ -1,19 +1,16 @@
 """
-:module: water_millero_aw_unit_test
+:module: water_millero_bp_unit_test
 :platform: Unix, Windows, OS
-:synopsis: unit test for WaterMilleroAW
+:synopsis: unit test for WaterMilleroBP
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
-..                  - Created member methods to test each member method of WaterMilleroAW class.
-..                  - Tested single value cases utilizing assertEquals functions.
-..                  - Implemented allclose function to limit number of decimal places checked.
-..                  - Arrays were added to test multiple values.
+..                  - changes
 """
 import numpy as np
 import unittest
-import aqpolypy.water.WaterMilleroAW as fm
+import aqpolypy.water.WaterMilleroBP as fm
 
 
 class TestWaterMilleroAW(unittest.TestCase):
@@ -51,20 +48,20 @@ class TestWaterMilleroAW(unittest.TestCase):
         test_vals = np.allclose(wfm.molar_volume(), param[:, 2], 0, 1e-6)
         self.assertTrue(test_vals)
 
-    # Testing dielectric constant (Archer Wang)
+    # Testing dielectric constant (Bradley Pitzer)
     def test_dielectric_constant(self):
         # dielectric constant of water at [temperature(K), pressure(MPa), dielectric constant] Archer & Wang Table 4
-        param = np.array([[293.15, 0.1, 80.20],
+        param = np.array([[338.15, 0.1, 65.22],
                           [318.15, 0.1, 71.50],
                           [353.15, 0.1, 60.87],
                           [273.15, 1, 87.94],
                           [278.15, 60, 88.20]])
         # converting param to [temperature(K), pressure(atm), dielectric constant]
         param[:, 1] = param[:, 1] / 0.101325
-        # testing dielectric constant up to a precision of 10^-2
+        # testing dielectric constant up to a precision of 10^-1
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(wfm.dielectric_constant(), param[:, 2], 0, 1e-2)
-        self.assertTrue(test_vals, wfm.dielectric_constant())
+        test_vals = np.allclose(wfm.dielectric_constant(), param[:, 2], 0, 1e-1)
+        self.assertTrue(test_vals, msg =wfm.dielectric_constant())
 
     # Testing compressibility (Fine Millero)
     def test_compressibility(self):

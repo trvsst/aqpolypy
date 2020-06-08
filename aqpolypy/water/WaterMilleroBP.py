@@ -1,17 +1,16 @@
 """
-:module: WaterMilleroAW
+:module: WaterMilleroBP
 :platform: Unix, Windows, OS
-:synopsis: Derived water properties class utilizing Fine Millero and Archer & Wang calculations
+:synopsis: Derived water properties class utilizing Fine Millero and Bradley & Pitzer calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
-..                  - Added constructor with temperature and pressure parameters.
-..                  - Updated member methods to use attributes and functions from units.
-..                  - Moved calculations from member methods into the constructor.
+..                  - Changed dielectric calculations from Archer & Wang to Bradley & Pitzer
 """
 
 import numpy as np
+import math
 import aqpolypy.units.units as un
 import aqpolypy.water.WaterPropertiesABC as wp
 
@@ -58,33 +57,23 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         """
         Calculations for dielectric constant
         """
-        # convert from atmospheres to MPa
-        self.p_mpa = 1e-6 * un.atm_2_pascal(self.pa)
-
         # coefficients
-        self.b = np.zeros(9)
-        self.b[0] = -4.044525e-2
-        self.b[1] = 103.6180
-        self.b[2] = 75.32165
-        self.b[3] = -23.23778
-        self.b[4] = -3.548184
-        self.b[5] = -1246.311
-        self.b[6] = 263307.7
-        self.b[7] = -6.928953e-1
-        self.b[8] = -204.4473
+        self.U = np.zeros(9)
+        self.U[0] = 3.4279e2
+        self.U[1] = -5.0866e-3
+        self.U[2] = 9.4690e-7
+        self.U[3] = -2.0525
+        self.U[4] = 3.1159e3
+        self.U[5] = -1.8289e2
+        self.U[6] = -8.0325e3
+        self.U[7] = 4.2142e6
+        self.U[8] = 2.1417
 
-        def g(x, y):
-            t1 = self.b[0] * y / x + self.b[1] / np.sqrt(x) + self.b[2] / (x - 215) + self.b[3] / np.sqrt(x - 215)
-            t2 = self.b[4] / (self.tk - 215) ** 0.25
-            t3 = np.exp(self.b[5] / x + self.b[6] / x ** 2 + self.b[7] * y / x + self.b[8] * y / x ** 2)
-            return 1 + 1e-3 * self.rt * (t1 + t2 + t3)
+        self.D100 = self.U[0] * (math.e ** (self.U[1] * self.tk + self.U[2] * self.tk ** 2))
+        self.C = self.U[3] + self.U[4] / (self.U[5] + self.tk)
+        self.B_dc = self.U[6] + (self.U[7] / self.tk) + self.U[8] * self.tk
 
-        self.fac = un.one_over4pi_epsilon0() * 4 * np.pi * self.mu ** 2 / (3 * un.k_boltzmann() * self.tk)
-        self.b_fac_0 = self.fac * g(self.tk, self.p_mpa)
-        self.b_fac_1 = self.alpha + self.b_fac_0
-        self.b_fac = self.rt * un.avogadro() * self.b_fac_1 / (3.0 * self.MolecularWeight / 1000)
-
-        self.dielectricConstant = 0.25 * (1 + 9 * self.b_fac + 3 * np.sqrt(1 + 2 * self.b_fac + 9 * self.b_fac ** 2))
+        self.dielectricConstant = self.D100 + self.C * np.log((self.B_dc + un.atm_2_bar(self.pa)) / (self.B_dc + 1000))
 
         """
         Calculations for compressibility
@@ -148,12 +137,4 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         return self.dielectricConstant
 
     def compressibility(self):
-<<<<<<< HEAD
-        """
-            Water compressibility
-
-            :return: compressibility of water (float)
-        """
-=======
->>>>>>> 182d654874a610d15d4e6bd2dcc65c64e0d718d5
         return self.comp
