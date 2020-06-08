@@ -137,7 +137,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
     def compressibility(self):
         """
             Water compressibility
-            
+
             :return: compressibility of water (float)
         """
         return self.comp
