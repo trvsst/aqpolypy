@@ -10,6 +10,7 @@
 ..                  - Made abstract methods: density, molar_volume, dielectric_constant, compressibility.
 ..                  - Added temperature and pressure parameters to constructor.
 ..                  - Added water polarizability and dipole moment to constructor.
+..                  - Made abstract methods: a_phi and a_v
 """
 
 
@@ -61,5 +62,19 @@ class WaterProperties(ABC):
     def compressibility(self):
         """
         Abstract method: calculates the compressibility of water
+        """
+        pass
+
+    @abstractmethod
+    def a_phi(self):
+        """
+        Abstract method: calculates the osmotic coefficient of water
+        """
+        pass
+
+    @abstractmethod
+    def a_v(self):
+        """
+        Abstract method: calculates the apparent molal volume of water
         """
         pass
