@@ -6,7 +6,10 @@
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
-..                  - describe changes
+..                  - Added molecular weight of water to constructor.
+..                  - Made abstract methods: density, molar_volume, dielectric_constant, compressibility.
+..                  - Added temperature and pressure parameters to constructor.
+..                  - Added water polarizability and dipole moment to constructor.
 """
 
 
