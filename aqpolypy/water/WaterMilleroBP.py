@@ -7,6 +7,8 @@
 .. history::
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Changed dielectric calculations from Archer & Wang to Bradley & Pitzer
+..                  - Added member method a_phi and a_v
+..                  - Implemented Bradley & Pitzer calculations for a_phi and a_v in constructor
 """
 
 import numpy as np
@@ -16,6 +18,13 @@ import aqpolypy.water.WaterPropertiesABC as wp
 
 
 class WaterPropertiesFineMillero(wp.WaterProperties):
+    """
+    Water Properties following the work of Fine and Millero :cite:`Fine1973`
+    Dielectric constant from Bradley and Pitzer :cite:`Bradley1979`
+    Apparent molal volume from Bradley and Pitzer :cite:`Bradley1979`
+    Osmotic coefficient from Bradley and Pitzer :cite:`Bradley1979`
+
+    """
 
     def __init__(self, tk, pa=1):
         """
@@ -74,23 +83,41 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         self.B_dc = self.U[6] + (self.U[7] / self.tk) + self.U[8] * self.tk
 
         self.dielectricConstant = self.D100 + self.C * np.log((self.B_dc + un.atm_2_bar(self.pa)) / (self.B_dc + 1000))
-
+        self.dielectricConstant_der = un.atm_2_bar(1) * self.C / (self.B_dc + (un.atm_2_bar(self.pa)))
         """
         Calculations for compressibility
         """
         self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (
-                    self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
+                self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
         self.comp = un.atm_2_bar(self.beta)
+
+        """
+        Calculations for osmotic coefficient
+        """
+        # Bjerrum length
+        self.l_b = un.e_square() / (un.k_boltzmann() * self.tk * self.dielectricConstant)
+
+        self.fac = 2 * np.pi * un.avogadro() * self.rt * self.l_b ** 3
+
+        self.osmotic_coefficient = np.sqrt(self.fac) / 3
+
+        """
+        Calculations for apparent molal volume
+        """
+        # add a factor 1e6 and convert to Pascal (lat two parts of a_v_0)
+        self.a_v_0 = 2 * self.osmotic_coefficient * un.r_gas() * self.tk * 1e6 / un.atm_2_pascal(1)
+        self.a_v_1 = self.dielectricConstant
+        self.a_v_2 = 3 * self.dielectricConstant_der
+        self.a_v_3 = self.comp
+
+        self.app_molal_vol = self.a_v_0 * (self.a_v_2 / self.a_v_1 - self.a_v_3)
 
     def density(self):
         """
-            Water density according to Fine Millero
-            Journal of Chemical Physics 59, 5529 (1973)
+            Water density according to Fine Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
-            :param tk: absolute temperature
-            :param pa: pressure in atmosphere
             :return: water density in SI
             :rtype: float
 
@@ -104,12 +131,10 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def molar_volume(self):
         """
-            molar water according to Fine Millero
-            Journal of Chemical Physics 59, 5529 (1973)
+            molar water according to Fine and Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
-            :param tk: absolute temperature
             :return: water density in SI
             :rtype: float
 
@@ -123,13 +148,8 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def dielectric_constant(self):
         """
-            Water dielectric constant according to
+            dielectric constant according to Bradley and Pitzer :cite:`Bradley1979`
 
-            Archer & Wang
-            Journal of Physical and Chemical Reference Data 19, 371 (1990)
-
-            :param tk: absolute temperature
-            :param pa: Pressure (in atm)
             :return: dielectric constant
             :rtype: float
             """
@@ -137,4 +157,28 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         return self.dielectricConstant
 
     def compressibility(self):
+        """
+            Water compressibility according to Fine and Millero :cite:`Fine1973`
+
+            :return: compressibility of water (float)
+            """
+
         return self.comp
+
+    def a_phi(self):
+        """
+            osmotic coefficient according to Bradley and Pitzer :cite:`Bradley1979`
+
+            :return: osmotic coefficient
+            :rtype: float
+            """
+        return self.osmotic_coefficient
+
+    def a_v(self):
+        """
+            apparent molal volume according to Bradley and Pitzer :cite:`Bradley1979`
+
+            :return: apparent molal volume
+            :rtype: float
+            """
+        return self.app_molal_vol
