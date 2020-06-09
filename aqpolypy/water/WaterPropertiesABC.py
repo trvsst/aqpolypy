@@ -25,6 +25,7 @@ class WaterProperties(ABC):
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
         :instantiate: temperature, pressure, molecular weight, polarizability, dipole moment
+
         """
 
         # water molecular weight
@@ -40,41 +41,51 @@ class WaterProperties(ABC):
     @abstractmethod
     def density(self):
         """
-        Abstract method: calculates the density of water
+        Abstract method: calculates the density of water :math:`\\rho_w`
         """
         pass
 
     @abstractmethod
     def molar_volume(self):
         """
-        Abstract method: calculates the molar volume
+        Abstract method: calculates the molar volume :math:`\\upsilon_w`
         """
         pass
 
     @abstractmethod
     def dielectric_constant(self):
         """
-        Abstract method: calculates the dielectric constant
+        Abstract method: calculates the relative dielectric constant :math:`\\varepsilon_{r}`
         """
         pass
 
     @abstractmethod
     def compressibility(self):
         """
-        Abstract method: calculates the compressibility of water
+        Abstract method: calculates the isothermal compressibility of water
+
+        :math:`\\beta_T = -\\frac{1}{V}\\left(\\frac{\\partial V}{\\partial P} \\right)_T`
         """
         pass
 
     @abstractmethod
     def a_phi(self):
         """
-        Abstract method: calculates the osmotic coefficient of water
+        Abstract method: calculates the osmotic coefficient of water defined by
+
+        :math:`A_{\\phi}=\\frac{1}{3}\\left(\\frac{2\\pi N_A\\rho_w l_B}{10^3}\\right)^{1/2}
+        \\left(\\frac{e^2}{4\\pi \\varepsilon_0 \\varepsilon_r}\\right)^{3/2}`
+
+        dimensionless because it is normalized to reference molality of :math:`\\sqrt{m^{\\ominus}}`
+        with :math:`m^{\\ominus}=\\mbox{kg mol}^{-1}`
         """
         pass
 
     @abstractmethod
     def a_v(self):
         """
-        Abstract method: calculates the apparent molal volume of water
+        Abstract method: calculates the apparent molal volume of water defined by
+
+        :math:`A_{v}=-2A_{\\phi}RT[3\\left(\\frac{\\partial\\varepsilon}{\\partial P}+\\beta_w\\right)`
         """
         pass

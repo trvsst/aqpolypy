@@ -1,7 +1,7 @@
 """
 :module: WaterMilleroAW
 :platform: Unix, Windows, OS
-:synopsis: Derived water properties class utilizing Fine Millero and Archer & Wang calculations
+:synopsis: Derived water properties class utilizing Fine & Millero and Archer & Wang calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
@@ -30,13 +30,12 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
         :instantiate: molecular weight, temperature, and pressure
-        :itype : float
+
         """
         super().__init__(tk, pa)
 
-        """
-        Calculations for density
-        """
+        # Calculations for density
+
         self.t = self.tk - un.celsius_2_kelvin(0)
         self.y = un.atm_2_bar((self.pa - 1))
 
@@ -55,14 +54,12 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         # density in kg/m^3
         self.rt = 1e3 / self.vol
 
-        """
-        Calculations for molar volume
-        """
+        # Calculations for molar volume
+
         self.molVol = 1e-3 * self.MolecularWeight / self.rt
 
-        """
-        Calculations for dielectric constant
-        """
+        # Calculations for dielectric constant
+
         # convert from atmospheres to MPa
         self.p_mpa = 1e-6 * un.atm_2_pascal(self.pa)
 
@@ -91,9 +88,8 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
         self.dielectricConstant = 0.25 * (1 + 9 * self.b_fac + 3 * np.sqrt(1 + 2 * self.b_fac + 9 * self.b_fac ** 2))
 
-        """
-        Calculations for compressibility
-        """
+        # Calculations for compressibility
+
         self.beta = self.V0 * (self.B - self.a2 * self.y ** 2) / (
                     self.vol * (self.B + self.a1 * self.y + self.a2 * self.y ** 2) ** 2)
         self.comp = un.atm_2_bar(self.beta)

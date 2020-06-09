@@ -7,15 +7,13 @@ often looks like this::
 
     #!/usr/bin/env python
 
-    from aqpolypy import tools
-    from aqpolypy import utils
+    aqpolypy.water.WaterMilleroBP as wp
 
-    if utils.has_towel():
-        print "Your towel is located:", location.where_is_my_towel()
+    wp.waterPropertiesFineMillero(300)
 
 
 Paragraphs are separated by blank lines. *Italics*, **bold**,
-and ``monospace`` look like this.
+and ``monospace``
 
 
 A Section

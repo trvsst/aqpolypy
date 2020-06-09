@@ -18,3 +18,11 @@ WaterMilleroAW
     :members:
     :undoc-members:
     :show-inheritance:
+
+WaterMilleroBP
+---------------
+
+.. automodule:: aqpolypy.water.WaterMilleroBP
+    :members:
+    :undoc-members:
+    :show-inheritance:
