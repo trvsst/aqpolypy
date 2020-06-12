@@ -26,3 +26,5 @@ WaterMilleroBP
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. raw:: latex
