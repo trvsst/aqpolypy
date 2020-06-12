@@ -1,47 +1,38 @@
 """
 :module: SaltNaClRP
 :platform: Unix, Windows, OS
-:synopsis: Derived salt properties class utilizing Rogers Pitzer calculations
+:synopsis: Derived salt properties class utilizing Rogers & Pitzer model calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
 .. history::
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
-..                  - changes
+..                  - Added NaCl parameters from Rogers & Pitzer
 """
 
 import numpy as np
-import aqpolypy.units.units as un
-import aqpolypy.water.WaterMilleroBP as wp
-import aqpolypy.salt.SaltPropertiesABC as sp
+import aqpolypy.salt.SaltGeneralPitzer as rp
 
 
-class SaltPropertiesRogersPitzer(sp.SaltProperties):
-    """
-    Slat Properties
+class NaClPropertiesRogersPitzer(rp.SaltPropertiesRogersPitzer):
 
-    """
-
-    def __init__(self, m, tk, pa=1):
+    def __init__(self, tk, pa=1):
         """
         constructor
 
-        :param :
-        :param :
+        :param tk: temperature in kelvin
+        :param pa: pressure in atmospheres
         :instantiate:
 
         """
 
         super().__init__(tk, pa)
 
-        """
-        Calculations log_gamma_nacl_simple
-        """
+        # Calculations log_gamma_nacl_simple
         self.cf = np.array([1.4495, 2.0442e-2, 5.7927e-3, -2.8860e-4])
 
-        """
-        Calculations nacl_params
-        """
+        # Calculations nacl_params
         self.mat_stoich = np.array([[1, 1], [1, -1]])
+
         self.m_ref = 5.550825
         self.y_ref = 10
         self.m_weight = 58.4428
@@ -105,59 +96,3 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         self.qm[18] = -8.3637e-4
 
         self.nacl_param = [self.mat_stoich, self.cm, self.p_ref, self.qm]
-
-    def h_fun(self):
-
-        return self.hf
-
-    def h_fun_gamma(self):
-
-        return self.hfg
-
-    def p_fun_gamma(self):
-        
-        return self.pfg
-
-    def params(self):
-
-        return self.param
-
-    def stoichiometry_coeffs(self):
-
-        return self.mat
-
-    def ionic_strength(self):
-
-        return self.i_str
-
-    def molar_vol_infinite_dilution(self):
-
-        return self.mol_vol_inf_dil
-
-    def density_sol(self):
-
-        return self.dens_sol
-
-    def molar_vol(self):
-
-        return self.mol_vol
-
-    def osmotic_coeff(self):
-
-        return self.osmotic_coefficient
-
-    def log_gamma(self):
-
-        return self.log_g
-
-    def log_gamma_simple(self):
-
-        return self.lgs
-
-    def log_gamma_nacl_simple(self):
-
-        return self.lgs
-
-    def nacl_params(self):
-
-        return self.nacl_param
