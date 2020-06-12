@@ -13,7 +13,7 @@ import unittest
 import aqpolypy.water.WaterMilleroBP as fm
 
 
-class TestWaterMilleroAW(unittest.TestCase):
+class TestWaterMilleroBP(unittest.TestCase):
 
     # Testing density (Fine Millero)
     def test_density(self):
