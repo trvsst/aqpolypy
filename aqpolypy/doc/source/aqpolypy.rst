@@ -10,6 +10,7 @@ Stable Python Packages
 
     aqpolypy.units
     aqpolypy.water
+    aqpolypy.salt
     aqpolypy.unit_tests
 
 .. bibliography:: refs.bib
