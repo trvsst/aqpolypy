@@ -10,7 +10,7 @@
 """
 
 import numpy as np
-import aqpolypy.salt.SaltGeneralPitzer as rp
+import aqpolypy.salt.SaltRogersPitzer as rp
 
 
 class NaClPropertiesRogersPitzer(rp.SaltPropertiesRogersPitzer):
