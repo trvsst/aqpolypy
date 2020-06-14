@@ -30,16 +30,6 @@ class SaltProperties(ABC):
 
         # Calculations for stoichiometry coefficients
         self.mat_stoich = np.array([None])
-        # nu_+ + nu_-
-        self.nu = np.sum(self.mat_stoich[0])
-        # nu_+ nu_-
-        self.nu_prod = self.mat_stoich[0, 0] * self.mat_stoich[0, 1]
-        # abs(z_+ z_-)
-        self.z_prod = np.abs(self.mat_stoich[1, 0] * self.mat_stoich[1, 1])
-        # nu_+, z_+
-        self.nz_prod_plus = self.mat_stoich[0, 0] * self.mat_stoich[1, 0]
-
-        self.mat = np.array([self.nu, self.nu_prod, self.z_prod, self.nz_prod_plus])
 
     @abstractmethod
     def ionic_strength(self, m):
