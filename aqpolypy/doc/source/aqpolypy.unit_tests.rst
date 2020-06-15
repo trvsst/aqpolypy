@@ -28,3 +28,11 @@ water_millero_bp_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
+
+salt_nacl_rp_unit_test
+--------------------------
+
+.. automodule:: aqpolypy.unit_tests.salt_nacl_rp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
