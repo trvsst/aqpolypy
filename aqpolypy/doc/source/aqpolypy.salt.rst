@@ -11,6 +11,14 @@ Abstract class
     :undoc-members:
     :show-inheritance:
 
+SaltRogersPitzer
+---------------
+
+.. automodule:: aqpolypy.salt.SaltRogersPitzer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 SaltNaClRP
 ---------------
 
