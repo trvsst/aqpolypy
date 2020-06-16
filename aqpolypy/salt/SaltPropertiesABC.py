@@ -41,7 +41,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def molar_vol_infinite_dilution(self):
         """
-        Abstract method: calculates the ------- :math:
+        Abstract method: calculates the partial molal volume of solute at infinite dilution :math:
         """
         pass
 
