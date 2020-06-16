@@ -8,6 +8,7 @@
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added abstract methods: ionic_strength, molar_vol_infinite_dilution, density_sol,
 ..                                            molar_vol, osmotic_coeff, log_gamma.
+..                  - Added stoichiometry coefficient to constructor.
 """
 
 import numpy as np
