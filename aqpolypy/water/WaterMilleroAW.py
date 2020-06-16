@@ -145,3 +145,15 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
             :return: compressibility of water (float)
         """
         return self.comp
+
+    def a_phi(self):
+        """
+            Unavailable for this model
+        """
+        pass
+
+    def a_v(self):
+        """
+            Unavailable for this model
+        """
+        pass
