@@ -48,14 +48,14 @@ class SaltProperties(ABC):
     @abstractmethod
     def density_sol(self, m):
         """
-        Abstract method: calculates the ------ :math:
+        Abstract method: calculates the density of electrolyte solution :math:
         """
         pass
 
     @abstractmethod
     def molar_vol(self, m):
         """
-        Abstract method: calculates the molar volume :math:
+        Abstract method: calculates the molar volume of electrolyte solution :math:
         """
         pass
 
@@ -69,6 +69,6 @@ class SaltProperties(ABC):
     @abstractmethod
     def log_gamma(self, m):
         """
-        Abstract method: calculates the ------ :math:
+        Abstract method: calculates the activity coefficient :math:
         """
         pass
