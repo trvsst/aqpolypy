@@ -89,7 +89,25 @@ class TestSaltNaClRP(unittest.TestCase):
         self.assertTrue(test_vals)
 
     def test_molar_vol(self):
-        pass
+        # parameters in [temperature (C), pressure (Bar), molality, molar volume cm^3/mol]
+        param = np.array([[10, 1, 1, 17.00347],
+                          [10, 1, 0.1, 15.59673],
+                          [10, 1, 0.5, 16.34880],
+                          [40, 1, 2, 20.05013],
+                          [40, 1, 3, 20.61311],
+                          [40, 1, 0.75, 19.10164],
+                          [30, 200, 1, 19.49070],
+                          [60, 200, 3, 21.52742],
+                          [40, 400, 1, 20.52720],
+                          [70, 800, 2, 22.34101]])
+        # converting to [temperature (K), pressure (atm), molality, molar volume m^3/mol]
+        param[:, 0] = 273.15 + param[:, 0]
+        param[:, 1] = param[:, 1] / 1.01325
+        param[:, 3] = param[:, 3] / 1000000
+        # testing params up to a precision of 10^-2
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
+        test_vals = np.allclose(salt_nacl.molar_vol(param[:, 2]), param[:, 3], 0, 1e-2)
+        self.assertTrue(test_vals)
 
     def test_osmotic_coeff(self):
         # parameters in [temperature (C), molality, osmotic coefficient]
@@ -108,7 +126,7 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 0] = 273.15 + param[:, 0]
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
-        test_vals = np.allclose( salt_nacl.osmotic_coeff(param[:, 1]), param[:, 2], 0, 1e-2)
+        test_vals = np.allclose(salt_nacl.osmotic_coeff(param[:, 1]), param[:, 2], 0, 1e-2)
         self.assertTrue(test_vals)
 
     def test_log_gamma(self):
