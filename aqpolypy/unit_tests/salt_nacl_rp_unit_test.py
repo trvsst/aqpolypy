@@ -92,10 +92,43 @@ class TestSaltNaClRP(unittest.TestCase):
         pass
 
     def test_osmotic_coeff(self):
-        pass
+        # parameters in [temperature (C), molality, osmotic coefficient]
+        param = np.array([[5, 1, 0.92436938],
+                          [5, 0.1, 0.93242304],
+                          [5, 0.5, 0.9160134],
+                          [25, 1, 0.93588145],
+                          [25, 2, 0.98430138],
+                          [45, 3, 1.05708439],
+                          [45, 0.7, 0.92870989],
+                          [65, 3, 1.05824243],
+                          [85, 0.1, 0.92489648],
+                          [95, 0.2, 0.9140571]])
+
+        # converting to [temperature (K), molality, osmotic coefficient]
+        param[:, 0] = 273.15 + param[:, 0]
+        # testing params up to a precision of 10^-2
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
+        test_vals = np.allclose( salt_nacl.osmotic_coeff(param[:, 1]), param[:, 2], 0, 1e-2)
+        self.assertTrue(test_vals)
 
     def test_log_gamma(self):
-        pass
+        # parameters in [temperature (C), molality, activity coefficient]
+        param = np.array([[5, 1, -0.43818367],
+                          [5, 0.1, -0.24821997],
+                          [5, 0.5, -0.39019683],
+                          [25, 1, -0.42229531],
+                          [25, 2, -0.40443826],
+                          [45, 3, -0.32152333],
+                          [45, 0.7, -0.41035063],
+                          [65, 3, -0.33051837],
+                          [85, 0.1, -0.28213002],
+                          [95, 0.2, -0.35491577]])
+        # converting to [temperature (K), molality, activity coefficient]
+        param[:, 0] = 273.15 + param[:, 0]
+        # testing params up to a precision of 10^-2
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
+        test_vals = np.allclose(salt_nacl.log_gamma(param[:, 1]), param[:, 2], 0, 1e-2)
+        self.assertTrue(test_vals)
 
 
 if __name__ == '__main__':
