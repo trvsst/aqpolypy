@@ -4,7 +4,7 @@
 :synopsis: Abstract class used for deriving child classes
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added molecular weight of water to constructor.
 ..                  - Made abstract methods: density, molar_volume, dielectric_constant, compressibility.
