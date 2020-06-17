@@ -20,8 +20,8 @@ class SaltProperties(ABC):
         """
         constructor
 
-        :param tk: temperature absolute
-        :param pa: pressure in atm
+        :param tk: temperature in kelvin
+        :param pa: pressure in atmospheres
         :instantiate: temperature, pressure, stoichiometry coefficients
 
         """
