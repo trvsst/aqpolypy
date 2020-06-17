@@ -4,7 +4,7 @@
 :synopsis: Abstract class used for deriving child classes
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added abstract methods: ionic_strength, molar_vol_infinite_dilution, density_sol,
 ..                                            molar_vol, osmotic_coeff, log_gamma.
@@ -36,6 +36,8 @@ class SaltProperties(ABC):
     def ionic_strength(self, m):
         """
         Abstract method: calculates the ionic strength of electrolyte :math:
+
+        :param m: molality
         """
         pass
 
@@ -50,6 +52,8 @@ class SaltProperties(ABC):
     def density_sol(self, m):
         """
         Abstract method: calculates the density of electrolyte solution :math:
+
+        :param m: molality
         """
         pass
 
@@ -57,6 +61,8 @@ class SaltProperties(ABC):
     def molar_vol(self, m):
         """
         Abstract method: calculates the molar volume of electrolyte solution :math:
+
+        :param m: molality
         """
         pass
 
@@ -64,6 +70,8 @@ class SaltProperties(ABC):
     def osmotic_coeff(self, m):
         """
         Abstract method: calculates the osmotic coefficient :math:
+
+        :param m: molality
         """
         pass
 
@@ -71,5 +79,7 @@ class SaltProperties(ABC):
     def log_gamma(self, m):
         """
         Abstract method: calculates the activity coefficient :math:
+
+        :param m: molality
         """
         pass
