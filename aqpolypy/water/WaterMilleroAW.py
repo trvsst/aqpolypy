@@ -4,7 +4,7 @@
 :synopsis: Derived water properties class utilizing Fine & Millero and Archer & Wang calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added constructor with temperature and pressure parameters.
 ..                  - Updated member methods to use attributes and functions from units.
@@ -29,7 +29,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: molecular weight, temperature, and pressure
+        :instantiate: temperature, pressure, molecular weight, polarizability, dipole moment
 
         """
         super().__init__(tk, pa)
@@ -113,11 +113,11 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def molar_volume(self):
         """
-            molar water according to Fine and Millero :cite:`Fine1973`
+            Molar volume of water according to Fine and Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
-            :return: water density in SI
+            :return: water molar volume in SI
             :rtype: float
 
 
@@ -130,30 +130,30 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def dielectric_constant(self):
         """
-            dielectric constant according to Archer and Wang :cite:`Archer1990`
+            Dielectric constant according to Archer and Wang :cite:`Archer1990`
 
-            :return: dielectric constant
+            :return: dielectric constant in SI
             :rtype: float
             """
-
         return self.dielectricConstant
 
     def compressibility(self):
         """
             Water compressibility according to Fine and Millero :cite:`Fine1973`
 
-            :return: compressibility of water (float)
-        """
+            :return: compressibility of water in SI
+            :rtype: float
+            """
         return self.comp
 
     def a_phi(self):
         """
-            Unavailable for this model
-        """
+            Osmotic coefficient unavailable for this model
+            """
         pass
 
     def a_v(self):
         """
-            Unavailable for this model
-        """
+            Apparent molal volume unavailable for this model
+            """
         pass
