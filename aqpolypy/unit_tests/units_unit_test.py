@@ -1,5 +1,12 @@
 """
-Unit Test for Units file
+:module: units_unit_test
+:platform: Unix, Windows, OS
+:synopsis: unit test for units
+
+.. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
+.. history:
+..                Kevin Marin <marink2@tcnj.edu>, May2020
+..                  - changes
 """
 import unittest
 import numpy as np
