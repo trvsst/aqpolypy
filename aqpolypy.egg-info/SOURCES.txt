@@ -1,0 +1,10 @@
+LICENSE.txt
+MANIFEST.in
+README.txt
+setup.py
+aqpolypy/__init__.py
+aqpolypy.egg-info/PKG-INFO
+aqpolypy.egg-info/SOURCES.txt
+aqpolypy.egg-info/dependency_links.txt
+aqpolypy.egg-info/requires.txt
+aqpolypy.egg-info/top_level.txt

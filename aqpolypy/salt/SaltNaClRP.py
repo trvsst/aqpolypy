@@ -4,7 +4,7 @@
 :synopsis: Derived salt properties class utilizing Rogers & Pitzer model calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added NaCl parameters from Rogers & Pitzer
 """
