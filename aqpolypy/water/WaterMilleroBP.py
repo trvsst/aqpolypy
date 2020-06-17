@@ -19,7 +19,7 @@ import aqpolypy.water.WaterPropertiesABC as wp
 
 class WaterPropertiesFineMillero(wp.WaterProperties):
     """
-    Water Properties following the work of Fine and Millero :cite:`Fine1973`
+    Water properties following the work of Fine and Millero :cite:`Fine1973`
     Dielectric constant from Bradley and Pitzer :cite:`Bradley1979`
     Apparent molal volume from Bradley and Pitzer :cite:`Bradley1979`
     Osmotic coefficient from Bradley and Pitzer :cite:`Bradley1979`
