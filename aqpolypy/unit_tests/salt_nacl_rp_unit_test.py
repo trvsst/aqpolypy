@@ -4,41 +4,75 @@
 :synopsis: unit test for SaltNaClRP
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
-..                  - changes
+..                  - Added tests for all methods in SaltPropertiesPitzer
 """
 import numpy as np
 import unittest
+import aqpolypy.units.units as un
 import aqpolypy.salt.SaltNaClRP as nacl
 
 
 class TestSaltNaClRP(unittest.TestCase):
 
     def test_h_fun(self):
-        pass
+        # parameters in [ionic strength, h_fun]
+        param = np.array([[0.1, 0.1340424057],
+                          [0.25, 0.1958348455],
+                          [0.50, 0.2559957171],
+                          [0.75, 0.296905218],
+                          [1, 0.3285239002],
+                          [2, 0.413400379],
+                          [3, 0.4685124111]])
+        # testing params up to a precision of 10^-6
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(300)
+        test_vals = np.allclose(salt_nacl.h_fun(param[:, 0]), param[:, 1], 0, 1e-6)
+        self.assertTrue(test_vals)
 
     def test_h_fun_gamma(self):
-        pass
+        # parameters in [ionic strength, h_fun_gamma]
+        param = np.array([[0.1, 0.765407667],
+                          [0.25, 1.095839382],
+                          [0.50, 1.406507087],
+                          [0.75, 1.612303325],
+                          [1, 1.768641055],
+                          [2, 2.177956004],
+                          [3, 2.436684943]])
+        # testing params up to a precision of 10^-6
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(300)
+        test_vals = np.allclose(salt_nacl.h_fun_gamma(param[:, 0]), param[:, 1], 0, 1e-6)
+        self.assertTrue(test_vals)
 
     def test_p_fun_gamma(self):
-        pass
+        # parameters in [ionic strength, p_fun_gamma]
+        param = np.array([[0.1, 0.5973924753],
+                          [0.25, 0.4481808382],
+                          [0.50, 0.3280905085],
+                          [0.75, 0.260674695],
+                          [1, 0.2161661792],
+                          [2, 0.1262676179],
+                          [3, 0.08733961077]])
+        # testing params up to a precision of 10^-6
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(300)
+        test_vals = np.allclose(salt_nacl.p_fun_gamma(param[:, 0]), param[:, 1], 0, 1e-6)
+        self.assertTrue(test_vals)
 
     def test_params(self):
-        # parameters in [temperature (C), pressure (Bar), [vp = None, bp, 2cp]]
+        # parameters in [temperature (C), pressure (bar), [vp = None, bp, 2cp]]
         param = np.array([[10, 1, None, 1.956e-5, -2.25e-6],
                           [30, 1, None, 1.069e-5, -1.07e-6],
                           [90, 1, None, 2.577e-6, -6.02e-8],
                           [40, 400, None, 6.779e-6, -7.19e-7],
                           [50, 800, None, 4.436e-6, -4.71e-7]])
         # converting to [temperature (K), pressure (atm), [vp = None, bp, 2cp]]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals1 = np.allclose(salt_nacl.params()[1], param[:, 3], 0, 1e-2)
+        test_vals = np.allclose(salt_nacl.params()[1], param[:, 3], 0, 1e-2)
         test_vals2 = np.allclose(2 * salt_nacl.params()[2], param[:, 4], 0, 1e-2)
-        self.assertTrue(test_vals1)
+        self.assertTrue(test_vals)
         self.assertTrue(test_vals2)
 
     def test_stoichiometry_coeffs(self):
@@ -49,26 +83,37 @@ class TestSaltNaClRP(unittest.TestCase):
         self.assertTrue(test_vals)
 
     def test_ionic_strength(self):
-        pass
+        # parameters in [molality mol/kg, ionic strength]
+        param = np.array([[0.1, 0.1],
+                          [0.25, 0.25],
+                          [0.50, 0.50],
+                          [0.75, 0.75],
+                          [1, 1],
+                          [2, 2],
+                          [3, 3]])
+        # testing params up to a precision of 10^-6
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(300)
+        test_vals = np.allclose(salt_nacl.ionic_strength(param[:, 0]), param[:, 1], 0, 1e-6)
+        self.assertTrue(test_vals)
 
     def test_molar_vol_infinite_dilution(self):
-        # parameters in [temperature (C), pressure (Bar), partial molal volume of solute cm^3/mol]
+        # parameters in [temperature (C), pressure (bar), partial molal volume of solute cm^3/mol]
         param = np.array([[10, 1, 1.506e1],
                           [50, 1, 1.774e1],
                           [90, 1, 1.710e1],
                           [20, 400, 1.789e1],
                           [50, 600, 1.967e1]])
         # converting to [temperature (K), pressure (atm), partial molal volume of solute m^3/mol]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
-        param[:, 2] = param[:, 2] / 1000000
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        param[:, 2] = param[:, 2] / 1e6
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
         test_vals = np.allclose(salt_nacl.molar_vol_infinite_dilution(), param[:, 2], 0, 1e-2)
         self.assertTrue(test_vals)
 
     def test_density_sol(self):
-        # parameters in [temperature (C), pressure (Bar), specific volume of NaCl(aq) cm^3/g]
+        # parameters in [temperature (C), pressure (bar), molality, specific volume of NaCl(aq) cm^3/g]
         param = np.array([[10, 1, 1, 0.961101],
                           [10, 1, 0.1, 0.995998],
                           [10, 1, 0.5, 0.979804],
@@ -79,17 +124,17 @@ class TestSaltNaClRP(unittest.TestCase):
                           [60, 200, 3, 0.9129],
                           [40, 400, 0.1, 0.987267],
                           [70, 600, 0.25, 0.9883]])
-        # converting to [temperature (K), pressure (atm), specific volume of NaCl(aq) kg/m^3]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
-        param[:, 3] = (1 / param[:, 3]) * 1000
+        # converting to [temperature (K), pressure (atm), molality, specific volume of NaCl(aq) kg/m^3]
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        param[:, 3] = (1 / param[:, 3]) * 1e3
         # testing params up to a precision of 10^-1
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
         test_vals = np.allclose(salt_nacl.density_sol(param[:, 2]), param[:, 3], 0, 1e-1)
         self.assertTrue(test_vals)
 
     def test_molar_vol(self):
-        # parameters in [temperature (C), pressure (Bar), molality, molar volume cm^3/mol]
+        # parameters in [temperature (C), pressure (bar), molality, molar volume cm^3/mol]
         param = np.array([[10, 1, 1, 17.00347],
                           [10, 1, 0.1, 15.59673],
                           [10, 1, 0.5, 16.34880],
@@ -101,9 +146,9 @@ class TestSaltNaClRP(unittest.TestCase):
                           [40, 400, 1, 20.52720],
                           [70, 800, 2, 22.34101]])
         # converting to [temperature (K), pressure (atm), molality, molar volume m^3/mol]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
-        param[:, 3] = param[:, 3] / 1000000
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        param[:, 3] = param[:, 3] / 1e6
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
         test_vals = np.allclose(salt_nacl.molar_vol(param[:, 2]), param[:, 3], 0, 1e-2)
@@ -123,7 +168,7 @@ class TestSaltNaClRP(unittest.TestCase):
                           [95, 0.2, 0.9140571]])
 
         # converting to [temperature (K), molality, osmotic coefficient]
-        param[:, 0] = 273.15 + param[:, 0]
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
         test_vals = np.allclose(salt_nacl.osmotic_coeff(param[:, 1]), param[:, 2], 0, 1e-2)
@@ -142,7 +187,7 @@ class TestSaltNaClRP(unittest.TestCase):
                           [85, 0.1, -0.28213002],
                           [95, 0.2, -0.35491577]])
         # converting to [temperature (K), molality, activity coefficient]
-        param[:, 0] = 273.15 + param[:, 0]
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
         test_vals = np.allclose(salt_nacl.log_gamma(param[:, 1]), param[:, 2], 0, 1e-2)
