@@ -3,24 +3,24 @@
 Salt
 =====
 
-Abstract class
----------------
+SaltPropertiesABC
+-----------------
 
 .. automodule:: aqpolypy.salt.SaltPropertiesABC
     :members:
     :undoc-members:
     :show-inheritance:
 
-SaltRogersPitzer
+SaltModelPitzer
 ---------------
 
-.. automodule:: aqpolypy.salt.SaltRogersPitzer
+.. automodule:: aqpolypy.salt.SaltModelPitzer
     :members:
     :undoc-members:
     :show-inheritance:
 
 SaltNaClRP
----------------
+----------
 
 .. automodule:: aqpolypy.salt.SaltNaClRP
     :members:
