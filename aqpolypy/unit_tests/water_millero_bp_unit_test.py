@@ -4,7 +4,7 @@
 :synopsis: unit test for WaterMilleroBP
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - changes
 """

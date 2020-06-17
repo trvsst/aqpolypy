@@ -10,10 +10,14 @@
 """
 
 import numpy as np
-import aqpolypy.salt.SaltRogersPitzer as rp
+import aqpolypy.salt.SaltModelPitzer as rp
 
 
-class NaClPropertiesRogersPitzer(rp.SaltPropertiesRogersPitzer):
+class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
+    """
+    NaCl properties following the work of Rogers and Pitzer :cite:`Rogers1982`
+
+    """
 
     def __init__(self, tk, pa=1):
         """
@@ -21,16 +25,13 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesRogersPitzer):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate:
+        :instantiate: temperature, pressure, stoichiometry coefficients
 
         """
 
         super().__init__(tk, pa)
 
-        # Calculations log_gamma_nacl_simple
-        self.cf = np.array([1.4495, 2.0442e-2, 5.7927e-3, -2.8860e-4])
-
-        # Calculations nacl_params
+        # Calculations nacl parameters and coefficients
         self.mat_stoich = np.array([[1, 1], [1, -1]])
 
         self.m_ref = 5.550825
@@ -95,4 +96,3 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesRogersPitzer):
         self.qm[17] = 0.8514
         self.qm[18] = -8.3637e-4
 
-        self.nacl_param = [self.mat_stoich, self.cm, self.p_ref, self.qm]

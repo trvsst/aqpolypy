@@ -4,7 +4,7 @@
 :synopsis: unit test for WaterMilleroAW
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Created member methods to test each member method of WaterMilleroAW class.
 ..                  - Tested single value cases utilizing assertEquals functions.

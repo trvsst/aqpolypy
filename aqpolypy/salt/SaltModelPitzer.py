@@ -4,7 +4,7 @@
 :synopsis: Implements Rogers & Pitzer model calculations to SaltPropertiesABC
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Implemented member methods
 """
@@ -15,15 +15,19 @@ import aqpolypy.water.WaterMilleroBP as wp
 import aqpolypy.salt.SaltPropertiesABC as sp
 
 
-class SaltPropertiesRogersPitzer(sp.SaltProperties):
+class SaltPropertiesPitzer(sp.SaltProperties):
+    """
+    Salt properties following the work of Pitzer :cite:`Pitzer1973a`
+
+    """
 
     def __init__(self, tk, pa=1):
         """
         constructor
 
-        :param tk: temperature absolute
-        :param pa: pressure in atm
-        :instantiate:
+        :param tk: temperature in kelvin
+        :param pa: pressure in atmospheres
+        :instantiate: temperature, pressure, stoichiometry coefficients
 
         """
 
@@ -39,7 +43,14 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
 
         self.qm = np.zeros(19)
 
+    @static
     def h_fun(self, i_str):
+        """
+            Parameter for apparent molal volume according to Pitzer :cite:`Pitzer1973a`
+
+            :return: apparent molal volume parameter in SI
+            :rtype: float
+            """
         # units are (kg/mol)^{1/2}
         b_param = 1.2
         h_fun = 0.5 * np.log(1 + b_param * np.sqrt(i_str)) / b_param
@@ -47,11 +58,24 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return h_fun
 
     def h_fun_gamma(self, i_str):
+        """
+            Parameter for activity coefficient according to Pitzer :cite:`Pitzer1973a`
+
+            :return: activity coefficient parameter in SI
+            :rtype: float
+            """
         b_param = 1.2
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
         return h_fun_gamma
 
+    @static
     def p_fun_gamma(self, i_str):
+        """
+            Parameter for activity coefficient according to Pitzer :cite:`Pitzer1973a`
+
+            :return: activity coefficient parameter in SI
+            :rtype: float
+            """
         # units are (kg/mol)^{1/2}
         alpha = 2.0
 
@@ -62,6 +86,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return p_fun_gamma
 
     def params(self):
+        """
+            Parameters in model according to Pitzer :cite:`Pitzer1973a`
+
+            :return: Parameters in SI
+            :rtype: float
+            """
         pr = self.pa * un.atm_2_bar(1)
         pr_atm = un.atm_2_bar(1)
 
@@ -86,6 +116,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return params
 
     def stoichiometry_coeffs(self):
+        """
+            Stoichiometry coefficients of electrolyte according to Pitzer :cite:`Pitzer1973a`
+
+            :return: Stoichiometry coefficients of electrolyte in SI
+            :rtype: float
+            """
         # nu_+ + nu_-
         nu = np.sum(self.mat_stoich[0])
         # nu_+ nu_-
@@ -100,10 +136,22 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return mat
 
     def ionic_strength(self, m):
+        """
+            Ionic strength according to Pitzer :cite:`Pitzer1973a`
+
+            :return: ionic strength in SI
+            :rtype: float
+            """
         i_str = 0.5 * m * np.sum(self.mat_stoich[0] * self.mat_stoich[1] ** 2)
         return i_str
 
     def molar_vol_infinite_dilution(self):
+        """
+            Partial molal volume of solute at infinite dilution according to Pitzer :cite:`Pitzer1973a`
+
+            :return: Partial molal volume of solute at infinite dilution in SI
+            :rtype: float
+            """
         # the factor 10 is the conversion from J to bar cm^3
         ct = 10 * un.r_gas() * self.tk
 
@@ -130,6 +178,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return molar_vol_infinite_dilution
 
     def density_sol(self, m):
+        """
+            Density of electrolyte solution according to Pitzer :cite:`Pitzer1973a`
+
+            :return: Density of electrolyte solution in SI
+            :rtype: float
+            """
         mw = wp.WaterPropertiesFineMillero(self.tk, self.pa).MolecularWeight
         # convert to cm^3/mol
         v_water = 1e6 * wp.WaterPropertiesFineMillero(self.tk, self.pa).molar_volume()
@@ -146,6 +200,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return density_sol
 
     def molar_vol(self, m):
+        """
+            Molar volume of electrolyte solution according to Pitzer :cite:`Pitzer1973a`
+
+            :return: Molar volume of electrolyte solution in SI
+            :rtype: float
+            """
         # the factor 10 is the conversion from J to bar cm^3
         ct = 10 * un.r_gas() * self.tk
 
@@ -172,6 +232,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return molar_vol
 
     def osmotic_coeff(self, m):
+        """
+            Osmotic coefficient according to Pitzer :cite:`Pitzer1973a`
+
+            :return: osmotic coefficient in SI
+            :rtype: float
+            """
         # pressure is 1 atm
         press = 1
         tc = 298.15
@@ -201,6 +267,12 @@ class SaltPropertiesRogersPitzer(sp.SaltProperties):
         return osmotic_coefficient
 
     def log_gamma(self, m):
+        """
+            Activity coefficient according to Pitzer :cite:`Pitzer1973a`
+
+            :return: activity coefficient in SI
+            :rtype: float
+            """
         # pressure is 1 atm
         press = 1
         tc = 298.15

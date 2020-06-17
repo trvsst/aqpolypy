@@ -18,7 +18,7 @@ import aqpolypy.water.WaterPropertiesABC as wp
 
 class WaterPropertiesFineMillero(wp.WaterProperties):
     """
-    Water Properties following the work of Fine and Millero :cite:`Fine1973`
+    Water properties following the work of Fine and Millero :cite:`Fine1973`
     Dilectric constant from Archer and Wang :cite:`Archer1990`
 
     """
