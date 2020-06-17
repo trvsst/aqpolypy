@@ -4,7 +4,7 @@
 :synopsis: Derived water properties class utilizing Fine & Millero and Bradley & Pitzer calculations
 
 .. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
-.. history::
+.. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Changed dielectric calculations from Archer & Wang to Bradley & Pitzer
 ..                  - Added member method a_phi and a_v
@@ -32,7 +32,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: molecular weight, temperature, and pressure
+        :instantiate: temperature, pressure, molecular weight, polarizability, dipole moment
 
         """
         super().__init__(tk, pa)
@@ -114,7 +114,8 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
             restricted to temperatures in range [0, 100]
 
-            :return: water density in SI (float)
+            :return: water density in SI
+            :rtype: float
 
 
             TODO: include warning if the temperature is outside [0,100]
@@ -126,11 +127,12 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def molar_volume(self):
         """
-            molar water according to Fine and Millero :cite:`Fine1973`
+            Molar volume of water according to Fine and Millero :cite:`Fine1973`
 
             restricted to temperatures in range [0, 100]
 
-            :return: water density in SI (float)
+            :return: water molar volume in SI
+            :rtype: float
 
             TODO: include warning if the temperature is outside [0,100]
             """
@@ -141,34 +143,36 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
 
     def dielectric_constant(self):
         """
-            dielectric constant according to Bradley and Pitzer :cite:`Bradley1979`
+            Dielectric constant according to Bradley and Pitzer :cite:`Bradley1979`
 
-            :return: dielectric constant (float)
+            :return: dielectric constant in SI
+            :rtype: float
             """
-
         return self.dielectricConstant
 
     def compressibility(self):
         """
             Water compressibility according to Fine and Millero :cite:`Fine1973`
 
-            :return: compressibility of water (float)
+            :return: compressibility of water in SI
+            :rtype: float
             """
-
         return self.comp
 
     def a_phi(self):
         """
-            osmotic coefficient according to Bradley and Pitzer :cite:`Bradley1979`
+            Osmotic coefficient according to Bradley and Pitzer :cite:`Bradley1979`
 
-            :return: osmotic coefficient (float)
+            :return: osmotic coefficient in SI
+            :rtype: float
             """
         return self.osmotic_coefficient
 
     def a_v(self):
         """
-            apparent molal volume according to Bradley and Pitzer :cite:`Bradley1979`
+            Apparent molal volume according to Bradley and Pitzer :cite:`Bradley1979`
 
-            :return: apparent molal volume (float)
+            :return: apparent molal volume in SI
+            :rtype: float
             """
         return self.app_molal_vol
