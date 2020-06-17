@@ -17,7 +17,7 @@ import aqpolypy.salt.SaltPropertiesABC as sp
 
 class SaltPropertiesPitzer(sp.SaltProperties):
     """
-    Salt Properties following the work of Pitzer :cite:`Pitzer1973a`
+    Salt properties following the work of Pitzer :cite:`Pitzer1973a`
 
     """
 
