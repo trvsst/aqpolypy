@@ -3,8 +3,8 @@
 Water
 =====
 
-Abstract class
---------------
+WaterPropertiesABC
+------------------
 
 .. automodule:: aqpolypy.water.WaterPropertiesABC
     :members:
@@ -12,7 +12,7 @@ Abstract class
     :show-inheritance:
 
 WaterMilleroAW
----------------
+--------------
 
 .. automodule:: aqpolypy.water.WaterMilleroAW
     :members:
@@ -20,7 +20,7 @@ WaterMilleroAW
     :show-inheritance:
 
 WaterMilleroBP
----------------
+--------------
 
 .. automodule:: aqpolypy.water.WaterMilleroBP
     :members:
