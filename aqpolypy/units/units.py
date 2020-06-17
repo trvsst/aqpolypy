@@ -93,6 +93,18 @@ def m_2_angstrom(x):
     return 1e10 * x
 
 
+def mol_angstrom_2_mol_mcube(c):
+    """
+
+    conversion from molecules angstrom cube to mols meter cube
+
+    :param c: concentration in molecules/Angstrom\ :sup:`3`
+    :return: concentration in mols/m :sup:`3`
+    """
+
+    return 1e3*c/mol_lit_2_mol_angstrom(1)
+
+
 def mol_lit_2_mol_angstrom(c):
     """
 
