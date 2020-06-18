@@ -1,5 +1,5 @@
 """
-:module: SaltGeneralPitzer
+:module: SaltModelPitzer
 :platform: Unix, Windows, OS
 :synopsis: Implements Rogers & Pitzer model calculations to SaltPropertiesABC
 
@@ -13,9 +13,10 @@ import numpy as np
 import aqpolypy.units.units as un
 import aqpolypy.water.WaterMilleroBP as wp
 import aqpolypy.salt.SaltPropertiesABC as sp
+from abc import ABC, abstractmethod
 
 
-class SaltPropertiesPitzer(sp.SaltProperties):
+class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     """
     Salt properties following the work of Pitzer :cite:`Pitzer1973a`
 
@@ -43,8 +44,46 @@ class SaltPropertiesPitzer(sp.SaltProperties):
 
         self.qm = np.zeros(19)
 
-    @static
-    def h_fun(self, i_str):
+        # calculations for params
+        self.pr = self.pa * un.atm_2_bar(1)
+        self.pr_atm = un.atm_2_bar(1)
+
+        self.vp_0 = self.cm[0] + self.cm[1] * self.tk + self.cm[2] * self.tk ** 2 + self.cm[3] * self.tk ** 3
+        self.vp_1 = (self.pr - self.pr_atm) * (self.cm[4] + self.cm[5] * self.tk + self.cm[6] * self.tk ** 2)
+        self.vp_2 = (self.pr - self.pr_atm) ** 2 * (self.cm[7] + self.cm[8] * self.tk)
+
+        self.vp = self.vp_0 + self.vp_1 + self.vp_2
+
+        self.bp_0 = self.cm[9] + self.cm[10] / (self.tk - 227) + self.cm[11] * self.tk + self.cm[12] * self.tk ** 2 + self.cm[13] / (680 - self.tk)
+        self.bp_1_1 = self.cm[14] + self.cm[15] / (self.tk - 227) + self.cm[16] * self.tk + self.cm[17] * self.tk ** 2
+        self.bp_1 = (self.bp_1_1 + self.cm[18] / (680 - self.tk)) * (self.pr - self.pr_atm)
+        self.bp_2_1 = self.cm[19] + self.cm[20] / (self.tk - 227) + self.cm[21] * self.tk + self.cm[22] / (680 - self.tk)
+        self.bp_2 = self.bp_2_1 * (self.pr - self.pr_atm) ** 2
+
+        self.bp = self.bp_0 + self.bp_1 + self.bp_2
+
+        self.cq = self.cm[23] + self.cm[24] / (self.tk - 227) + self.cm[25] * self.tk + self.cm[26] * self.tk ** 2 + self.cm[27] / (680 - self.tk)
+        self.cp = 0.5 * self.cq
+        self.params = np.array([self.vp, self.bp, self.cp])
+
+        # calculations for stoichiometry coefficients
+        # nu_+ + nu_-
+        self.nu = np.sum(self.mat_stoich[0])
+        # nu_+ nu_-
+        self.nu_prod = self.mat_stoich[0, 0] * self.mat_stoich[0, 1]
+        # abs(z_+ z_-)
+        self.z_prod = np.abs(self.mat_stoich[1, 0] * self.mat_stoich[1, 1])
+        # nu_+, z_+
+        self.nz_prod_plus = self.mat_stoich[0, 0] * self.mat_stoich[1, 0]
+
+        self.mat = np.array([self.nu, self.nu_prod, self.z_prod, self.nz_prod_plus])
+
+    @abstractmethod
+    def actual_coefficients(self):
+        pass
+
+    @staticmethod
+    def h_fun(i_str):
         """
             Parameter for apparent molal volume according to Pitzer :cite:`Pitzer1973a`
 
@@ -68,8 +107,8 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
         return h_fun_gamma
 
-    @static
-    def p_fun_gamma(self, i_str):
+    @staticmethod
+    def p_fun_gamma(i_str):
         """
             Parameter for activity coefficient according to Pitzer :cite:`Pitzer1973a`
 
@@ -84,56 +123,6 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         p_fun_gamma = (1 - (1 + x - 0.5 * x ** 2) * np.exp(-x)) / x ** 2
 
         return p_fun_gamma
-
-    def params(self):
-        """
-            Parameters in model according to Pitzer :cite:`Pitzer1973a`
-
-            :return: Parameters in SI
-            :rtype: float
-            """
-        pr = self.pa * un.atm_2_bar(1)
-        pr_atm = un.atm_2_bar(1)
-
-        vp_0 = self.cm[0] + self.cm[1] * self.tk + self.cm[2] * self.tk ** 2 + self.cm[3] * self.tk ** 3
-        vp_1 = (pr - pr_atm) * (self.cm[4] + self.cm[5] * self.tk + self.cm[6] * self.tk ** 2)
-        vp_2 = (pr - pr_atm) ** 2 * (self.cm[7] + self.cm[8] * self.tk)
-
-        vp = vp_0 + vp_1 + vp_2
-
-        bp_0 = self.cm[9] + self.cm[10] / (self.tk - 227) + self.cm[11] * self.tk + self.cm[12] * self.tk ** 2 + self.cm[13] / (680 - self.tk)
-        bp_1_1 = self.cm[14] + self.cm[15] / (self.tk - 227) + self.cm[16] * self.tk + self.cm[17] * self.tk ** 2
-        bp_1 = (bp_1_1 + self.cm[18] / (680 - self.tk)) * (pr - pr_atm)
-        bp_2_1 = self.cm[19] + self.cm[20] / (self.tk - 227) + self.cm[21] * self.tk + self.cm[22] / (680 - self.tk)
-        bp_2 = bp_2_1 * (pr - pr_atm) ** 2
-
-        bp = bp_0 + bp_1 + bp_2
-
-        cq = self.cm[23] + self.cm[24] / (self.tk - 227) + self.cm[25] * self.tk + self.cm[26] * self.tk ** 2 + self.cm[27] / (680 - self.tk)
-        cp = 0.5 * cq
-        params = np.array([vp, bp, cp])
-
-        return params
-
-    def stoichiometry_coeffs(self):
-        """
-            Stoichiometry coefficients of electrolyte according to Pitzer :cite:`Pitzer1973a`
-
-            :return: Stoichiometry coefficients of electrolyte in SI
-            :rtype: float
-            """
-        # nu_+ + nu_-
-        nu = np.sum(self.mat_stoich[0])
-        # nu_+ nu_-
-        nu_prod = self.mat_stoich[0, 0] * self.mat_stoich[0, 1]
-        # abs(z_+ z_-)
-        z_prod = np.abs(self.mat_stoich[1, 0] * self.mat_stoich[1, 1])
-        # nu_+, z_+
-        nz_prod_plus = self.mat_stoich[0, 0] * self.mat_stoich[1, 0]
-
-        mat = np.array([nu, nu_prod, z_prod, nz_prod_plus])
-
-        return mat
 
     def ionic_strength(self, m):
         """
@@ -159,11 +148,11 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         vol_water = 1e6 * wp.WaterPropertiesFineMillero(self.tk, self.pa).molar_volume()
 
         # stoichiometric_coefficients
-        nu, nu_prod, z_prod, nz_prod_plus = self.stoichiometry_coeffs()
+        nu, nu_prod, z_prod, nz_prod_plus = self.mat
         m_r = self.p_ref[1]
         y_r = self.p_ref[2]
 
-        vp, bp, cp = self.params()
+        vp, bp, cp = self.params
 
         i_str = self.ionic_strength(m_r)
 
@@ -210,10 +199,10 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         ct = 10 * un.r_gas() * self.tk
 
         # stoichiometric_coefficients
-        nu, nu_prod, z_prod, nz_prod_plus = self.stoichiometry_coeffs()
+        nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # coefficients V_m, B, C
-        vp, bp, cp = self.params()
+        vp, bp, cp = self.params
 
         # ionic strength
         i_str = self.ionic_strength(m)
@@ -252,7 +241,7 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         c_phi = c_phi_1 + self.qm[13] * (self.tk - tc)
 
         # stoichiometric_coefficients
-        nu, nu_prod, z_prod, nz_prod_plus = self.stoichiometry_coeffs()
+        nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # ionic strength
         i_str = self.ionic_strength(m)
@@ -287,7 +276,7 @@ class SaltPropertiesPitzer(sp.SaltProperties):
         c_phi = c_phi_1 + self.qm[13] * (self.tk - tc)
 
         # stoichiometric_coefficients
-        nu, nu_prod, z_prod, nz_prod_plus = self.stoichiometry_coeffs()
+        nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # ionic strength
         i_str = self.ionic_strength(m)
