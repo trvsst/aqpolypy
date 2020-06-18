@@ -2,7 +2,7 @@ Polymer
 =======
 
 PolymerPropertiesABC
------------------
+--------------------
 
 .. automodule:: aqpolypy.polymer.PolymerPropertiesABC
     :members:
