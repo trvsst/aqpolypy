@@ -1,3 +1,5 @@
+.. _polymer:
+
 Polymer
 =======
 
@@ -17,4 +19,3 @@ PEOSimple
     :undoc-members:
     :show-inheritance:
 
-.. raw:: latex
