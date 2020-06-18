@@ -29,8 +29,6 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
 
         """
 
-        super().__init__(tk, pa)
-
         # Calculations nacl parameters and coefficients
         self.mat_stoich = np.array([[1, 1], [1, -1]])
 
@@ -96,3 +94,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.qm[17] = 0.8514
         self.qm[18] = -8.3637e-4
 
+        super().__init__(tk, pa)
+
+    def actual_coefficients(self):
+        return [self.mat_stoich, self.cm, self.p_ref, self.qm]
