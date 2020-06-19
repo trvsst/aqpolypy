@@ -107,7 +107,7 @@ class BinaryBrush(MakeBrushSolvent):
 
         return (1 + u / self.hat_r) ** (self.dim - 1)
 
-    def f(self, u, phi):
+    def f_dens(self, u, phi):
         """
         free energy density, given as
 
@@ -141,7 +141,7 @@ class BinaryBrush(MakeBrushSolvent):
         h_m = self.determine_h()
 
         def fun(u):
-            return self.f(u, self.phi(u))
+            return self.f_dens(u, self.phi(u))
 
         return integrate.quad(fun, 0.0, h_m)
 
@@ -227,7 +227,7 @@ class BinaryBrush(MakeBrushSolvent):
         makes the free energy a minimum with respect the brush length :math:`H`, that is:
 
         .. math::
-            \\frac{\\partial}{\partial H} f=0
+            \\frac{\\partial}{\\partial H} f=0
 
         :return: optimal :math:`\\Lambda``
         """
@@ -237,3 +237,22 @@ class BinaryBrush(MakeBrushSolvent):
             return self.free_energy()[0]
 
         return optimize.minimize_scalar(fopt)
+
+    def der_free_energy(self):
+        """
+        Computes the derivative of the free energy:
+
+        .. math::
+            \\frac{\\partial f}{\\partial H}
+
+        :return: derivative of the free energy (float)
+        """
+
+        h_t = self.determine_h()
+        phi_h = self.phi(h_t)
+
+        # note that what we call the langrange parameter Lambda in reality
+        # is \tilde{Lambda}+\chi, hence Lambda =tilde{Lambda}-\chi
+        lam_real = self.lag - 0.5 * (1 / self.xi_t + 1)
+
+        return self.f_dens(h_t, phi_h) + self.f_norm * self.intg(h_t) * lam_real * phi_h
