@@ -27,4 +27,3 @@ SaltNaClRP
     :undoc-members:
     :show-inheritance:
 
-.. raw:: latex
