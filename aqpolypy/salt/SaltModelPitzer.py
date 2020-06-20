@@ -190,6 +190,8 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def molar_vol(self, m):
         """
             Molar volume of electrolyte solution according to Pitzer :cite:`Pitzer1973a`
+            :math:`\\upsilon_s = \\bar{\\upsilon}^{\\circ}_s+\\nu|z_Mz_X|A_vh_{(I)}+2\\nu_M\\nu_XRT\\left(mB^{v}_{MX}
+            +\\left(\\nu_Mz_M\\right)m^2C^{v}_{MX}\\right)`
 
             :return: Molar volume of electrolyte solution in SI
             :rtype: float
