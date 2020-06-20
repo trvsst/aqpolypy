@@ -13,6 +13,7 @@
 """
 import numpy as np
 import unittest
+import aqpolypy.units.units as un
 import aqpolypy.water.WaterMilleroAW as fm
 
 
@@ -27,8 +28,8 @@ class TestWaterMilleroAW(unittest.TestCase):
                           [30, 100, 0.999939],
                           [55, 300, 1.001642]])
         # converting param to [temperature(K), pressure(atm), specific volume]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         # testing density up to a precision of 10^-4
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(1e3 / wfm.density(), param[:, 2], 0, 1e-4)
@@ -43,8 +44,8 @@ class TestWaterMilleroAW(unittest.TestCase):
                           [35, 100, 1.001597],
                           [55, 300, 1.001642]])
         # converting param to [temperature(K), pressure(atm), molar volume]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         param[:, 2] = (param[:, 2] / 1e6) * fm.WaterPropertiesFineMillero(300).MolecularWeight
         # testing molar volume up to a precision of 10^-6
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
@@ -60,7 +61,7 @@ class TestWaterMilleroAW(unittest.TestCase):
                           [273.15, 1, 87.94],
                           [278.15, 60, 88.20]])
         # converting param to [temperature(K), pressure(atm), dielectric constant]
-        param[:, 1] = param[:, 1] / 0.101325
+        param[:, 1] = param[:, 1] * 1e6 / un.atm_2_pascal(1)
         # testing dielectric constant up to a precision of 10^-2
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.dielectric_constant(), param[:, 2], 0, 1e-2)
@@ -75,9 +76,9 @@ class TestWaterMilleroAW(unittest.TestCase):
                           [35, 100, 43.305],
                           [55, 300, 40.911]])
         # converting param to [temperature(K), pressure(atm), compressibility (atm-1)]
-        param[:, 0] = 273.15 + param[:, 0]
-        param[:, 1] = param[:, 1] / 1.01325
-        param[:, 2] = (param[:, 2] / 1e6) * 1.01325
+        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
+        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        param[:, 2] = (param[:, 2] / 1e6) * un.atm_2_bar(1)
         # testing compressibility up to a precision of 10^-6
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.compressibility(), param[:, 2], 0, 1e-6)
