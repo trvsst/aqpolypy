@@ -59,23 +59,22 @@ class TestSaltNaClRP(unittest.TestCase):
         self.assertTrue(test_vals)
 
     def test_params(self):
-        # parameters in [temperature (C), pressure (bar)]
-        param = np.array([[10, 1],
-                          [30, 1],
-                          [90, 1],
-                          [40, 400],
-                          [50, 800]])
-        # converting to [temperature (K), pressure (atm)]
+        # parameters in [temperature (C), pressure (bar), [bp, 2cp]]
+        param = np.array([[10, 1, 1.956e-5, -2.25e-6],
+                          [30, 1, 1.069e-5, -1.07e-6],
+                          [90, 1, 2.577e-6, -6.02e-8],
+                          [40, 400, 6.779e-6, -7.19e-7],
+                          [50, 800, 4.436e-6, -4.71e-7]])
+        # converting to [temperature (K), pressure (atm), [bp, cp]]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
         param[:, 1] = param[:, 1] / un.atm_2_bar(1)
-        # parameters to test with [[vp], [bp], [2cp]]
-        test_param = np.array([[1113.403599, 1123.146784, 1157.752227, 1115.961917, 1109.549088],
-                               [1.956e-5, 1.069e-5, 2.577e-6, 6.779e-6, 4.436e-6],
-                               [-2.25e-6, -1.07e-6, -6.02e-8, -7.19e-7, -4.71e-7]])
+        param[:, 3] = param[:, 3] / 2
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose(salt_nacl.params, test_param, 0, 1e-2)
-        self.assertTrue(test_vals)
+        test_vals1 = np.allclose(salt_nacl.params[1], param[:, 2], 0, 1e-2)
+        test_vals2 = np.allclose(salt_nacl.params[2], param[:, 3], 0, 1e-2)
+        self.assertTrue(test_vals1)
+        self.assertTrue(test_vals2)
 
     def test_stoichiometry_coeffs(self):
         # parameters in stoichiometry coefficient[nu = 2, nu_prod = 1, z_prod = 1, nz_prod_plus = 1]
