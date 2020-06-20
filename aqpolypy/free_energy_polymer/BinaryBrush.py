@@ -32,7 +32,7 @@ class BinaryBrush(MakeBrushSolvent):
         :param kwargs: optional arguments c_s, v_solvent
         """
 
-        super().__init__(dim, chi, sigma, rad, pol, kwargs)
+        super().__init__(dim, chi, sigma, rad, pol, **kwargs)
 
         # number of components is brush and solvent
         self.num_of_components = 2
@@ -49,6 +49,7 @@ class BinaryBrush(MakeBrushSolvent):
         Ideal free energy:
 
         .. math::
+            :label: free_ideal
 
             f_{id}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\frac{\\upsilon}{\\upsilon_p}
             \\frac{\\phi(u)}{N}\\log\\left(\\frac{\\phi(u)}{Ne}\\right)+(1-\\phi(u))\\log\\left(\\frac{1-\\phi(u)}{e}
@@ -69,6 +70,7 @@ class BinaryBrush(MakeBrushSolvent):
         Flory Huggins free energy:
 
         .. math::
+            :label: flory_huggins
 
             f_{fh}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\chi \\phi(u)(1-\\phi(u))\\right]
 
@@ -83,6 +85,7 @@ class BinaryBrush(MakeBrushSolvent):
         Stretching free energy
 
         .. math::
+            :label: stretch
 
             f_{s}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\frac{1}{\\hat{\\xi}^4_S}
             \\frac{1}{c_s}\\frac{\\upsilon}{\\upsilon_p}\\frac{1}{\\phi(u)}\\right]
@@ -98,6 +101,7 @@ class BinaryBrush(MakeBrushSolvent):
         Geometric factor
 
         .. math::
+            :label: geom
 
             Q(u)=\\left(1+\\frac{u}{\\hat{R}}\\right)^{d-1}
 
@@ -109,9 +113,10 @@ class BinaryBrush(MakeBrushSolvent):
 
     def f_dens(self, u, phi):
         """
-        free energy density, given as
+        free energy density, is given from Eq. :eq:`free_ideal`, :eq:`flory_huggins`, :eq:`stretch` and :eq:`geom`
 
         .. math::
+            :label: free_density
 
             f(u,\\phi) = Q(u)\\left(f_{id}(\\phi)+f_{fg}(\\phi)\\right)+\\frac{f_s(\\phi)}{Q(u)}
 
@@ -128,20 +133,32 @@ class BinaryBrush(MakeBrushSolvent):
 
         return val0 * val1 + val2 / val0
 
-    def free_energy(self):
+    def free_energy(self, size_b=None, phi_b=None):
         """
-        free energy of the Brush
+        free energy of the brush: integration of Eq. :eq:`free_density` over the brush size Eq. :eq:`brush_size`
 
         .. math::
-            f\\equiv\\frac{F}{{\\cal N} k_B T}=\\int_0^{H} du f(u,\\phi(u))
+            :label: free
 
+            f(H)\\equiv\\frac{F}{{\\cal N} k_B T}=\\int_0^{H} du f(u,\\phi(u))
+
+        :param size_b: brush size
+        :param phi_b: function phi
         :return: value of the free energy (float)
         """
 
-        h_m = self.determine_h()
+        if size_b is None:
+            h_m = self.determine_h()
+        else:
+            h_m = size_b
+
+        if phi_b is None:
+            phi_a = self.phi
+        else:
+            phi_a = phi_b
 
         def fun(u):
-            return self.f_dens(u, self.phi(u))
+            return self.f_dens(u, phi_a(u))
 
         return integrate.quad(fun, 0.0, h_m)
 
@@ -150,7 +167,9 @@ class BinaryBrush(MakeBrushSolvent):
         Equation of the minimization for the ideal and Flory-Huggins
 
         .. math::
-            E_1(\\phi) \\equiv \\frac{\\upsilon}{\\upsilon_p}\\frac{1}{N}\\log\\left(\\frac{\\phi(u)}{N}\\right)
+            :label: E_def
+
+            E_1(\\phi(u)) \\equiv \\frac{\\upsilon}{\\upsilon_p}\\frac{1}{N}\\log\\left(\\frac{\\phi(u)}{N}\\right)
             -\\log(1-\\phi(u))+\\chi(1-2\\phi(u))+\\Lambda
 
         :param phi: polymer volume fraction :math:`\\phi(u)`
@@ -158,18 +177,22 @@ class BinaryBrush(MakeBrushSolvent):
         """
 
         ct2_1 = np.log(phi / self.n_p) / (self.n_p * self.r_vol)
-        ct2_2 = -(phi + np.log(1 - phi))
-        ct2_3 = -phi / self.xi_t
+        ct2_2 = -np.log(1 - phi)
+        ct2_3 = -2*self.chi*phi
 
-        return ct2_1 + ct2_2 + ct2_3 + self.lag
+        return ct2_1 + ct2_2 + ct2_3 + self.lag + self.chi
 
     def eqn_min_phi(self, u, phi):
         """
         Equation satisfied by :math:`\\phi(u)`. It is
 
         .. math::
-            E_1(\\phi)-\\frac{1}{\\hat{\\xi}^4_S}\\frac{1}{c_s}\\frac{\\upsilon}{\\upsilon_p}
+            :label: min_equation
+
+            E_1(\\phi(u))-\\frac{1}{\\hat{\\xi}^4_S}\\frac{1}{c_s}\\frac{\\upsilon}{\\upsilon_p}
             \\frac{1}{\\phi^2(u)(1+\\frac{u}{\\hat{R}})^{2d-2}}=0
+
+        :math:`E_1` is defined by Eq. :eq:`E_def`.
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param phi: polymer volume fraction :math:`\\phi(u)`
@@ -183,7 +206,12 @@ class BinaryBrush(MakeBrushSolvent):
 
     def determine_h(self):
         """
-        Compute the size of the brush :math:`H`, (for fixed :math:`\\Lambda`)
+        Compute the size of the brush for a given Lagrange parameter :math:`\\Lambda`
+
+        .. math::
+            :label: brush_size
+
+            H(\\Lambda)
 
         :return: optimal the value of :math:`H` (float)
         """
@@ -200,7 +228,12 @@ class BinaryBrush(MakeBrushSolvent):
 
     def phi(self, u, tol=1e-7):
         """
-        function :math:`\\phi(u)`
+        function
+
+        .. math:: \\phi(u)
+            :label: phi
+
+        obtained by solvint Eq. :eq:`min_equation`
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param tol: tolerance
@@ -222,18 +255,23 @@ class BinaryBrush(MakeBrushSolvent):
 
     def optimal_lambda(self):
         """
-
         Computes the optimal value of :math:`\\Lambda`, defined as the value that
         makes the free energy a minimum with respect the brush length :math:`H`, that is:
 
         .. math::
-            \\frac{\\partial}{\\partial H} f=0
+            :label: f_der_min
 
-        :return: optimal :math:`\\Lambda``
+            \\frac{\\partial}{\\partial H} f(H)=0
+
+        see Eq. :eq:`free`
+
+        :return: optimal :math:`\\Lambda``  ( OptimizeResultsObject_ )
+
+        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
         """
 
         def fopt(lam):
-            self.lam = lam
+            self.lag = lam
             return self.free_energy()[0]
 
         return optimize.minimize_scalar(fopt)
@@ -243,7 +281,11 @@ class BinaryBrush(MakeBrushSolvent):
         Computes the derivative of the free energy:
 
         .. math::
+            :label: f_der
+
             \\frac{\\partial f}{\\partial H}
+
+        see Eq. :eq:`free`
 
         :return: derivative of the free energy (float)
         """
@@ -251,8 +293,21 @@ class BinaryBrush(MakeBrushSolvent):
         h_t = self.determine_h()
         phi_h = self.phi(h_t)
 
-        # note that what we call the langrange parameter Lambda in reality
-        # is \tilde{Lambda}+\chi, hence Lambda =tilde{Lambda}-\chi
-        lam_real = self.lag - 0.5 * (1 / self.xi_t + 1)
+        return self.f_dens(h_t, phi_h) + self.f_norm * self.intg(h_t) * self.lag * phi_h
 
-        return self.f_dens(h_t, phi_h) + self.f_norm * self.intg(h_t) * lam_real * phi_h
+    def inv_phi(self, phi):
+        """
+        Computes the inverse function :math:`\\phi` Eq. :eq:`phi`
+
+        .. math::
+            :label: u_phi
+
+            u(\\phi) \\rightarrow  u(\\phi(u))=u
+
+        :param phi: polymer volume fraction  :math:`\\phi(u)`
+        :return: value of :math:`u(\\phi)` (float)
+        """
+
+        val = self.f_norm * self.lhs_eqn_phi(phi) * phi / (self.f_stretch(phi))
+
+        return self.hat_r * (val ** (-0.5 / (self.dim - 1)) - 1)

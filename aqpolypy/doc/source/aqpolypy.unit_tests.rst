@@ -36,3 +36,19 @@ salt_nacl_rp_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
+
+polymer_peo_unit_test
+---------------------
+
+.. automodule:: aqpolypy.unit_tests.polymer_peo_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+polymer_brush_spherical_unit_test
+---------------------------------
+
+.. automodule:: aqpolypy.unit_tests.polymer_brush_spherical_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:

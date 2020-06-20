@@ -15,7 +15,7 @@ class MakeBrushSolvent(object):
 
     """ Defines the free energy of a BrushSolvent System """
 
-    def __init__(self, dim, chi, sigma, rad, pol, c_s=2/3, v_sol=29.91):
+    def __init__(self, dim, chi, sigma, rad, pol, **kwargs):
         """
         constructor
 
@@ -24,9 +24,17 @@ class MakeBrushSolvent(object):
         :param sigma: grafting density :math:`\\sigma`` in chains/nm :sup:`3`
         :param rad: nanocrystal radius in Angstrom
         :param pol: Polymer object
+        :param kwargs: c_s and v_sol coefficients default to 2/3 and 29.91 (average water volume)
         :param c_s: coefficient of stretching energy
         :param v_sol: average volume of solvent molecule (default is water)
         """
+
+        c_s = 2/3
+        if 'c_s' in kwargs:
+            c_s = kwargs['c_s']
+        v_sol = 29.91
+        if 'v_sol' in kwargs:
+            v_sol = kwargs['v_sol']
 
         self.dim = dim
         self.chi = chi
@@ -55,7 +63,7 @@ class MakeBrushSolvent(object):
         self.xi_s = 1/(self.pol.k_length*self.pol.nu*np.sqrt(self.sigma))
 
         # hat_r
-        self.hat_r = 0.5 * self.rad / pol.k_length
+        self.hat_r = self.rad / pol.k_length
 
         # ratio of monomer to solvent volumes
         self.r_vol = pol.volume / self.v_avg
@@ -64,7 +72,7 @@ class MakeBrushSolvent(object):
         self.num_chains = self.sigma * np.pi * 8 * self.rad ** 3 / 6
 
         # n_p
-        self.n_p = self.pol.n_s
+        self.n_p = self.pol.n_p
 
         # define opm values
         self.param_lambda = self.n_p / self.hat_r
