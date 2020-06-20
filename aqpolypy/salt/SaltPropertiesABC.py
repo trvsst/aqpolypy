@@ -61,7 +61,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def molar_vol(self, m):
         """
-        Abstract method: calculates the molar volume of electrolyte solution :math:
+        Abstract method: calculates the molar volume of electrolyte solution :math:`\\upsilon_s`
 
         :param m: molality
         """
