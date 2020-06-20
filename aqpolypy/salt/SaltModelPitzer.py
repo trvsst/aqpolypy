@@ -35,14 +35,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         super().__init__(tk, pa)
 
         # electrolyte un-instantiated parameters
-        self.m_ref = None
-        self.y_ref = None
-        self.m_weight = None
-        self.p_ref = np.array([self.m_weight, self.m_ref, self.y_ref])
-
-        self.cm = np.zeros(28)
-
-        self.qm = np.zeros(19)
+        self.mat_stoich, self.cm, self.p_ref, self.qm = self.actual_coefficients()
 
         # calculations for params
         self.pr = self.pa * un.atm_2_bar(1)
@@ -105,6 +98,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             """
         b_param = 1.2
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
+
         return h_fun_gamma
 
     @staticmethod
@@ -132,6 +126,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :rtype: float
             """
         i_str = 0.5 * m * np.sum(self.mat_stoich[0] * self.mat_stoich[1] ** 2)
+
         return i_str
 
     def molar_vol_infinite_dilution(self):
@@ -164,6 +159,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         # return in SI m^3
         molar_vol_infinite_dilution = 1e-6 * mv_i
+
         return molar_vol_infinite_dilution
 
     def density_sol(self, m):
@@ -186,6 +182,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         # return density in kg/m3
         density_sol = 1e3 * dens
+
         return density_sol
 
     def molar_vol(self, m):
@@ -218,6 +215,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         # return in m^3/mol
         molar_vol = 1e-6 * val
+
         return molar_vol
 
     def osmotic_coeff(self, m):
@@ -253,6 +251,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * c_phi
 
         osmotic_coefficient = 1 + val_1 + val_2 + val_3
+
         return osmotic_coefficient
 
     def log_gamma(self, m):
@@ -286,4 +285,5 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         val_3 = 1.5 * (2 * nu_prod ** 1.5 / nu) * m ** 2 * c_phi
 
         log_gamma = val_1 + val_2 + val_3
+
         return log_gamma
