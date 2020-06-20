@@ -30,12 +30,12 @@ class SaltProperties(ABC):
         self.pa = pa
 
         # Calculations for stoichiometry coefficients
-        self.mat_stoich = np.array([None])
+        # ***** self.mat_stoich = np.array([None]) *****
 
     @abstractmethod
     def ionic_strength(self, m):
         """
-        Abstract method: calculates the ionic strength of electrolyte :math:
+        Abstract method: calculates the ionic strength of electrolyte :math:`I = \\frac{1}{2} \\sum_{i} m_i z_i^2`
 
         :param m: molality
         """
@@ -51,7 +51,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def density_sol(self, m):
         """
-        Abstract method: calculates the density of electrolyte solution :math:
+        Abstract method: calculates the density of electrolyte solution :math:`\\rho_{sol} = M_w \\frac{(1 + \\frac{mM_2}{1000})}{\\upsilon_w + \\frac{mM_w\\upsilon_2}{1000}}`
 
         :param m: molality
         """
@@ -69,7 +69,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def osmotic_coeff(self, m):
         """
-        Abstract method: calculates the osmotic coefficient :math:
+        Abstract method: calculates the osmotic coefficient :math:`\\phi = 1 - |z_Mz_X|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_M\\nu_X}{\\nu}(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha I^{\\frac{1}{2}}})+m^{2}\\frac{2(\\nu_m\\nu_x)^{3/2}}{\\nu}C^{\\phi}_{MX}`
 
         :param m: molality
         """
@@ -78,7 +78,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def log_gamma(self, m):
         """
-        Abstract method: calculates the activity coefficient :math:
+        Abstract method: calculates the activity coefficient :math:`ln\\gamma_{\\pm} = -|z_Mz_X|A_{\\phi}(\\frac{I^{\\frac{1}{2}}}{1+ bI^{\\frac{1}{2}}}+\\frac{2}{b}ln(1+bI^{\\frac{1}{2}}))+m\\frac{2\\nu_M\\nu_X}{\\nu}(2\\beta^{(0)}_{MX}+\frac{2\\beta^{(1)}_{MX}}{\\alpha^2I}[1-(1+\\alpha I^{\\frac{1}{2}}-\\frac{\\alpha^2I}{2})e^{-\\alpha I^{\\frac{1}{2}}}])+\\frac{3m^2}{2}(\\frac{2(\\nu_M\\nu_X)}{\\nu}C^{\\phi}_{MX})`
 
         :param m: molality
         """
