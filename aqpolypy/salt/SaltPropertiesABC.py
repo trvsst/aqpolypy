@@ -69,9 +69,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def osmotic_coeff(self, m):
         """
-        Abstract method: calculates the osmotic coefficient :math:`\\phi = 1 - |z_Mz_X|A_\\phi\\frac{I^{\\frac{1}{2}}}
-        {1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_M\\nu_X}{\\nu}\\left(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha
-        I^{\\frac{1}{2}}}\\right)+m^{2}\\frac{2\\left(\\nu_M\\nu_X\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{MX}`
+        Abstract method: calculates the osmotic coefficient :math:`\\phi`
 
         :param m: molality
         """
@@ -80,11 +78,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def log_gamma(self, m):
         """
-        Abstract method: calculates the activity coefficient :math:`\\ln\\gamma_{\\pm} = -|z_Mz_X|A_{\\phi}
-        \\left(\\frac{I^{\\frac{1}{2}}}{1+ bI^{\\frac{1}{2}}}+\\frac{2}{b}\\ln\\left(1+bI^{\\frac{1}{2}}\\right)\\right)
-        +m\\frac{2\\nu_M\\nu_X}{\\nu}\\left(2\\beta^{(0)}_{MX}+\\frac{2\\beta^{(1)}_{MX}}{\\alpha^2I}
-        \\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}-\\frac{\\alpha^2I}{2}\\right)e^{-\\alpha I^{\\frac{1}{2}}}
-        \\right]\\right)+\\frac{3m^2}{2}\\left(\\frac{2\\left(\\nu_M\\nu_X\\right)}{\\nu}C^{\\phi}_{MX}\\right)`
+        Abstract method: calculates the activity coefficient :math:`\\ln\\gamma_{\\pm}`
 
         :param m: molality
         """
