@@ -132,6 +132,8 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def molar_vol_infinite_dilution(self):
         """
             Partial molal volume of solute at infinite dilution according to Pitzer :cite:`Pitzer1973a`
+            :math:`\\bar{\\upsilon}^{\\circ}_s = \\frac{V_{(m_1)}}{m_1} - \\upsilon_wY-\\nu|z_Mz_X|A_vh_{(I)}
+            - 2\\nu_M\\nu_XRT\\left(m_1B^{v}_{MX}+\\left(\\nu_Mz_M\\right)m^2_1C^{v}_{MX}\\right)`
 
             :return: Partial molal volume of solute at infinite dilution in SI
             :rtype: float
