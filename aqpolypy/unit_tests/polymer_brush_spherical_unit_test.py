@@ -99,6 +99,10 @@ class TestPolymerFreeSpherical(unittest.TestCase):
             exp1 = np.allclose(res_val[:, ind], c_phi[:, ind], atol=t_mat[ind], rtol=0.0)
             self.assertTrue(exp1)
 
+        # check normalization
+        norm = b_sph.phi_normalization()
+        self.assertTrue(np.abs(norm[0]-1) < 1e-10)
+
         # check inverse function
         u_val = b_sph.inv_phi(c_phi[:, 0])
         self.assertTrue(np.allclose(u_val, v_mat))

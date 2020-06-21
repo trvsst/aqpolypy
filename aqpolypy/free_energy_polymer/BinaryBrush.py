@@ -233,7 +233,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math:: \\phi(u)
             :label: phi
 
-        obtained by solvint Eq. :eq:`min_equation`
+        obtained by solving Eq. :eq:`min_equation`. Note that it verifies the normalization Eq. :eq:`norm`
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param tol: tolerance
@@ -311,3 +311,24 @@ class BinaryBrush(MakeBrushSolvent):
         val = self.f_norm * self.lhs_eqn_phi(phi) * phi / (self.f_stretch(phi))
 
         return self.hat_r * (val ** (-0.5 / (self.dim - 1)) - 1)
+
+    def phi_normalization(self):
+        """
+        verifies that the :math:`\\phi(u)``  is properly normalized, namely
+
+        .. math::
+            :label: norm
+
+            \\frac{\\xi_S^2}{N} \\int_0^{\\hat{H}}du\\phi(u) = 1
+
+        :return:  (normalization, error) as a tuple
+        """
+
+        def intgr(u):
+            return self.intg(u) * self.phi(u)
+
+        fac = self.xi_s ** 2 / self.n_p
+
+        val = integrate.quad(intgr, 0.0, self.determine_h())
+
+        return [fac * val[0], fac * val[1]]
