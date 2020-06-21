@@ -104,7 +104,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
             :math:`f_{p1}(I)` is defined in :eq:`pitzer_function_1`
 
-            :return: value of function in SI (float)
+            :return: value of function (float)
             """
         b_param = 1.2
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
@@ -122,7 +122,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
                 f_{p3}(I)=\\frac{1}{\\alpha^2I}\\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}
                 -\\frac{\\alpha^2I}{2}\\right)e^{-\\alpha I^{\\frac{1}{2}}}\\right]
 
-            :return: activity coefficient parameter in SI (float)
+            :return: value of function (float)
             """
         # units are (kg/mol)^{1/2}
         alpha = 2.0
@@ -146,8 +146,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def molar_vol_infinite_dilution(self):
         """
             Partial molal volume of solute at infinite dilution according to Pitzer :cite:`Pitzer1973a`
-            :math:`\\bar{\\upsilon}^{\\circ}_s = \\frac{V_{(m_1)}}{m_1} - \\upsilon_wY-\\nu|z_Mz_X|A_vh_{(I)}
-            - 2\\nu_M\\nu_XRT\\left(m_1B^{v}_{MX}+\\left(\\nu_Mz_M\\right)m^2_1C^{v}_{MX}\\right)`
+
+            .. math::
+                :label: mol_infty_dilution
+
+                `\\bar{\\upsilon}^{\\circ}_s = \\frac{V_{(m_1)}}{m_1} - \\upsilon_wY-\\nu|z_Mz_X|A_vh_{(I)}
+                - 2\\nu_M\\nu_XRT\\left(m_1B^{v}_{MX}+\\left(\\nu_Mz_M\\right)m^2_1C^{v}_{MX}\\right)`
 
             :return: Partial molal volume of solute at infinite dilution in SI (float)
             """
@@ -202,8 +206,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def molar_vol(self, m):
         """
             Molar volume of electrolyte solution according to Pitzer :cite:`Pitzer1973a`
-            :math:`\\upsilon_s = \\bar{\\upsilon}^{\\circ}_s+\\nu|z_Mz_X|A_vh_{(I)}+2\\nu_M\\nu_XRT\\left(mB^{v}_{MX}
-            +\\left(\\nu_Mz_M\\right)m^2C^{v}_{MX}\\right)`
+
+            .. math::
+                :label: molar_vol
+
+                \\upsilon_s = \\bar{\\upsilon}^{\\circ}_s+\\nu|z_Mz_X|A_vh_{(I)}+2\\nu_M\\nu_XRT\\left(mB^{v}_{MX}
+                +\\left(\\nu_Mz_M\\right)m^2C^{v}_{MX}\\right)
 
             :return: Molar volume of electrolyte solution in SI (float)
             """
@@ -236,9 +244,11 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def osmotic_coeff(self, m):
         """
             Osmotic coefficient according to Pitzer :cite:`Pitzer1973a`
-            :math:`\\phi = 1 - |z_Mz_X|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_M\\nu_X}{\\nu}
-            \\left(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha I^{\\frac{1}{2}}}\\right)+m^{2}\\frac{2
-            \\left(\\nu_M\\nu_X\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{MX}`
+
+            .. math::
+                \\phi = 1 - |z_Mz_X|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_M\\nu_X}{\\nu}
+                \\left(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha I^{\\frac{1}{2}}}\\right)+m^{2}
+                \\frac{2\\left(\\nu_M\\nu_X\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{MX}
 
             :return: osmotic coefficient in SI (float)
             """

@@ -97,4 +97,10 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         super().__init__(tk, pa)
 
     def actual_coefficients(self):
+        """
+        returns the values of the coefficients as a lit
+
+        :return: fitting coefficients for NaCl (list)
+        
+        """
         return [self.mat_stoich, self.cm, self.p_ref, self.qm]
