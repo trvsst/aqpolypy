@@ -68,6 +68,9 @@ class MakeBrushSolvent(object):
         # ratio of monomer to solvent volumes
         self.r_vol = pol.volume / self.v_avg
 
+        # free energy normalization
+        self.f_norm = self.r_vol * self.xi_s ** 2
+
         # number of chains
         self.num_chains = self.sigma * np.pi * 8 * self.rad ** 3 / 6
 
@@ -77,4 +80,7 @@ class MakeBrushSolvent(object):
         # define opm values
         self.param_lambda = self.n_p / self.hat_r
         self.tau = (1 + self.dim * self.param_lambda / self.xi_s ** 2) ** (1 / self.dim)
-        self.opm_radius = self.hat_r*(self.tau-1)
+        self.opm_radius = self.hat_r*self.tau
+        self.opm_radius_angstrom = self.opm_radius*pol.k_length
+        self.opm_brush_radius = self.opm_radius - self.hat_r
+        self.opm_brush_radius_angstrom = self.opm_brush_radius*pol.k_length

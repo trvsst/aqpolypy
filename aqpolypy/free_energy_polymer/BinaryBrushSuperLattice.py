@@ -1,5 +1,5 @@
 """
-:module: SphericalBrush
+:module: BinaryBrushSuperLattice
 :platform: Unix, Windows, OS
 :synopsis: Defines a Spherical Brush in Solvent
 
@@ -15,9 +15,9 @@ from scipy import optimize
 from aqpolypy.free_energy_polymer.BrushSolution import MakeBrushSolvent
 
 
-class BinaryBrush(MakeBrushSolvent):
+class BinaryBrushSuperLattice(MakeBrushSolvent):
 
-    """ Defines the free energy of a BrushSolvent System """
+    """ Defines the free energy of a Brush in a superlattice"""
 
     def __init__(self, dim, chi, sigma, rad, pol, lag, **kwargs):
         """
