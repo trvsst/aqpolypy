@@ -78,10 +78,14 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     @staticmethod
     def h_fun(i_str):
         """
-            Parameter for apparent molal volume according to Pitzer :cite:`Pitzer1973a`
+            Function for apparent molal volume according to Pitzer :cite:`Pitzer1973a`
 
-            :return: apparent molal volume parameter in SI
-            :rtype: float
+            .. math::
+                :label: pitzer_function_1
+
+                f_{p1}(I)=\\frac{1}{2b}\\ln\\left(1+bI^{\\frac{1}{2}}\\right)
+
+            :return: value of function  (float)
             """
         # units are (kg/mol)^{1/2}
         b_param = 1.2
@@ -91,10 +95,16 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def h_fun_gamma(self, i_str):
         """
-            Parameter for activity coefficient according to Pitzer :cite:`Pitzer1973a`
+             Function in activity coefficient according to Pitzer :cite:`Pitzer1973a`
 
-            :return: activity coefficient parameter in SI
-            :rtype: float
+             .. math::
+                :label: pitzer_function_2
+
+                f_{p2}(I)=\\frac{I^{\\frac{1}{2}}}{1+ bI^{\\frac{1}{2}}}+ 4f_{p1}(I)
+
+            :math:`f_{p1}(I)` is defined in :eq:`pitzer_function_1`
+
+            :return: value of function in SI (float)
             """
         b_param = 1.2
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
@@ -104,10 +114,15 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     @staticmethod
     def p_fun_gamma(i_str):
         """
-            Parameter for activity coefficient according to Pitzer :cite:`Pitzer1973a`
+            function in activity coefficient according to Pitzer :cite:`Pitzer1973a`
 
-            :return: activity coefficient parameter in SI
-            :rtype: float
+            .. math::
+                :label: pitzer_function_3
+
+                f_{p3}(I)=\\frac{1}{\\alpha^2I}\\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}
+                -\\frac{\\alpha^2I}{2}\\right)e^{-\\alpha I^{\\frac{1}{2}}}\\right]
+
+            :return: activity coefficient parameter in SI (float)
             """
         # units are (kg/mol)^{1/2}
         alpha = 2.0
@@ -120,10 +135,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def ionic_strength(self, m):
         """
-            Ionic strength according to Pitzer :cite:`Pitzer1973a`
+            Ionic strength
 
-            :return: ionic strength in SI
-            :rtype: float
+            :return: ionic strength in SI (float)
             """
         i_str = 0.5 * m * np.sum(self.mat_stoich[0] * self.mat_stoich[1] ** 2)
 
@@ -135,8 +149,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :math:`\\bar{\\upsilon}^{\\circ}_s = \\frac{V_{(m_1)}}{m_1} - \\upsilon_wY-\\nu|z_Mz_X|A_vh_{(I)}
             - 2\\nu_M\\nu_XRT\\left(m_1B^{v}_{MX}+\\left(\\nu_Mz_M\\right)m^2_1C^{v}_{MX}\\right)`
 
-            :return: Partial molal volume of solute at infinite dilution in SI
-            :rtype: float
+            :return: Partial molal volume of solute at infinite dilution in SI (float)
             """
         # the factor 10 is the conversion from J to bar cm^3
         ct = 10 * un.r_gas() * self.tk
@@ -168,8 +181,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         """
             Density of electrolyte solution according to Pitzer :cite:`Pitzer1973a`
 
-            :return: Density of electrolyte solution in SI
-            :rtype: float
+            :return: Density of electrolyte solution in SI (float)
             """
         mw = wp.WaterPropertiesFineMillero(self.tk, self.pa).MolecularWeight
         # convert to cm^3/mol
@@ -193,8 +205,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :math:`\\upsilon_s = \\bar{\\upsilon}^{\\circ}_s+\\nu|z_Mz_X|A_vh_{(I)}+2\\nu_M\\nu_XRT\\left(mB^{v}_{MX}
             +\\left(\\nu_Mz_M\\right)m^2C^{v}_{MX}\\right)`
 
-            :return: Molar volume of electrolyte solution in SI
-            :rtype: float
+            :return: Molar volume of electrolyte solution in SI (float)
             """
         # the factor 10 is the conversion from J to bar cm^3
         ct = 10 * un.r_gas() * self.tk
@@ -229,8 +240,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             \\left(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha I^{\\frac{1}{2}}}\\right)+m^{2}\\frac{2
             \\left(\\nu_M\\nu_X\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{MX}`
 
-            :return: osmotic coefficient in SI
-            :rtype: float
+            :return: osmotic coefficient in SI (float)
             """
         # pressure is 1 atm
         press = 1
@@ -264,14 +274,17 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def log_gamma(self, m):
         """
             Activity coefficient according to Pitzer :cite:`Pitzer1973a`
-            :math:`\\ln\\gamma_{\\pm} = -|z_Mz_X|A_{\\phi}\\left(\\frac{I^{\\frac{1}{2}}}{1+ bI^{\\frac{1}{2}}}
-            +\\frac{2}{b}\\ln\\left(1+bI^{\\frac{1}{2}}\\right)\\right)+m\\frac{2\\nu_M\\nu_X}{\\nu}
-            \\left(2\\beta^{(0)}_{MX}+\\frac{2\\beta^{(1)}_{MX}}{\\alpha^2I}\\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}
-            -\\frac{\\alpha^2I}{2}\\right)e^{-\\alpha I^{\\frac{1}{2}}}\\right]\\right)+\\frac{3m^2}{2}
-            \\left(\\frac{2\\left(\\nu_M\\nu_X\\right)}{\\nu}C^{\\phi}_{MX}\\right)`
 
-            :return: activity coefficient in SI
-            :rtype: float
+            .. math::
+                :label: pitzer_activity
+
+                \\ln\\gamma_{\\pm} = -|z_Mz_X|A_{\\phi}f_{p2}(I)+m\\frac{2\\nu_M\\nu_X}{\\nu}
+                \\left(2\\beta^{(0)}_{MX}+2\\beta^{(1)}_{MX}f_{p3}(I)\\right)+\\frac{3m^2}{2}
+                \\left(\\frac{2\\left(\\nu_M\\nu_X\\right)}{\\nu}C^{\\phi}_{MX}\\right)`
+
+            functions are defined in Eq. :eq:`pitzer_function_2`, :eq:`pitzer_function_3`
+
+            :return: activity coefficient (float)
             """
         # pressure is 1 atm
         press = 1

@@ -34,7 +34,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def ionic_strength(self, m):
         """
-        Abstract method: calculates the ionic strength of electrolyte :math:`I = \\frac{1}{2} \\sum_{i} m_i z_i^2`
+        Abstract method: calculates the ionic strength of electrolyte :math:`I = \\frac{m}{2} \\sum_{i} \\nu_i z_i^2`
 
         :param m: molality
         """
@@ -43,8 +43,8 @@ class SaltProperties(ABC):
     @abstractmethod
     def molar_vol_infinite_dilution(self):
         """
-        Abstract method: calculates the partial molal volume of solute at infinite dilution :math:`\\bar{\\upsilon}^{
-                                                                                                    \\circ}_s`
+        Abstract method: calculates the partial molal volume of solute at
+        infinite dilution :math:`\\bar{\\upsilon}^{\\circ}_s`
         """
         pass
 
