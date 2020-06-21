@@ -11,6 +11,7 @@
 from abc import ABC, abstractmethod
 import aqpolypy.units.units as un
 
+
 class PolymerProperties(ABC):
 
     """ Defines basic characteristic of a polymer"""
