@@ -16,3 +16,4 @@ Stable Python Packages
     aqpolypy.unit_tests
 
 .. bibliography:: refs.bib
+    :all:
