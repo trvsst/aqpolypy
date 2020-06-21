@@ -44,7 +44,7 @@ class SaltProperties(ABC):
     def molar_vol_infinite_dilution(self):
         """
         Abstract method: calculates the partial molal volume of solute at infinite dilution :math:`\\bar{\\upsilon}^{
-                                                                                                    \\circ}_s`
+        \\circ}_s`
         """
         pass
 
