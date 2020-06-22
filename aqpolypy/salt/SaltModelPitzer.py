@@ -150,8 +150,8 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: mol_infty_dilution
 
-                `\\bar{\\upsilon}^{\\circ}_s = \\frac{V_{(m_1)}}{m_1} - \\upsilon_wY-\\nu|z_Mz_X|A_vh_{(I)}
-                - 2\\nu_M\\nu_XRT\\left(m_1B^{v}_{MX}+\\left(\\nu_Mz_M\\right)m^2_1C^{v}_{MX}\\right)`
+                \\upsilon_1^{\\infty}=\\frac{\\upsilon(m_r)}{m_r}-Y \\upsilon_0^{\\infty}-\\nu|z_{+}z_{-}|A_v h(I_r)
+                -2\\nu_+\\nu_{-} RT\\left[ m_r B^{\\nu}_{\\pm}+\\nu_{+}z_{+}m^2_rC^{\\nu}_{\\pm}\\right]
 
             :return: Partial molal volume of solute at infinite dilution in SI (float)
             """
@@ -210,8 +210,8 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: molar_vol
 
-                \\upsilon_s = \\bar{\\upsilon}^{\\circ}_s+\\nu|z_Mz_X|A_vh_{(I)}+2\\nu_M\\nu_XRT\\left(mB^{v}_{MX}
-                +\\left(\\nu_Mz_M\\right)m^2C^{v}_{MX}\\right)
+                \\upsilon_{\\phi}(m)=\\upsilon^{\\infty}_1+\\nu|z_{+}z_{-}|A_v h(I)
+                +2\\nu_+\\nu_{-} RT\\left[ m B^{\\nu}_{\\pm}+m^2\\nu_{+}z_{+}C^{\\nu}_{\\pm}  \\right]
 
             :return: Molar volume of electrolyte solution in SI (float)
             """
@@ -246,9 +246,10 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             Osmotic coefficient according to Pitzer :cite:`Pitzer1973a`
 
             .. math::
-                \\phi = 1 - |z_Mz_X|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_M\\nu_X}{\\nu}
-                \\left(\\beta^{(0)}_{MX}\\beta^{(1)}_{MX}e^{-\\alpha I^{\\frac{1}{2}}}\\right)+m^{2}
-                \\frac{2\\left(\\nu_M\\nu_X\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{MX}
+
+                \\phi = 1 - |z_{+}z_{-}|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_{+}\\nu_{-}}
+                {\\nu}\\left(\\beta^{(0)}_{\\pm}+\\beta^{(1)}_{\\pm}e^{-\\alpha I^{\\frac{1}{2}}}\\right)
+                +m^{2}\\frac{2\\left(\\nu_{+}\\nu_{-}\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{\\pm}
 
             :return: osmotic coefficient in SI (float)
             """
@@ -288,9 +289,10 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: pitzer_activity
 
-                \\ln\\gamma_{\\pm} = -|z_Mz_X|A_{\\phi}f_{p2}(I)+m\\frac{2\\nu_M\\nu_X}{\\nu}
-                \\left(2\\beta^{(0)}_{MX}+2\\beta^{(1)}_{MX}f_{p3}(I)\\right)+\\frac{3m^2}{2}
-                \\left(\\frac{2\\left(\\nu_M\\nu_X\\right)}{\\nu}C^{\\phi}_{MX}\\right)`
+                \\log(\\gamma_{\\pm})=-|z_{+}z_{-}|A_{\\gamma}f_{p2}(I)
+                +m\\frac{2\\nu_{+}\\nu_{-}}{\\nu}\\left(2\\beta^{(0)}_{\\pm}
+                +2\\beta^{(1)}_{\\pm}f_{p3}(I)\\right)
+                +\\frac{3m^2}{2}\\frac{2(\\nu_+\\nu_-)^{3/2}}{\\nu}C^{\\phi}_{\\pm}
 
             functions are defined in Eq. :eq:`pitzer_function_2`, :eq:`pitzer_function_3`
 
