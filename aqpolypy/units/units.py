@@ -115,6 +115,40 @@ def mol_lit_2_mol_angstrom(c):
     return conv
 
 
+def molality_2_molarity(c, vol_solvent, vol_solute, m_solvent):
+    """
+    Conversion from molality to molarity conversion
+
+    :param c: molality in SI units
+    :param vol_solvent: molar volume of solvent in SI units
+    :param vol_solute: molar volume of solute in SI units
+    :param: m_solvent: molecular weight of the solvent in SI units
+    :return: molarity (SI units)
+    :rtype: float
+    """
+
+    y = 1e3 / (c * m_solvent)
+
+    return 1e-3 / (vol_solvent * y + vol_solute)
+
+
+def molarity_2_molality(c, vol_solvent, vol_solute, m_solvent):
+    """
+    Conversion from molarity to molality conversion
+
+    :param c: molarity in SI units
+    :param vol_solvent: molar volume of solvent in SI units
+    :param vol_solute: molar volume of solute in SI units
+    :param: m_solvent: molecular weight of the solvent in SI units
+    :return: molality (SI units)
+    :rtype: float
+    """
+
+    y = (1e-3 / c - vol_solute) / vol_solvent
+
+    return 1e3 / (y * m_solvent)
+
+
 def one_over4pi_epsilon0():
     """
     Value of :math:`\\frac{1}{4\\pi\\varepsilon_0}`
