@@ -39,7 +39,7 @@ class SaltProperties(ABC):
         .. math::
             :label: ionic_strength
 
-            I(m)=\frac{m}{2}(\nu_{+}z_{+}^2+\nu_{-}z_{-}^2)
+            I(m)=\\frac{m}{2}(\\nu_{+}z_{+}^2+\\nu_{-}z_{-}^2)
 
         :param m: molality
         """
