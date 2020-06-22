@@ -16,3 +16,10 @@ units
     :undoc-members:
     :show-inheritance:
 
+concentration
+-------------
+
+.. automodule:: aqpolypy.units.concentration
+    :members:
+    :undoc-members:
+    :show-inheritance:
