@@ -84,3 +84,6 @@ class MakeBrushSolvent(object):
         self.opm_radius_angstrom = self.opm_radius*pol.k_length
         self.opm_brush_radius = self.opm_radius - self.hat_r
         self.opm_brush_radius_angstrom = self.opm_brush_radius*pol.k_length
+
+        # number of components
+        self.num_of_components = None
