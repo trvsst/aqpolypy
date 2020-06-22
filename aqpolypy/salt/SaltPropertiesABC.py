@@ -34,7 +34,12 @@ class SaltProperties(ABC):
     @abstractmethod
     def ionic_strength(self, m):
         """
-        Abstract method: calculates the ionic strength of electrolyte :math:`I = \\frac{m}{2} \\sum_{i} \\nu_i z_i^2`
+        Abstract method: calculates the ionic strength of electrolyte
+
+        .. math::
+            :label: ionic_strength
+
+            I(m)=\frac{m}{2}(\nu_{+}z_{+}^2+\nu_{-}z_{-}^2)
 
         :param m: molality
         """
@@ -45,15 +50,19 @@ class SaltProperties(ABC):
         """
 
         Abstract method: calculates the partial molal volume of solute at
-        infinite dilution :math:`\\bar{\\upsilon}^{\\circ}_s`
+        infinite dilution :math:`\\upsilon_1^{\\infty}`
         """
         pass
 
     @abstractmethod
     def density_sol(self, m):
         """
-        Abstract method: calculates the density of electrolyte solution :math:`\\rho_{sol} = M_w
-        \\frac{\\left(1 + \\frac{mM_2}{1000}\\right)}{\\upsilon_w + \\frac{mM_w\\upsilon_2}{1000}}`
+        Abstract method: calculates the density of electrolyte solution
+
+        .. math::
+            :label: density_solution
+
+            \\rho(m)=\\frac{1000+m M_1}{v_{m}}
 
         :param m: molality
         """
@@ -62,7 +71,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def molar_vol(self, m):
         """
-        Abstract method: calculates the molar volume of electrolyte solution :math:`\\upsilon_s`
+        Abstract method: calculates the molar volume of electrolyte solution :math:`\\upsilon_{\\phi}(m)`
 
         :param m: molality
         """
@@ -80,7 +89,7 @@ class SaltProperties(ABC):
     @abstractmethod
     def log_gamma(self, m):
         """
-        Abstract method: calculates the activity coefficient :math:`\\ln\\gamma_{\\pm}`
+        Abstract method: calculates the activity coefficient :math:`\\log(\\gamma_{\\pm})`
 
         :param m: molality
         """
