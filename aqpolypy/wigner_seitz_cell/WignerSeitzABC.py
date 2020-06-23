@@ -37,6 +37,18 @@ class WiSe(ABC):
 
         :return: no return is instantiated by derived class
         """
+    @staticmethod
+    def h_size(theta, dn, rad):
+        """
+        returns the maximum length of the brush as a function of angle theta
+
+        :param theta: coordinate :math:`\\theta`
+        :param dn: nearest neighbot distance
+        :param rad: nanocrystal radius
+        :return: brush length at the corresponding orientation
+        """
+
+        return (dn + (1 - np.cos(theta)) * rad) / np.cos(theta)
 
     def s_angle_tot(self):
         """
@@ -100,15 +112,16 @@ class WiSe(ABC):
 
         ws_vol = np.zeros(self.distinct_wedges)
 
-        def h(x):
-            return (dn+(1-np.cos(x))*rad)/np.cos(x)
-
         def ze(x):
             return 0
 
         if self.dim == 2:
             def fun(x, y):
                 return y+rad
+
+            def h(x):
+                return self.h_size(x, dn, rad)
+            
             for ind, wg in enumerate(self.wedges):
                 a, b = wg[0]
                 ws_vol[ind] = integrate.dblquad(fun, a, b, ze, h)
@@ -117,7 +130,7 @@ class WiSe(ABC):
                 return np.sin(y)*(z+rad)**2
 
             def h3(x, y):
-                return h(y)
+                return self.h_size(y, dn, rad)
 
             def z3(x, y):
                 return ze(y)
