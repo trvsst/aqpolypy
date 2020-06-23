@@ -17,6 +17,8 @@ import aqpolypy.units.units as un
 
 class Bjerrum():
 
+
+
     def __init__(self, tk, pa=1):
         """
         constructor
@@ -39,23 +41,43 @@ class Bjerrum():
 
     def temp_star(self, ion_size):
         """
-        returns :math:'T^{\\ast}=a/l_B(T)'
+            Dimensionless temperature according to Ebeling :cite:`Ebel:71`
 
-        :param ion_size: Ion size (In Angstrom)
-        :return: dimensionless temperature
-        :rtype: float
-        """
+            .. math::
+                :label: dimensionless_temp
+
+                T^{\\ast}=\\frac{a}{l_B(T)}
+
+                :label: bjerrum_length
+
+                l_B(T)=\\frac{q^2}{4\\pi\\varepsilon_0\\varepsilon_r k_B T}
+
+            :param ion_size: Ion size (in Angstrom)
+            :return: dimensionless temperature (float)
+            """
 
         return ion_size / self.bjerrum_length
 
     def bjerrum_constant_approx(self, ion_size, acc=1e-2):
         """
-        Value of Bjerrum constant calculated by integral
+        Value of Bjerrum constant calculated by integral according to Ebeling :cite:`Ebel:71`
 
-        :param ion_size: Ion size (In Angstrom)
+        .. math::
+            :label: association_constant
+
+            K_B(T)=4\\pi a^3\\int_1^{\\infty}dy y^2\\left(e^{b/y}+e^{-b/y}-2-\\frac{b^2}{y^2}\\right)
+
+            :label: b_variable
+
+            b=1/T^{\\ast}
+
+            :label: ion_radius
+
+            a
+
+        :param ion_size: Ion size (in Angstrom)
         :param acc: Accuracy
-        :return: Bjerrum constant in units of :math:`a^3`
-        :rtype: float
+        :return: Bjerrum constant in units of :math:`a^3` (float)
         """
 
         b_par = 1 / self.temp_star(ion_size)
@@ -74,11 +96,10 @@ class Bjerrum():
 
     def bjerrum_constant(self, ion_size):
         """
-        Value of Bjerrum constant
+        Value of Bjerrum constant according to Ebeling :cite:`Ebel:71`
 
-        :param ion_size: Ion size (In Angstrom)
-        :return: Bjerrum constant in units of :math:`a^3`
-        :rtype: float
+        :param ion_size: Ion size (in Angstrom)
+        :return: Bjerrum constant in units of :math:`a^3`(float)
         """
 
         z = 1 / self.temp_star(ion_size)
