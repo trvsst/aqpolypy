@@ -12,29 +12,22 @@
 import numpy as np
 from scipy.integrate import quad
 from scipy.special import expi
-import aqpolypy.water.WaterMilleroBP as wfm
 import aqpolypy.units.units as un
 
-class Bjerrum():
 
+class Bjerrum:
 
-
-    def __init__(self, tk, pa=1):
+    def __init__(self, WaterObject):
         """
         constructor
 
-        :param tk: temperature in kelvin
-        :param pa: pressure in atmospheres
-        :instantiate: temperature, pressure, bjerrum length
+        :param WaterObject: object of water class
+        :instantiate: water class object, bjerrum length
 
         """
-        # temperature and pressure
-        self.tk = tk
-        self.pa = pa
-
-        self.epsilon = wfm.WaterPropertiesFineMillero(self.tk).dielectric_constant()
+        self.epsilon = WaterObject.dielectric_constant()
         self.e_square = un.e_square()
-        self.kbt = self.tk * un.k_boltzmann()
+        self.kbt = WaterObject.tk * un.k_boltzmann()
 
         # Bjerrum length in A
         self.bjerrum_length = un.m_2_angstrom(self.e_square / (self.kbt * self.epsilon))
@@ -87,7 +80,9 @@ class Bjerrum():
             z = b_par / x
             return x ** 2 * (np.exp(z) + np.exp(-z) - 2 - z ** 2)
 
-        val, err = quad(intgrnd, 1, max_val)
+        integral_quad = quad(intgrnd, 1, max_val)
+        val = integral_quad[0]
+        err = integral_quad[1]
 
         err_cut_off = (acc * b_par ** 4 / 12.0) / val
 
