@@ -21,7 +21,7 @@ class TestIcosahedra(unittest.TestCase):
         # tests the area
         ico = Ic.Icosahedra()
 
-        # let us compute solid angle
+        # check solid angle
         ang = ico.s_angle()
         ang_total = ico.s_angle_tot()
         # result is 4pi for the total angle, 4pi/120 num_wedges = 120
@@ -29,7 +29,12 @@ class TestIcosahedra(unittest.TestCase):
         self.assertLess(np.abs(ang_total-res), 1e-9)
         self.assertLess(np.abs(ang[0] - res/ico.num_wedges[0]), 1e-9)
 
-        # Computing the volume
+        # maximum value of theta
+        psi = np.arccos((1 + np.sqrt(5)) / (2 * np.sqrt(3)))
+        ang = np.arctan(np.tan(psi) / np.cos(np.pi/3))
+        self.assertLess(np.abs(ico.max_theta()[0]-ang), 1e-9)
+
+        # Check the volume
         dn = 1
         vl = ico.vol(dn)
         vl_tot = ico.vol_tot(dn)

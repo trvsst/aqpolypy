@@ -31,11 +31,11 @@ class WiSe(ABC):
         self.num_wedges = n_distinct_wedges*[None]
 
     @abstractmethod
-    def name(self):
+    def max_theta(self):
         """
-        name of the wigner seitz cell
+        returns maximum angle
 
-        :return: name of the wigner-seitz cell
+        :return: no return is instantiated by derived class
         """
 
     def s_angle_tot(self):

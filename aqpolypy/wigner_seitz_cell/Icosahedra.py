@@ -11,6 +11,7 @@
 import aqpolypy.wigner_seitz_cell.WignerSeitzABC as Ws
 import numpy as np
 
+
 class Icosahedra(Ws.WiSe):
 
     """ Defines a general Wigner Seitz cell"""
@@ -37,11 +38,23 @@ class Icosahedra(Ws.WiSe):
         self.wedges[0] = ((0, np.pi/3), (f1, f2))
         self.num_wedges[0] = 120
 
-    def name(self):
+    def max_theta(self):
         """
-        name of the wigner seitz cell
+        maximum value of the angle :math:`\\theta` for the corresponding wedge
 
-        :return: name (str)
+        :return: maximum value of the angle :math:`\\theta` (ndarray)
         """
 
-        return 'Icosahedron'
+        b = self.wedges[0][0][1]
+        fun = self.wedges[0][1][1]
+
+        return np.array([fun(b)])
+
+    def __str__(self):
+        """
+        String representation
+
+        :return: name of the class
+        """
+
+        return 'Icosahedron Wigner-Seitz cell'
