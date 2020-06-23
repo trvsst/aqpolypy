@@ -1,12 +1,12 @@
 .. _polymer:
 
-Polymer
-=======
+Wigner-Seitz Cell
+=================
 
 WignerSeitzABC
 --------------
 
-.. automodule:: aqpolypy.polymer.WignerSeitzABC
+.. automodule:: aqpolypy.wigner_seitz_cell.WignerSeitzABC
     :members:
     :undoc-members:
     :show-inheritance:
@@ -15,7 +15,7 @@ WignerSeitzABC
 Icosahedron
 -----------
 
-.. automodule:: aqpolypy.polymer.Icosahedra
+.. automodule:: aqpolypy.wigner_seitz_cell.Icosahedra
     :members:
     :undoc-members:
     :show-inheritance:
@@ -24,7 +24,7 @@ Icosahedron
 Rhombic Dodecahedron (fcc)
 --------------------------
 
-.. automodule:: aqpolypy.polymer.RhombicDodecahedron
+.. automodule:: aqpolypy.wigner_seitz_cell.RhombicDodecahedron
     :members:
     :undoc-members:
     :show-inheritance:
