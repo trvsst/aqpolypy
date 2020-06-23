@@ -17,5 +17,9 @@ Stable Python Packages
     aqpolypy.wigner_seitz_cell
     aqpolypy.unit_tests
 
+
+Bibliography
+------------
+
 .. bibliography:: refs.bib
     :all:
