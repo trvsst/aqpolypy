@@ -11,3 +11,11 @@ Bjerrum
     :undoc-members:
     :show-inheritance:
 
+DebyeHuckel
+-----------
+
+.. automodule:: aqpolypy.salts_theory.DebyeHuckel
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
