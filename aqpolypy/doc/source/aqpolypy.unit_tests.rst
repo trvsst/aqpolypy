@@ -13,6 +13,14 @@ units_unit_test
     :undoc-members:
     :show-inheritance:
 
+concentration_unit_test
+-----------------------
+
+.. automodule:: aqpolypy.unit_tests.concentration_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 water_millero_aw_unit_test
 --------------------------
 
