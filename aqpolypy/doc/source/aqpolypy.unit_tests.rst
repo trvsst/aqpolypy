@@ -60,3 +60,21 @@ polymer_brush_spherical_unit_test
     :members:
     :undoc-members:
     :show-inheritance:
+
+
+icosahedra_unit_test
+--------------------
+
+.. automodule:: aqpolypy.unit_tests.icosahedra_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+rhombic_dodecahedron_unit_test
+------------------------------
+
+.. automodule:: aqpolypy.unit_tests.rhombic_dodecahedron_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:

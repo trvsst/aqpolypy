@@ -13,7 +13,12 @@ Stable Python Packages
     aqpolypy.salt
     aqpolypy.polymer
     aqpolypy.free_energy_polymer
+    aqpolypy.wigner_seitz_cell
     aqpolypy.unit_tests
+
+
+Bibliography
+------------
 
 .. bibliography:: refs.bib
     :all:
