@@ -34,5 +34,14 @@ class Icosahedra(Ws.WiSe):
         def f2(x):
             return np.arctan(np.tan(psi)/np.cos(x))
 
-        self.wedge[0] = ((0, np.pi/3), (f1, f2))
+        self.wedges[0] = ((0, np.pi/3), (f1, f2))
         self.num_wedges[0] = 120
+
+    def name(self):
+        """
+        name of the wigner seitz cell
+
+        :return: name (str)
+        """
+
+        return 'Icosahedron'
