@@ -17,17 +17,17 @@ import aqpolypy.units.units as un
 
 class Bjerrum:
 
-    def __init__(self, WaterObject):
+    def __init__(self, water_object):
         """
         constructor
 
-        :param WaterObject: object of water class
+        :param water_object: object of water class
         :instantiate: water class object, bjerrum length
 
         """
-        self.epsilon = WaterObject.dielectric_constant()
+        self.epsilon = water_object.dielectric_constant()
         self.e_square = un.e_square()
-        self.kbt = WaterObject.tk * un.k_boltzmann()
+        self.kbt = water_object.tk * un.k_boltzmann()
 
         # Bjerrum length in A
         self.bjerrum_length = un.m_2_angstrom(self.e_square / (self.kbt * self.epsilon))
