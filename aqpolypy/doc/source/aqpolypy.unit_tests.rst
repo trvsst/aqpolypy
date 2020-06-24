@@ -53,6 +53,14 @@ bjerrum_unit_test
     :undoc-members:
     :show-inheritance:
 
+debye_huckel_unit_test
+----------------------
+
+.. automodule:: aqpolypy.unit_tests.debye_huckel_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 polymer_peo_unit_test
 ---------------------
 
