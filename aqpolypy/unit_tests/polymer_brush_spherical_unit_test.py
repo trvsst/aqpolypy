@@ -170,6 +170,68 @@ class TestPolymerFreeSpherical(unittest.TestCase):
         self.assertTrue(np.allclose(l_comp-chi, vals))
         self.assertTrue(np.allclose(d_comp, d_vals, atol=1e-6, rtol=0.0))
 
+    def test_solveh(self):
+        """testing solving for the lagrange parameter that gives a brush size"""
+
+        # let us take the PEO with molecular weight 5000
+        pl_peo = PeO.PEOSimple(5000)
+
+        # sphere test 1
+        dim = 3
+        # sphere test2
+        xi_t = 5.0
+        chi = 0.5 * (1 / xi_t + 1)
+        sigma = 1.9
+        rad = 0.5 * 90.72
+        lag_ini = 1e-3 - chi
+
+        # compare brush size and free energy for a given value of Lambda
+        b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        h_val = b_sph.determine_h()*pl_peo.k_length
+        c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        c_sph.determine_lagrange(h_val)
+        self.assertLess(np.abs(c_sph.lag-b_sph.lag), 1e-8)
+
+        # starting from a different value of the lagrange parameter
+        lag_ini = 0.1
+        b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        h_val = b_sph.determine_h() * pl_peo.k_length
+        lag_ini_t = 1
+        c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini_t)
+        c_sph.determine_lagrange(h_val)
+        self.assertLess(np.abs(c_sph.lag - b_sph.lag), 1e-7)
+
+        # different values of chi=1.0
+        xi_t = 1.0
+        chi = 0.5 * (1 / xi_t + 1)
+        lag_ini = 1e-3 - chi
+        b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        h_val = b_sph.determine_h() * pl_peo.k_length
+        c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        c_sph.determine_lagrange(h_val)
+        self.assertLess(np.abs(c_sph.lag - b_sph.lag), 1e-7)
+
+        # different values of chi=0.5
+        xi_t = 0.5
+        chi = 0.5 * (1 / xi_t + 1)
+        lag_ini = 1e-1 - chi
+        b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        h_val = b_sph.determine_h() * pl_peo.k_length
+        c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        c_sph.determine_lagrange(h_val)
+        self.assertLess(np.abs(c_sph.lag - b_sph.lag), 1e-7)
+
+        # different values of chi=0.1, optimal value of h
+        xi_t = 0.1
+        chi = 0.5 * (1 / xi_t + 1)
+        lag_ini = 1e-3 - chi
+        b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        res = b_sph.optimal_lambda()
+        h_val = b_sph.determine_h() * pl_peo.k_length
+        c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
+        c_sph.determine_lagrange(h_val, lag=-1.6)
+        self.assertLess(np.abs(c_sph.lag - b_sph.lag), 1e-7)
+
 
 if __name__ == '__main__':
     unittest.main()

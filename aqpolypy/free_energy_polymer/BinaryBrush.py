@@ -201,24 +201,35 @@ class BinaryBrush(MakeBrushSolvent):
 
         return val1 - val2
 
-    def determine_lagrange(self, h):
+    def determine_lagrange(self, h, lag=None):
         """
         Determine the value of the Lagrange parameter :math:`\\Lambda` that gives a brush of size :math:`h`
 
         :param h: value of brush size (in Angstrom)
+        :param lag: initial value of Lagrange multiplier
         """
 
         # brush size in dimensionless units
         h_var = h/self.pol.k_length
 
+        if lag is None:
+            lag = 1e-3 - self.chi
+
         def intgr(u):
             return self.intg(u) * self.phi(u)
+
+        def der_intgr(u):
+            return self.intg(u) * self.der_phi_lag(u)
 
         def fun(x):
             self.lag = x
             return integrate.quad(intgr, 0, h_var)[0] - self.n_p / self.xi_s ** 2
 
-        return optimize.newton(fun, self.lag_ini, self.der_phi_lag())
+        def der_fun(x):
+            self.lag = x
+            return integrate.quad(der_intgr, 0, h_var)[0]
+
+        return optimize.newton(fun, lag, der_fun)
 
     def determine_h(self):
         """
@@ -266,7 +277,6 @@ class BinaryBrush(MakeBrushSolvent):
             return self.eqn_min_phi(u, x)
 
         ic = [tol, 1 - tol]
-
         return optimize.brentq(fp_phi, ic[0], ic[1])
 
     def der_phi_lag(self, u):
@@ -276,7 +286,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: phi_der
 
-            \\frac{\\partial \\phi(u)}{\\partial \\Lambda}=-\\frac{\\phi(u)(1-\\phi(u)}{\\frac{\\upsilon}{\\upsilon_p}
+            \\frac{\\partial \\phi(u)}{\\partial \\Lambda}=-\\frac{\\phi(u)(1-\\phi(u))}{\\frac{\\upsilon}{\\upsilon_p}
             \\frac{1}{N}(1-\\phi(u))\\left(1+2\\log(\\frac{\\phi(u)}{N}\\right)+\\phi(u)-6\\chi\\phi(u)(1-\\phi(u))
             +2(1-\\phi(u))\\left(\\Lambda+\\chi-\\log(1-\\phi(u))\\right)}
 
@@ -286,7 +296,7 @@ class BinaryBrush(MakeBrushSolvent):
 
         z = self.phi(u)
 
-        c1 = self.r_vol*(1-z)*(1+2*np.log(z/self.n_p))/self.n_p
+        c1 = (1-z)*(1+2*np.log(z/self.n_p))/(self.r_vol*self.n_p)
         c2 = z- 6*self.chi*z*(1-z)+2*(1-z)*(self.lag+self.chi-np.log(1-z))
 
         return -z*(1-z)/(c1+c2)
