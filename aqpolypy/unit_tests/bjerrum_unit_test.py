@@ -89,3 +89,7 @@ class TestBjerrum(unittest.TestCase):
         test_2 = np.allclose(obj_bj_2.bjerrum_constant(param[:, 1]), param[:, 2], 0, 1e1)
         self.assertTrue(test_1)
         self.assertTrue(test_2)
+
+
+if __name__ == '__main__':
+    unittest.main()
