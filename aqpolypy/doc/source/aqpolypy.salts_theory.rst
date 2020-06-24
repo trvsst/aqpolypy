@@ -19,3 +19,11 @@ DebyeHuckel
     :undoc-members:
     :show-inheritance:
 
+HardCore
+--------
+
+.. automodule:: aqpolypy.salts_theory.HardCore
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
