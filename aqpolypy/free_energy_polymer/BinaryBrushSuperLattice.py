@@ -18,7 +18,7 @@ class BinaryBrushSuperLattice(MakeBrushSolvent):
 
     """ Defines the free energy of a Brush in a superlattice"""
 
-    def __init__(self, dim, chi, sigma, rad, pol, d_n, **kwargs):
+    def __init__(self, dim, chi, sigma, rad, pol, d_n, ws, **kwargs):
         """
         constructor
 
@@ -26,8 +26,9 @@ class BinaryBrushSuperLattice(MakeBrushSolvent):
         :param chi: Flory-Huggins Parameter :math:`\\chi`
         :param sigma: grafting density :math:`\\sigma`` in chains/nm :sup:`3`
         :param rad: nanocrystal radius in Angstrom
-        :param pol: Polymer object
+        :param pol: object of class :class:`PolymerProperties <aqpolypy.polymer.PolymerPropertiesABC.PolymerProperties>`
         :param d_n: nearest neighbor distance for nanocrystals within the lattice in Angstrom
+        :param ws: object of class :class:`WiSe <aqpolypy.wigner_seitz_cell.WignerSeitzABC.WiSe>`
         :param kwargs: optional arguments c_s, v_solvent
         """
 
