@@ -15,64 +15,62 @@ import aqpolypy.units.units as un
 
 class HardCore:
 
-    def __init__(self):
+    def __init__(self, b_fac=np.array([1, 1, 2])):
         """
         constructor
-        """
 
-    @staticmethod
-    def free_energy_hc_excess(c, ion_size, b_fac=np.array([1, 1, 2])):
+        :param b_fac: B_factors for the different species in units of ion_size
+        :instantiate: B_factors
         """
-        Excess free energy of the hard core according to :cite:`Levin1996`
+        self.b_fac = b_fac
+
+    def free_energy_hc_excess(self, c, ion_size):
+        """
+        Excess free energy of the hard core
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :param b_fac: B_factors for the different species in units of ion_size
         :return : excess free energy (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
 
-        arg_vol = np.dot(b_fac, cc_molecular) * ion_size ** 3
+        arg_vol = np.dot(self.b_fac, cc_molecular) * ion_size ** 3
 
         free_energy_hc_excess = np.sum(cc_molecular, axis=0) * np.log(1 - arg_vol)
         return free_energy_hc_excess
 
-    @staticmethod
-    def pot_chem_hc_excess(c, ion_size, b_fac=np.array([1, 1, 2])):
+    def pot_chem_hc_excess(self, c, ion_size):
         """
-        Excess chemical potential of the hard core according to :cite:`Levin1996`
+        Excess chemical potential of the hard core
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :param b_fac: B_factors for the different species in units of ion_size
         :return : excess chemical potential (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
 
-        arg_vol = np.dot(b_fac, cc_molecular) * ion_size ** 3
+        arg_vol = np.dot(self.b_fac, cc_molecular) * ion_size ** 3
 
         t1 = -np.log(1 - arg_vol)
         t2 = ion_size ** 3 * np.sum(cc_molecular, axis=0) / (1 - arg_vol)
 
-        pot_chem_hc_excess = np.outer(b_fac, t2) + t1
+        pot_chem_hc_excess = np.outer(self.b_fac, t2) + t1
         return pot_chem_hc_excess
 
-    @staticmethod
-    def pressure_hc_excess(c, ion_size, b_fac=np.array([1, 1, 2])):
+    def pressure_hc_excess(self, c, ion_size):
         """
-        Excess pressure for the hard core according to :cite:`Levin1996`
+        Excess pressure for the hard core
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :param b_fac: B_factors for the different species in units of ion_size
         :return : excess pressure (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
 
-        arg_vol = np.dot(b_fac, cc_molecular) * ion_size ** 3
+        arg_vol = np.dot(self.b_fac, cc_molecular) * ion_size ** 3
 
         pressure_hc_excess = np.sum(cc_molecular, axis=0) / (1 - arg_vol)
         return pressure_hc_excess
