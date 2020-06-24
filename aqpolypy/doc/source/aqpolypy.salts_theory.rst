@@ -27,3 +27,11 @@ HardCore
     :undoc-members:
     :show-inheritance:
 
+Dipole
+------
+
+.. automodule:: aqpolypy.salts_theory.Dipole
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
