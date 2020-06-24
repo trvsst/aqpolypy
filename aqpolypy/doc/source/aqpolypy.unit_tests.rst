@@ -45,6 +45,14 @@ salt_nacl_rp_unit_test
     :undoc-members:
     :show-inheritance:
 
+bjerrum_unit_test
+-----------------
+
+.. automodule:: aqpolypy.unit_tests.bjerrum_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 polymer_peo_unit_test
 ---------------------
 
