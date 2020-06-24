@@ -94,7 +94,7 @@ class Bjerrum:
         Value of Bjerrum constant according to Ebeling :cite:`Ebel:71`
 
         :param ion_size: Ion size (in Angstrom)
-        :return: Bjerrum constant in units of :math:`a^3`(float)
+        :return: Bjerrum constant in units of :math:`a^3` (float)
         """
 
         z = 1 / self.temp_star(ion_size)
