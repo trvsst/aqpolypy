@@ -61,6 +61,14 @@ debye_huckel_unit_test
     :undoc-members:
     :show-inheritance:
 
+hard_core_unit_test
+-------------------
+
+.. automodule:: aqpolypy.unit_tests.hard_core_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 dipole_unit_test
 ----------------
 
