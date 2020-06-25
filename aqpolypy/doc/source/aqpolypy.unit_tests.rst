@@ -61,6 +61,14 @@ debye_huckel_unit_test
     :undoc-members:
     :show-inheritance:
 
+dipole_unit_test
+----------------
+
+.. automodule:: aqpolypy.unit_tests.dipole_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 polymer_peo_unit_test
 ---------------------
 
