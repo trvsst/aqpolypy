@@ -41,7 +41,9 @@ class Bjerrum:
 
                 T^{\\ast}=\\frac{a}{l_B(T)}
 
-                :label: bjerrum_length
+            Bjerrum length is
+
+            .. math::
 
                 l_B(T)=\\frac{q^2}{4\\pi\\varepsilon_0\\varepsilon_r k_B T}
 
@@ -60,11 +62,15 @@ class Bjerrum:
 
             K_B(T)=4\\pi a^3\\int_1^{\\infty}dy y^2\\left(e^{b/y}+e^{-b/y}-2-\\frac{b^2}{y^2}\\right)
 
-            :label: b_variable
+        B variable is
 
-            b=1/T^{\\ast}
+        .. math::
 
-            :label: ion_radius
+            b = 1/T^{\\ast}
+
+        Ion radius is
+
+        .. math::
 
             a
 

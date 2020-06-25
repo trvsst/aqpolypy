@@ -29,10 +29,10 @@ class Dipole:
     @staticmethod
     def omega(x):
         """
-        Function omega as defined in :cite:`Levin1996` Eq. 7.13
+        Function :math:`\\omega` as defined in :cite:`Levin1996` Eq. 7.13
 
         :param x: argument
-        :return : value of omega (float)
+        :return: value of :math:`\\omega` (float)
         """
         omega = 3 * (np.log(1 + x + x ** 2 / 3) - x + x ** 2 / 6) / x ** 4
         return omega
@@ -40,10 +40,10 @@ class Dipole:
     @staticmethod
     def der_x2omega(x):
         """
-        Derivative of  x^2omega
+        Derivative of :math:`x^2\\omega`
 
         :param x: argument
-        :return : value of the derivative (float)
+        :return: value of the derivative (float)
         """
 
         val1 = x * (6 + 5 * x + x ** 2) / (3 + 3 * x + x ** 2)
@@ -57,11 +57,11 @@ class Dipole:
         Excess free energy of the dipole function
 
         :param c: concentration of ions (both + and -) mols/litre (M)
-        :param ion_size: ionic size in Angstrom
+        :param ion_size: ionic size (in Angstrom)
         :param x_pair: fraction of Bjerrum pairs
         :param a1_d: dipole distance, in units of ion_size
         :param a2_d: diameter of enclosing dipole, in units of ion_size
-        :return : excess free energy in units of ion_size**3 (float)
+        :return: excess free energy in units of :math:`ion\\_size^3` (float)
         """
 
         l_dh = dh.DebyeHuckel(self.bjerrum_object).debye_length((1 - x_pair) * c)
@@ -78,11 +78,11 @@ class Dipole:
         Excess chemical potential of the dipole function
 
         :param c: concentration of ions (both + and -) mols/litre (M)
-        :param ion_size: ionic size in Angstrom
+        :param ion_size: ionic size (in Angstrom)
         :param x_pair: fraction of Bjerrum pairs
         :param a1_d: dipole distance, in units of ion_size
         :param a2_d: diameter of enclosing dipole, in units of ion_size
-        :return : excess chemical potential (ndarray)
+        :return: excess chemical potential (ndarray)
         """
 
         l_dh = dh.DebyeHuckel(self.bjerrum_object).debye_length((1 - x_pair) * c)

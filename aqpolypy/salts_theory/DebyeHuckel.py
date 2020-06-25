@@ -47,7 +47,7 @@ class DebyeHuckel:
 
         :param c: concentration of ions (both + and -) mols/litre (M)
         :param ion_size: Ion diameter (in Angstrom)
-        :return: excess free energy per unit volume in units of math:'k_BT/a^3' (float)
+        :return: excess free energy per unit volume in units of :math:`\\frac{k_BT}{a^3}` (float)
         """
 
         return ion_size / self.debye_length(c)
@@ -58,7 +58,7 @@ class DebyeHuckel:
 
         :param c: concentration of ions (both + and -) mols/litre (M)
         :param ion_size: Ion diameter (in Angstrom)
-        :return: excess free energy per unit volume in units of math:'k_BT/a^3' (float)
+        :return: excess free energy per unit volume in units of :math:`\\frac{k_BT}{a^3}` (float)
         """
 
         z = self.ion_size_debye_ratio(c, ion_size)
@@ -72,7 +72,7 @@ class DebyeHuckel:
 
         :param c: concentration of ions (both + and -) mols/litre (M)
         :param ion_size: Ion diameter (in Angstrom)
-        :return: excess chemical potential in units of math:'k_BT' (float)
+        :return: excess chemical potential in units of :math:`k_BT` (float)
         """
         z = self.ion_size_debye_ratio(c, ion_size)
 
@@ -87,7 +87,7 @@ class DebyeHuckel:
 
         :param c: concentration of ions (both + and -) mols/litre (M)
         :param ion_size: Ion diameter (in Angstrom)
-        :return: excess pressure in units of math:'k_BT/a^3' (float)
+        :return: excess pressure in units of :math:`\\frac{k_BT}{a^3}` (float)
         """
         z = self.ion_size_debye_ratio(c, ion_size)
 

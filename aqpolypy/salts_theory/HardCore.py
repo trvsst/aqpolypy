@@ -30,7 +30,7 @@ class HardCore:
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :return : excess free energy (float)
+        :return: excess free energy (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
@@ -46,7 +46,7 @@ class HardCore:
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :return : excess chemical potential (float)
+        :return: excess chemical potential (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
@@ -65,7 +65,7 @@ class HardCore:
 
         :param c: concentration of the different species mols/litre (M)
         :param ion_size: ionic size (in Angstrom)
-        :return : excess pressure (float)
+        :return: excess pressure (float)
         """
 
         cc_molecular = un.mol_lit_2_mol_angstrom(c)
