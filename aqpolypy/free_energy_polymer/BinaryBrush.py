@@ -331,9 +331,9 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: f_der
 
-            \\frac{\\partial f}{\\partial \\hat{H}} =
+            \\frac{\\partial f}{\\partial \\hat{H}} = -4\\pi \\hat{H}^2 \\frac{b^3}{{\\cal N} k_B T} \\Pi
 
-        see Eq. :eq:`free`
+        where :math:`\\Pi` is the Osmotic pressure. See also Eq. :eq:`free`
 
         :return: derivative of the free energy (float)
         """
