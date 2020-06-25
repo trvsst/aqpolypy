@@ -37,6 +37,15 @@ class WiSe(ABC):
 
         :return: no return is instantiated by derived class
         """
+
+    def min_theta(self):
+        """
+        returns the minimum angle
+
+        :return: minimum angle (ndarray)
+        """
+        return np.zeros(self.distinct_wedges)
+
     @staticmethod
     def h_size(theta, dn, rad):
         """
@@ -121,7 +130,7 @@ class WiSe(ABC):
 
             def h(x):
                 return self.h_size(x, dn, rad)
-            
+
             for ind, wg in enumerate(self.wedges):
                 a, b = wg[0]
                 ws_vol[ind] = integrate.dblquad(fun, a, b, ze, h)

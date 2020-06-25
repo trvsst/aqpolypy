@@ -137,7 +137,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: free
 
-            f(H)\\equiv\\frac{F}{{\\cal N} k_B T}=\\int_0^{H} du f(u,\\phi(u))
+            f(\\hat{H})\\equiv\\frac{F}{{\\cal N} k_B T}=\\int_0^{\\hat{H}} du f(u,\\phi(u))
 
         :param size_b: brush size
         :param phi_b: function phi
@@ -238,9 +238,9 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: brush_size
 
-            H(\\Lambda)
+            \\hat{H}(\\Lambda)
 
-        :return: optimal the value of :math:`H` (float)
+        :return: optimal the value of :math:`\\hat{H}` (float)
         """
 
         def intgr(u):
@@ -309,7 +309,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: f_der_min
 
-            \\frac{\\partial}{\\partial H} f(H)=0
+            \\frac{\\partial}{\\partial \\hat{H}} f(\\hat{H})=0
 
         see Eq. :eq:`free`
 
@@ -331,7 +331,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: f_der
 
-            \\frac{\\partial f}{\\partial H}
+            \\frac{\\partial f}{\\partial \\hat{H}} =
 
         see Eq. :eq:`free`
 
