@@ -75,8 +75,8 @@ class TestDipole(unittest.TestCase):
                     test_1 = np.allclose(dp_method[j], param[i, 4 + j], 0, 1e-4)
                     test_2 = np.allclose(dp_method_2[j], param[i, 4 + j], 0, 1e-4)
 
-                self.assertTrue(test_1, dp_method[0])
-                self.assertTrue(test_2, dp_method_2[j])
+                self.assertTrue(test_1)
+                self.assertTrue(test_2)
 
 
 if __name__ == '__main__':
