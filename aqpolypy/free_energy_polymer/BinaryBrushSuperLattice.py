@@ -44,14 +44,10 @@ class BinaryBrushSuperLattice(MakeBrushSolvent):
 
         self.d_min = 2*(self.hat_r*pol.k_length + self.h_min)
         self.d_max = 2*(self.hat_r*pol.k_length + self.h_max)
-        print(self.h_min, self.h_max)
-        print(self.d_min, self.d_max)
 
         # find the lagrange multipliers corresponding to these distances
         lag_ini = 1e-3-chi
         bb = BinaryBrush(dim, chi, sigma, rad, pol, lag_ini)
         lag_opt = bb.optimal_lambda().x
-        print(lag_opt, 2*(self.hat_r+bb.determine_h())*pol.k_length)
         self.lag_max = bb.determine_lagrange(self.h_max[0])
         self.lag_min = bb.determine_lagrange(self.h_min[0], lag_opt)
-

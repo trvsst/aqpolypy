@@ -27,7 +27,7 @@ class BinaryBrush(MakeBrushSolvent):
         :param chi: Flory-Huggins Parameter :math:`\\chi`
         :param sigma: grafting density :math:`\\sigma`` in chains/nm :sup:`3`
         :param rad: nanocrystal radius in Angstrom
-        :param pol: Polymer object
+        :param pol: object of class :class:`PolymerProperties <aqpolypy.polymer.PolymerPropertiesABC.PolymerProperties>`
         :param lag: Initial Lagrange Multiplier :math:`\\Lambda` (necessary to enforce normalization of :math:`\\phi`)
         :param kwargs: optional arguments c_s, v_solvent
         """
@@ -41,57 +41,58 @@ class BinaryBrush(MakeBrushSolvent):
         self.lag = lag
         self.lag_ini = lag
 
-    def f_ideal(self, phi):
+    def f_ideal(self, u, phi):
         """
         Ideal free energy:
 
         .. math::
             :label: free_ideal
 
-            f_{id}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\frac{\\upsilon}{\\upsilon_p}
-            \\frac{\\phi(u)}{N}\\log\\left(\\frac{\\phi(u)}{Ne}\\right)+(1-\\phi(u))\\log\\left(\\frac{1-\\phi(u)}{e}
-            \\right)+1\\right]
+            f_{id}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2 Q(u)\\left[(1-\\phi(u))
+            \\log\\left(\\frac{1-\\phi(u)}{e}\\right)+1\\right]
 
+        :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param phi: polymer volume fraction :math:`\\phi(u)`
-
         :return: value of the free energy (float)
         """
 
-        id_1 = lg(phi / (self.r_vol * self.n_p), phi / (self.n_p * np.exp(1)))
+        # id_1 = lg(phi / (self.r_vol * self.n_p), phi / (self.n_p * np.exp(1)))
         id_2 = lg(1 - phi, (1 - phi) / np.exp(1)) + 1
 
-        return self.f_norm * (id_1 + id_2)
+        return self.f_norm * self.intg(u) * id_2
 
-    def f_flory_huggins(self, phi):
+    def f_flory_huggins(self, u, phi):
         """
         Flory Huggins free energy:
 
         .. math::
             :label: flory_huggins
 
-            f_{fh}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\chi \\phi(u)(1-\\phi(u))\\right]
+            f_{fh}(u, \\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2 Q(u)\\left[\\chi \\phi(u)(1-\\phi(u))\\right]
 
+        :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param phi: polymer volume fraction :math:`\\phi(u)`
         :return: value of the free energy (float)
         """
 
-        return self.f_norm * self.chi * phi * (1 - phi)
+        return self.f_norm * self.intg(u) * self.chi * phi * (1 - phi)
 
-    def f_stretch(self, phi):
+    def f_stretch(self, u, phi):
         """
         Stretching free energy
 
         .. math::
             :label: stretch
 
-            f_{s}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2\\left[\\frac{1}{\\hat{\\xi}^4_S}
+            f_{s}(u,\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2 Q(u) \\left[\\frac{1}{\\hat{\\xi}^4_S}
             \\frac{1}{c_s}\\frac{\\upsilon}{\\upsilon_p}\\frac{1}{\\phi(u)}\\right]
 
+        :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param phi: polymer volume fraction :math:`\\phi(u)`
         :return: value of the free energy (float)
         """
-
-        return self.f_norm / ((self.xi_s ** 4) * self.c_s * self.r_vol * phi)
+        # print(self.intg(u), u, phi)
+        return self.f_norm / (self.intg(u)*(self.xi_s ** 4) * self.c_s * self.r_vol * phi)
 
     def intg(self, u):
         """
@@ -115,20 +116,15 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: free_density
 
-            f(u,\\phi) = Q(u)\\left(f_{id}(\\phi)+f_{fg}(\\phi)\\right)+\\frac{f_s(\\phi)}{Q(u)}
+            f(u,\\phi) = \\left[f_{id}(u, \\phi), f_{fg}(u, \\phi), f_s(u, \\phi)\\right]
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :param phi: polymer volume fraction  :math:`\\phi(u)`
 
-        :return: value of free energy (float)
+        :return: value of free energy for each energy contribution (ndarray)
         """
 
-        val0 = self.intg(u)
-
-        val1 = self.f_ideal(phi) + self.f_flory_huggins(phi)
-        val2 = self.f_stretch(phi)
-
-        return val0 * val1 + val2 / val0
+        return np.array([self.f_ideal(u, phi), self.f_flory_huggins(u, phi), self.f_stretch(u, phi)])
 
     def free_energy(self, size_b=None, phi_b=None):
         """
@@ -141,7 +137,7 @@ class BinaryBrush(MakeBrushSolvent):
 
         :param size_b: brush size
         :param phi_b: function phi
-        :return: value of the free energy (float)
+        :return: value of the free energy (list)
         """
 
         if size_b is None:
@@ -154,10 +150,14 @@ class BinaryBrush(MakeBrushSolvent):
         else:
             phi_a = phi_b
 
-        def fun(u):
-            return self.f_dens(u, phi_a(u))
+        fr = 3*[0]
 
-        return integrate.quad(fun, 0.0, h_m)
+        for ind in range(3):
+            def fun(u):
+                return self.f_dens(u, phi_a(u))[ind]
+            fr[ind] = integrate.quad(fun, 0.0, h_m)
+
+        return fr
 
     def lhs_eqn_phi(self, phi):
         """
@@ -166,18 +166,17 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: E_def
 
-            E_1(\\phi(u)) \\equiv \\frac{\\upsilon}{\\upsilon_p}\\frac{1}{N}\\log\\left(\\frac{\\phi(u)}{N}\\right)
-            -\\log(1-\\phi(u))+\\chi(1-2\\phi(u))+\\Lambda
+            E_1(\\phi(u)) \\equiv -\\log(1-\\phi(u))+\\chi(1-2\\phi(u))+\\Lambda
 
         :param phi: polymer volume fraction :math:`\\phi(u)`
         :return: value of the quantity (float)
         """
 
-        ct2_1 = np.log(phi / self.n_p) / (self.n_p * self.r_vol)
+        # ct2_1 = np.log(phi / self.n_p) / (self.n_p * self.r_vol)
         ct2_2 = -np.log(1 - phi)
         ct2_3 = -2*self.chi*phi
 
-        return ct2_1 + ct2_2 + ct2_3 + self.lag + self.chi
+        return ct2_2 + ct2_3 + self.lag + self.chi
 
     def eqn_min_phi(self, u, phi):
         """
@@ -197,7 +196,7 @@ class BinaryBrush(MakeBrushSolvent):
         """
 
         val1 = self.lhs_eqn_phi(phi)
-        val2 = self.f_stretch(phi) / (self.f_norm * phi * (self.intg(u)) ** 2)
+        val2 = self.f_stretch(u, phi) / (self.f_norm * phi * self.intg(u))
 
         return val1 - val2
 
@@ -286,9 +285,8 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: phi_der
 
-            \\frac{\\partial \\phi(u)}{\\partial \\Lambda}=-\\frac{\\phi(u)(1-\\phi(u))}{\\frac{\\upsilon}{\\upsilon_p}
-            \\frac{1}{N}(1-\\phi(u))\\left(1+2\\log(\\frac{\\phi(u)}{N}\\right)+\\phi(u)-6\\chi\\phi(u)(1-\\phi(u))
-            +2(1-\\phi(u))\\left(\\Lambda+\\chi-\\log(1-\\phi(u))\\right)}
+            \\frac{\\partial \\phi(u)}{\\partial \\Lambda}=-\\frac{\\phi(u)(1-\\phi(u))}{
+            \\phi(u)-6\\chi\\phi(u)(1-\\phi(u))+2(1-\\phi(u))\\left(\\Lambda+\\chi-\\log(1-\\phi(u))\\right)}
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
         :return: value of :math:`\\frac{\\partial \\phi(u)}{\\partial \\Lambda}` (float)
@@ -296,10 +294,10 @@ class BinaryBrush(MakeBrushSolvent):
 
         z = self.phi(u)
 
-        c1 = (1-z)*(1+2*np.log(z/self.n_p))/(self.r_vol*self.n_p)
-        c2 = z- 6*self.chi*z*(1-z)+2*(1-z)*(self.lag+self.chi-np.log(1-z))
+        # c1 = (1-z)*(1+2*np.log(z/self.n_p))/(self.r_vol*self.n_p)
+        c2 = z - 6*self.chi*z*(1-z)+2*(1-z)*(self.lag+self.chi-np.log(1-z))
 
-        return -z*(1-z)/(c1+c2)
+        return -z*(1-z)/c2
 
     def optimal_lambda(self):
         """
@@ -320,7 +318,8 @@ class BinaryBrush(MakeBrushSolvent):
 
         def fopt(lam):
             self.lag = lam
-            return self.free_energy()[0]
+            free = self.free_energy()
+            return free[0][0] + free[1][0] + free[2][0]
 
         return optimize.minimize_scalar(fopt)
 
@@ -340,8 +339,9 @@ class BinaryBrush(MakeBrushSolvent):
 
         h_t = self.determine_h()
         phi_h = self.phi(h_t)
+        fe = self.f_dens(h_t, phi_h)
 
-        return self.f_dens(h_t, phi_h) + self.f_norm * self.intg(h_t) * self.lag * phi_h
+        return np.sum(fe) + self.f_norm * self.intg(h_t) * self.lag * phi_h
 
     def inv_phi(self, phi):
         """
@@ -356,7 +356,7 @@ class BinaryBrush(MakeBrushSolvent):
         :return: value of :math:`u(\\phi)` (float)
         """
 
-        val = self.f_norm * self.lhs_eqn_phi(phi) * phi / (self.f_stretch(phi))
+        val = self.f_norm * self.lhs_eqn_phi(phi) * phi / (self.f_stretch(0, phi))
 
         return self.hat_r * (val ** (-0.5 / (self.dim - 1)) - 1)
 
@@ -367,7 +367,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: norm
 
-            \\frac{\\xi_S^2}{N} \\int_0^{\\hat{H}}du\\phi(u) = 1
+            \\frac{{\\hat \\xi}_S^2}{N} \\int_0^{\\hat{H}}du\\phi(u) = 1
 
         :return:  (normalization, error) as a tuple
         """
