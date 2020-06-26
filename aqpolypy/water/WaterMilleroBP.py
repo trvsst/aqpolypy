@@ -12,7 +12,6 @@
 """
 
 import numpy as np
-import math
 import aqpolypy.units.units as un
 import aqpolypy.water.WaterPropertiesABC as wp
 
@@ -76,7 +75,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         self.U[7] = 4.2142e6
         self.U[8] = 2.1417
 
-        self.D100 = self.U[0] * (math.e ** (self.U[1] * self.tk + self.U[2] * self.tk ** 2))
+        self.D100 = self.U[0] * (np.exp(self.U[1] * self.tk + self.U[2] * self.tk ** 2))
         self.C = self.U[3] + self.U[4] / (self.U[5] + self.tk)
         self.B_dc = self.U[6] + (self.U[7] / self.tk) + self.U[8] * self.tk
 
