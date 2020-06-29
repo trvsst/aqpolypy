@@ -94,3 +94,22 @@ class SaltProperties(ABC):
         :param m: molality
         """
         pass
+
+    @abstractmethod
+    def apparent_molal_enthalpy(self, m):
+        """
+        Abstract method: calculates the apparent molal enthalpy :math:`L_{\\phi}`
+
+        :param m: molality
+        """
+        pass
+
+    @abstractmethod
+    def heat_dilution(self, m1, m2):
+        """
+        Abstract method: calculates the heat of dilution
+
+        :param m1: molality
+        :param m2: molality
+        """
+        pass
