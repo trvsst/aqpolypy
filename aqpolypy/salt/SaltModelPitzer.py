@@ -324,3 +324,48 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         log_gamma = val_1 + val_2 + val_3
 
         return log_gamma
+
+    def apparent_molal_enthalpy(self, m):
+        """
+            Apparent molal enthalpy according to Pitzer :cite:``
+
+            .. math::
+
+
+
+            :return: apparent molal enthalpy in SI (float)
+            """
+        # stoichiometric_coefficients
+        nu, nu_prod, z_prod, nz_prod_plus = self.mat
+
+        # ionic strength
+        i_str = self.ionic_strength(m)
+        x = np.sqrt(i_str)
+
+        beta_0_der = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
+        beta_1_der = 2 * self.qm[9] * self.tk + self.qm[8]
+
+        beta_prime = beta_0_der + (2 * beta_1_der / (2 ** 2) * i_str) * (1 - (1 + 2 * x) * np.exp(-2 * x))
+
+        c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
+        c_prime = ((nu_prod ** 0.5) / 2) * c_phi_der_t
+
+        a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
+
+        l_phi = nu * z_prod * (a_h / 3.6) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * m ** 2)
+
+        return l_phi
+
+    def heat_dilution(self, m1, m2):
+        """
+            Heat of dilution according to Pitzer :cite:``
+
+            .. math::
+
+
+
+            :return: heat of dilution in SI (float)
+            """
+        heat_dil = self.apparent_molal_enthalpy(m2) - self.apparent_molal_enthalpy(m1)
+
+        return heat_dil
