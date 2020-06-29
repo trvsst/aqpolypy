@@ -10,7 +10,8 @@
 ..                  - Made abstract methods: density, molar_volume, dielectric_constant, compressibility.
 ..                  - Added temperature and pressure parameters to constructor.
 ..                  - Added water polarizability and dipole moment to constructor.
-..                  - Made abstract methods: a_phi and a_v
+..                  - Made abstract methods: a_phi and a_v.
+..                  - Added enthalpy_coefficient abstract method.
 """
 
 
@@ -89,3 +90,11 @@ class WaterProperties(ABC):
         :math:`A_{v}=-2A_{\\phi}RT[3\\left(\\frac{\\partial\\varepsilon}{\\partial P}+\\beta_w\\right)`
         """
         pass
+
+    @abstractmethod
+    def enthalpy_coefficient(self):
+        """
+        Abstract method: calculates the enthalpy coefficient of water defined by
+
+        :math:`A_{H}=-6A_{\\phi}\\left[1+T\\left(\\frac{\\partial \\ln D}{\\partial T}\\right)_{P}+\\frac{T\\alpha_{w}}{3}\\right]`
+        """
