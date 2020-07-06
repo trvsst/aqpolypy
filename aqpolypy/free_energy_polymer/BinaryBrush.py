@@ -48,7 +48,7 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: free_ideal
 
-            f_{id}(\\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2 Q(u)\\left[(1-\\phi(u))
+            f_{id}(u, \\phi)=\\frac{\\upsilon_p}{\\upsilon}\\hat{\\xi}_S^2 Q(u)\\left[(1-\\phi(u))
             \\log\\left(\\frac{1-\\phi(u)}{e}\\right)+1\\right]
 
         :param u: variable :math:`u\\equiv\\frac{z}{b}`, where z is the perpendicular direction
@@ -330,9 +330,9 @@ class BinaryBrush(MakeBrushSolvent):
         .. math::
             :label: f_der
 
-            \\frac{\\partial f}{\\partial \\hat{H}} = -4\\pi \\hat{H}^2 \\frac{b^3}{{\\cal N} k_B T} \\Pi
+            \\frac{\\partial f}{\\partial \\hat{H}} = -\\frac{\\Pi(\\hat{H})}{{\\cal N}_p k_B T} S_d(R+H)
 
-        where :math:`\\Pi` is the Osmotic pressure. See also Eq. :eq:`free`
+        where :math:`\\Pi` is the Osmotic pressure and :math:`S_d(R+H)` the projected area. See also Eq. :eq:`free`
 
         :return: derivative of the free energy (float)
         """
