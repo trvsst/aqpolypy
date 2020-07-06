@@ -96,5 +96,5 @@ class WaterProperties(ABC):
         """
         Abstract method: calculates the enthalpy coefficient of water defined by
 
-        :math:`A_{H}=-6A_{\\phi}\\left[1+T\\left(\\frac{\\partial \\ln D}{\\partial T}\\right)_{P}+\\frac{T\\alpha_{w}}{3}\\right]`
+        :math:`A_{H}=-9A_{\\phi}\\left[1+T\\left(\\frac{\\partial \\ln D}{\\partial T}\\right)_{P}+\\frac{T\\alpha_{w}}{3}\\right]`
         """
