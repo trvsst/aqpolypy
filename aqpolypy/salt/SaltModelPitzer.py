@@ -327,11 +327,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def apparent_molal_enthalpy(self, m):
         """
-            Apparent molal enthalpy according to Pitzer :cite:``
+            Apparent molal enthalpy according to Silvester and Pitzer :cite:`Silvester1977`
 
             .. math::
 
-
+                ^\\phi L=\\nu |z_{+}z_{-}|\\left(\\frac{A_{H}}{3.6}\\right)\\ln \\left(1 + 1.2 I^{\\frac{1}{2}}\\right)
+                - 2 \\nu_{+} \\nu_{-}RT^{2} \\left(mB^{'}_{\\pm} + m^{2}C^{'}_{\\pm}\\right)
 
             :return: apparent molal enthalpy in SI (float)
             """
@@ -345,24 +346,24 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         beta_0_der = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
         beta_1_der = 2 * self.qm[9] * self.tk + self.qm[8]
 
-        beta_prime = beta_0_der + (2 * beta_1_der / (2 ** 2) * i_str) * (1 - (1 + 2 * x) * np.exp(-2 * x))
+        beta_prime = beta_0_der + (2 * beta_1_der / ((2 ** 2) * i_str)) * (1 - (1 + 2 * x) * np.exp(-2 * x))
 
         c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
         c_prime = ((nu_prod ** 0.5) / 2) * c_phi_der_t
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
 
-        l_phi = nu * z_prod * (a_h / 3.6) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * m ** 2)
+        l_phi = nu * z_prod * (a_h / (2 * 1.2)) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * (m ** 2))
 
         return l_phi
 
     def heat_dilution(self, m1, m2):
         """
-            Heat of dilution according to Pitzer :cite:``
+            Heat of dilution according to Silvester and Pitzer :cite:`Silvester1977`
 
             .. math::
 
-
+                \\Delta \\bar{H}_{D}\\left(m_{1}\\rightarrow m_{2}\\right) = \\, ^\\phi L_{2} \\, -\\, ^\\phi L_{1}
 
             :return: heat of dilution in SI (float)
             """
