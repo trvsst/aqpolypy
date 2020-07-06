@@ -14,6 +14,7 @@ from scipy import optimize
 from aqpolypy.free_energy_polymer.BrushSolution import MakeBrushSolvent
 from aqpolypy.free_energy_polymer.BinaryBrush import BinaryBrush
 
+
 class BinaryBrushSuperLattice(MakeBrushSolvent):
 
     """ Defines the free energy of a Brush in a superlattice"""
@@ -37,17 +38,25 @@ class BinaryBrushSuperLattice(MakeBrushSolvent):
         # number of components is brush and solvent
         self.num_of_components = 2
 
-        self.d_n = d_n
-        # compute the maximum and minimum values of the brush size
-        self.h_min = 0.5*self.d_n/np.cos(ws.min_theta()) - self.hat_r*pol.k_length
-        self.h_max = 0.5*self.d_n/np.cos(ws.max_theta()) - self.hat_r*pol.k_length
-
-        self.d_min = 2*(self.hat_r*pol.k_length + self.h_min)
-        self.d_max = 2*(self.hat_r*pol.k_length + self.h_max)
-
         # find the lagrange multipliers corresponding to these distances
-        lag_ini = 1e-3-chi
+        lag_ini = 1e-3 - chi
         bb = BinaryBrush(dim, chi, sigma, rad, pol, lag_ini)
+
+        self.p_n = d_n
         lag_opt = bb.optimal_lambda().x
-        self.lag_max = bb.determine_lagrange(self.h_max[0])
-        self.lag_min = bb.determine_lagrange(self.h_min[0], lag_opt)
+        self.lag_opt = lag_opt
+        self.h_max = bb.determine_h()*pol.k_length
+        self.d_n = 2 * (self.h_max + pol.k_length * self.hat_r) * np.cos(ws.max_theta()[0])
+
+        # compute the maximum and minimum values of the brush size
+        self.h_min = 0.5*self.d_n/np.cos(ws.min_theta()[0]) - self.hat_r*pol.k_length
+
+        self.d_min = 2 * (self.hat_r * pol.k_length + self.h_min)
+        self.d_max = 2 * (self.hat_r*pol.k_length + self.h_max)
+
+        self.d_opm_max = 2*self.opm_radius_angstrom/np.cos(ws.max_theta()[0])
+        self.theta_max = np.arccos(self.p_n/self.d_max)
+        self.theta_ratio = self.theta_max/ws.max_theta()[0]
+
+        self.d_extended = 2*(self.hat_r * pol.k_length + pol.max_length)
+        # self.lag_min = bb.determine_lagrange(self.h_min, lag_opt)
