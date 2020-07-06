@@ -126,7 +126,7 @@ class TestWaterMilleroBP(unittest.TestCase):
         param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         # testing enthalpy coeff up to a precision of 10^-2
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(wfm.enthalpy_coefficient() / (un.r_gas() * param[:, 0]), param[:, 2], 0, 1e-2)
+        test_vals = np.allclose(((2 / 3) * wfm.enthalpy_coefficient()) / (un.r_gas() * param[:, 0]), param[:, 2], 0, 1e-2)
         self.assertTrue(test_vals, wfm.enthalpy_coefficient() / (un.r_gas() * param[:, 0]))
 
 
