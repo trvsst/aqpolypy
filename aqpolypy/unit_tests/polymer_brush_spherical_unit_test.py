@@ -147,7 +147,7 @@ class TestPolymerFreeSpherical(unittest.TestCase):
         d_vals = np.zeros_like(vals)
         f_comp = np.array([[52.57338855, 93.5907969, 5.05843421], [52.01845303, 94.09298618, 5.09861057],
                            [51.45344121, 94.60620618, 5.14026642], [50.87778347, 95.13109749, 5.18351718],
-                           [50.29085432, 95.6683648, 5.2284931 ], [49.69196466, 96.21878595, 5.27534192],
+                           [50.29085432, 95.6683648, 5.2284931], [49.69196466, 96.21878595, 5.27534192],
                            [49.08035284, 96.78322257, 5.32423227], [48.45517411, 97.36263262, 5.37535786],
                            [47.81548843, 97.95808509, 5.42894285], [47.16024629, 98.5707773, 5.48524865],
                            [46.48827252, 99.20205492, 5.54458278]])
@@ -232,7 +232,7 @@ class TestPolymerFreeSpherical(unittest.TestCase):
         chi = 0.5 * (1 / xi_t + 1)
         lag_ini = 1e-3 - chi
         b_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
-        res = b_sph.optimal_lambda()
+        # res = b_sph.optimal_lambda()
         h_val = b_sph.determine_h() * pl_peo.k_length
         c_sph = Bb.BinaryBrush(dim, chi, sigma, rad, pl_peo, lag_ini)
         c_sph.determine_lagrange(h_val, lag=-1.6)
