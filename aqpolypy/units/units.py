@@ -43,6 +43,17 @@ def r_gas():
     return avogadro() * k_boltzmann()
 
 
+def joule_2_cal(e):
+    """
+    Conversion of joule to calories
+
+    :param e: energy in joule
+    :return: energy in calories
+    :rtype: float
+    """
+    return e / 4.184
+
+
 def atm_2_pascal(p):
     """
     Conversion of atmosphere to pascal
