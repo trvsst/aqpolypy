@@ -37,7 +37,8 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         # Calculations for density
 
         self.t = self.tk - un.celsius_2_kelvin(0)
-        self.y = un.atm_2_bar(self.pa)
+        # pressure in applied bar according to Fine and Millero
+        self.y = un.atm_2_bar(self.pa - 1)
 
         self.den1 = 0.9998396 + self.t * 18.224944e-3 - 7.922210e-6 * self.t ** 2 - 55.44846e-9 * self.t ** 3
         self.den2 = 149.7562e-12 * self.t ** 4 - 393.2952e-15 * self.t ** 5
