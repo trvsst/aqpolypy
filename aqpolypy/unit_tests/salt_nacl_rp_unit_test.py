@@ -196,16 +196,16 @@ class TestSaltNaClRP(unittest.TestCase):
 
     def test_apparent_molal_enthalpy(self):
         # parameters in [temperature (C), molality, apparent relative molal enthalpy (cal/mol)]
-        param = np.array([[0, 1.0, -188.13738556],
-                          [0, 0.1, 32.98689493],
-                          [0, 0.5, -55.56858075],
-                          [25, 1.0, 4.22026872],
-                          [25, 2.0, -134.37678334],
-                          [25, 3.0, -252.47537574],
-                          [25, 1.2, -24.15893739],
-                          [50, 3.5, 135.18532687],
-                          [50, 0.1, 148.42044347],
-                          [75, 0.8, 411.81098069]])
+        param = np.array([[0, 1.0, -188.11417381],
+                          [0, 0.1, 32.99636565],
+                          [0, 0.5, -55.55049346],
+                          [25, 1.0, 4.22338911],
+                          [25, 2.0, -134.37285678],
+                          [25, 3.0, -252.47092572],
+                          [25, 1.2, -24.15561616],
+                          [50, 3.5, 135.16767688],
+                          [50, 0.1, 148.41561978],
+                          [75, 0.8, 411.78485441]])
         # converting to [temperature (K), molality, apparent relative molal enthalpy (cal/mol)]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
         # testing params up to a precision of 10^-2
