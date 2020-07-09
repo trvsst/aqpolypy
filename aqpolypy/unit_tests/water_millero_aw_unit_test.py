@@ -21,35 +21,37 @@ class TestWaterMilleroAW(unittest.TestCase):
 
     # Testing density (Fine Millero)
     def test_density(self):
-        # density of water at [temperature(C), pressure(bar), specific volume] Millero TABLEIV
-        param = np.array([[5, 1, 1.000036],
-                          [30, 1, 1.004369],
-                          [75, 1, 1.025805],
+        # density of water at [temperature(C), pressure(applied_bar), specific volume] Millero TABLEIV
+        param = np.array([[5, 0, 1.000036],
+                          [30, 0, 1.004369],
+                          [75, 0, 1.025805],
                           [30, 100, 0.999939],
                           [55, 300, 1.001642]])
         # converting param to [temperature(K), pressure(atm), specific volume]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
-        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
-        # testing density up to a precision of 10^-4
+        # 1 atm = 1 applied_atm + 1, according to Millero
+        param[:, 1] = (param[:, 1] / un.atm_2_bar(1)) + 1
+        # testing density up to a precision of 10^-6
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(1e3 / wfm.density(), param[:, 2], 0, 1e-4)
+        test_vals = np.allclose(1e3 / wfm.density(), param[:, 2], 0, 1e-6)
         self.assertTrue(test_vals)
 
     # Testing molar volume (Fine Millero)
     def test_molar_volume(self):
-        # molar volume of water at [temperature(C), pressure(bar), specific volume] Millero TABLE IV
-        param = np.array([[5, 1, 1.000036],
-                          [30, 1, 1.004369],
-                          [75, 1, 1.025805],
+        # molar volume of water at [temperature(C), pressure(applied_bar), specific volume] Millero TABLE IV
+        param = np.array([[5, 0, 1.000036],
+                          [30, 0, 1.004369],
+                          [75, 0, 1.025805],
                           [35, 100, 1.001597],
                           [55, 300, 1.001642]])
         # converting param to [temperature(K), pressure(atm), molar volume]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
-        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        # 1 atm = 1 applied_atm + 1, according to Millero
+        param[:, 1] = (param[:, 1] / un.atm_2_bar(1)) + 1
         param[:, 2] = (param[:, 2] / 1e6) * fm.WaterPropertiesFineMillero(300).MolecularWeight
-        # testing molar volume up to a precision of 10^-6
+        # testing molar volume up to a precision of 10^-11
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(wfm.molar_volume(), param[:, 2], 0, 1e-6)
+        test_vals = np.allclose(wfm.molar_volume(), param[:, 2], 0, 1e-11)
         self.assertTrue(test_vals)
 
     # Testing dielectric constant (Archer Wang)
@@ -65,23 +67,24 @@ class TestWaterMilleroAW(unittest.TestCase):
         # testing dielectric constant up to a precision of 10^-2
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
         test_vals = np.allclose(wfm.dielectric_constant(), param[:, 2], 0, 1e-2)
-        self.assertTrue(test_vals, wfm.dielectric_constant())
+        self.assertTrue(test_vals)
 
     # Testing compressibility (Fine Millero)
     def test_compressibility(self):
-        # compressibility of water at [temperature(C), pressure(bar), compressibility (10^6 bar-1)] Millero TABLE V
-        param = np.array([[5, 1, 49.175],
-                          [30, 1, 44.771],
-                          [75, 1, 45.622],
+        # compressibility of water at [temperature(C), pressure(applied_bar), compressibility (10^6 bar-1)] Millero TABLE V
+        param = np.array([[5, 0, 49.175],
+                          [30, 0, 44.771],
+                          [75, 0, 45.622],
                           [35, 100, 43.305],
                           [55, 300, 40.911]])
         # converting param to [temperature(K), pressure(atm), compressibility (atm-1)]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
-        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
+        # 1 atm = 1 applied_atm + 1, according to Millero
+        param[:, 1] = (param[:, 1] / un.atm_2_bar(1)) + 1
         param[:, 2] = (param[:, 2] / 1e6) * un.atm_2_bar(1)
-        # testing compressibility up to a precision of 10^-6
+        # testing compressibility up to a precision of 10^-9
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(wfm.compressibility(), param[:, 2], 0, 1e-6)
+        test_vals = np.allclose(wfm.compressibility(), param[:, 2], 0, 1e-9)
         self.assertTrue(test_vals)
 
 
