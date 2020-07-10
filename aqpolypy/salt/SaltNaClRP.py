@@ -7,9 +7,11 @@
 .. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Added NaCl parameters from Rogers & Pitzer
+..                  - Added Pitzer Parameters along with its pressure and temperature derivatives
 """
 
 import numpy as np
+import aqpolypy.units.units as un
 import aqpolypy.salt.SaltModelPitzer as rp
 
 
@@ -28,6 +30,8 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         :instantiate: temperature, pressure, stoichiometry coefficients
 
         """
+        self.tk = tk
+        self.pa = pa
 
         # Calculations nacl parameters and coefficients
         self.mat_stoich = np.array([[1, 1], [1, -1]])
@@ -94,13 +98,81 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.qm[17] = 0.8514
         self.qm[18] = -8.3637e-4
 
+        # Pitzer Parameters
+        self.tc = 298.15
+
+        self.beta0_1 = self.qm[0] + self.qm[1] * (1 / self.tk - 1 / self.tc) + self.qm[2] * np.log(self.tk / self.tc)
+        self.beta0_2 = self.qm[3] * (self.tk - self.tc) + self.qm[4] * (self.tk ** 2 - self.tc ** 2)
+        self.beta0 = self.beta0_1 + self.beta0_2
+
+        self.beta1 = self.qm[5] + self.qm[8] * (self.tk - self.tc) + self.qm[9] * (self.tk ** 2 - self.tc ** 2)
+
+        self.c_phi_1 = self.qm[10] + self.qm[11] * (1 / self.tk - 1 / self.tc) + self.qm[12] * np.log(self.tk / self.tc)
+        self.c_phi = self.c_phi_1 + self.qm[13] * (self.tk - self.tc)
+        self.params = np.array([self.beta0, self.beta1, self.c_phi])
+
+        # Pitzer Parameters pressure derivative
+        self.pr = self.pa * un.atm_2_bar(1)
+        self.pr_atm = un.atm_2_bar(1)
+
+        self.vp_0 = self.cm[0] + self.cm[1] * self.tk + self.cm[2] * self.tk ** 2 + self.cm[3] * self.tk ** 3
+        self.vp_1 = (self.pr - self.pr_atm) * (self.cm[4] + self.cm[5] * self.tk + self.cm[6] * self.tk ** 2)
+        self.vp_2 = (self.pr - self.pr_atm) ** 2 * (self.cm[7] + self.cm[8] * self.tk)
+
+        self.vp = self.vp_0 + self.vp_1 + self.vp_2
+
+        self.bp_0 = self.cm[9] + self.cm[10] / (self.tk - 227) + self.cm[11] * self.tk + self.cm[12] * self.tk ** 2 + self.cm[13] / (680 - self.tk)
+        self.bp_1_1 = self.cm[14] + self.cm[15] / (self.tk - 227) + self.cm[16] * self.tk + self.cm[17] * self.tk ** 2
+        self.bp_1 = (self.bp_1_1 + self.cm[18] / (680 - self.tk)) * (self.pr - self.pr_atm)
+        self.bp_2_1 = self.cm[19] + self.cm[20] / (self.tk - 227) + self.cm[21] * self.tk + self.cm[22] / (680 - self.tk)
+        self.bp_2 = self.bp_2_1 * (self.pr - self.pr_atm) ** 2
+
+        self.bp = self.bp_0 + self.bp_1 + self.bp_2
+
+        self.cq = self.cm[23] + self.cm[24] / (self.tk - 227) + self.cm[25] * self.tk + self.cm[26] * self.tk ** 2 + self.cm[27] / (680 - self.tk)
+        self.cp = 0.5 * self.cq
+        self.params_der_p = np.array([self.vp, self.bp, self.cp])
+
+        # Pitzer Parameters pressure derivative
+        self.beta_0_der_t = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
+        self.beta_1_der_t = 2 * self.qm[9] * self.tk + self.qm[8]
+        self.c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
+        self.params_der_t = np.array([self.beta_0_der_t, self.beta_1_der_t, self.c_phi_der_t])
+
         super().__init__(tk, pa)
 
     def actual_coefficients(self):
         """
-        returns the values of the coefficients as a lit
+        returns the values of the coefficients as a list
 
         :return: fitting coefficients for NaCl (list)
         
         """
         return [self.mat_stoich, self.cm, self.p_ref, self.qm]
+
+    def pitzer_parameters(self):
+        """
+        returns the values of the Pitzer Parameters as a list
+
+        :return: Pitzer Parameters for NaCl (array)
+
+        """
+        return self.params
+
+    def pitzer_parameters_der_p(self):
+        """
+        returns the values of the Pitzer Parameters pressure derivative as a list
+
+        :return: Pitzer Parameters pressure derivative for NaCl (array)
+
+        """
+        return self.params_der_p
+
+    def pitzer_parameters_der_t(self):
+        """
+        returns the values of the Pitzer Parameters temperature derivative as a list
+
+        :return: Pitzer Parameters temperature derivative for NaCl (array)
+
+        """
+        return self.params_der_t
