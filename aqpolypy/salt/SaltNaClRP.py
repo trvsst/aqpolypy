@@ -27,7 +27,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: temperature, pressure, stoichiometry coefficients
+        :instantiate: temperature, pressure, stoichiometry coefficients, Pitzer Parameters
 
         """
         self.tk = tk
