@@ -58,8 +58,8 @@ class TestSaltNaClRP(unittest.TestCase):
         test_vals = np.allclose(salt_nacl.p_fun_gamma(param[:, 0]), param[:, 1], 0, 1e-6)
         self.assertTrue(test_vals)
 
-    def test_params(self):
-        # parameters in [temperature (C), pressure (bar), [bp, 2cp]]
+    def test_params_der_p(self):
+        # pressure derivative parameters in [temperature (C), pressure (bar), [bp, 2cp]]
         param = np.array([[10, 1, 1.956e-5, -2.25e-6],
                           [30, 1, 1.069e-5, -1.07e-6],
                           [90, 1, 2.577e-6, -6.02e-8],
@@ -71,8 +71,8 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 3] = param[:, 3] / 2
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals1 = np.allclose(salt_nacl.params[1], param[:, 2], 0, 1e-2)
-        test_vals2 = np.allclose(salt_nacl.params[2], param[:, 3], 0, 1e-2)
+        test_vals1 = np.allclose(salt_nacl.params_der_p[1], param[:, 2], 0, 1e-2)
+        test_vals2 = np.allclose(salt_nacl.params_der_p[2], param[:, 3], 0, 1e-2)
         self.assertTrue(test_vals1)
         self.assertTrue(test_vals2)
 
