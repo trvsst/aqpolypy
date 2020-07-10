@@ -7,6 +7,8 @@
 .. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Implemented member methods
+..                  - Removed calculations of Pitzer Parameters
+..                  - Implemented abstract methods for Pitzer Parameters
 """
 
 import numpy as np
@@ -28,7 +30,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         :param tk: temperature in kelvin
         :param pa: pressure in atmospheres
-        :instantiate: temperature, pressure, stoichiometry coefficients
+        :instantiate: temperature, pressure, stoichiometry coefficients, Pitzer Parameters
 
         """
 
@@ -37,27 +39,10 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # electrolyte un-instantiated parameters
         self.mat_stoich, self.cm, self.p_ref, self.qm = self.actual_coefficients()
 
-        # calculations for params
-        self.pr = self.pa * un.atm_2_bar(1)
-        self.pr_atm = un.atm_2_bar(1)
-
-        self.vp_0 = self.cm[0] + self.cm[1] * self.tk + self.cm[2] * self.tk ** 2 + self.cm[3] * self.tk ** 3
-        self.vp_1 = (self.pr - self.pr_atm) * (self.cm[4] + self.cm[5] * self.tk + self.cm[6] * self.tk ** 2)
-        self.vp_2 = (self.pr - self.pr_atm) ** 2 * (self.cm[7] + self.cm[8] * self.tk)
-
-        self.vp = self.vp_0 + self.vp_1 + self.vp_2
-
-        self.bp_0 = self.cm[9] + self.cm[10] / (self.tk - 227) + self.cm[11] * self.tk + self.cm[12] * self.tk ** 2 + self.cm[13] / (680 - self.tk)
-        self.bp_1_1 = self.cm[14] + self.cm[15] / (self.tk - 227) + self.cm[16] * self.tk + self.cm[17] * self.tk ** 2
-        self.bp_1 = (self.bp_1_1 + self.cm[18] / (680 - self.tk)) * (self.pr - self.pr_atm)
-        self.bp_2_1 = self.cm[19] + self.cm[20] / (self.tk - 227) + self.cm[21] * self.tk + self.cm[22] / (680 - self.tk)
-        self.bp_2 = self.bp_2_1 * (self.pr - self.pr_atm) ** 2
-
-        self.bp = self.bp_0 + self.bp_1 + self.bp_2
-
-        self.cq = self.cm[23] + self.cm[24] / (self.tk - 227) + self.cm[25] * self.tk + self.cm[26] * self.tk ** 2 + self.cm[27] / (680 - self.tk)
-        self.cp = 0.5 * self.cq
-        self.params = np.array([self.vp, self.bp, self.cp])
+        # Pitzer Parameters
+        self.params = self.pitzer_parameters()
+        self.params_der_p = self.pitzer_parameters_der_p()
+        self.params_der_t = self.pitzer_parameters_der_t()
 
         # calculations for stoichiometry coefficients
         # nu_+ + nu_-
@@ -73,6 +58,18 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     @abstractmethod
     def actual_coefficients(self):
+        pass
+
+    @abstractmethod
+    def pitzer_parameters(self):
+        pass
+
+    @abstractmethod
+    def pitzer_parameters_der_p(self):
+        pass
+
+    @abstractmethod
+    def pitzer_parameters_der_t(self):
         pass
 
     @staticmethod
@@ -166,7 +163,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         m_r = self.p_ref[1]
         y_r = self.p_ref[2]
 
-        vp, bp, cp = self.params
+        vp, bp, cp = self.params_der_p
 
         i_str = self.ionic_strength(m_r)
 
@@ -222,7 +219,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # coefficients V_m, B, C
-        vp, bp, cp = self.params
+        vp, bp, cp = self.params_der_p
 
         # ionic strength
         i_str = self.ionic_strength(m)
@@ -255,16 +252,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             """
         # pressure is 1 atm
         press = 1
-        tc = 298.15
 
-        beta0_1 = self.qm[0] + self.qm[1] * (1 / self.tk - 1 / tc) + self.qm[2] * np.log(self.tk / tc)
-        beta0_2 = self.qm[3] * (self.tk - tc) + self.qm[4] * (self.tk ** 2 - tc ** 2)
-        beta0 = beta0_1 + beta0_2
-
-        beta1 = self.qm[5] + self.qm[8] * (self.tk - tc) + self.qm[9] * (self.tk ** 2 - tc ** 2)
-
-        c_phi_1 = self.qm[10] + self.qm[11] * (1 / self.tk - 1 / tc) + self.qm[12] * np.log(self.tk / tc)
-        c_phi = c_phi_1 + self.qm[13] * (self.tk - tc)
+        # Pitzer Parameters
+        beta0, beta1, c_phi = self.params
 
         # stoichiometric_coefficients
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
@@ -300,16 +290,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             """
         # pressure is 1 atm
         press = 1
-        tc = 298.15
 
-        beta0_1 = self.qm[0] + self.qm[1] * (1 / self.tk - 1 / tc) + self.qm[2] * np.log(self.tk / tc)
-        beta0_2 = self.qm[3] * (self.tk - tc) + self.qm[4] * (self.tk ** 2 - tc ** 2)
-        beta0 = beta0_1 + beta0_2
-
-        beta1 = self.qm[5] + self.qm[8] * (self.tk - tc) + self.qm[9] * (self.tk ** 2 - tc ** 2)
-
-        c_phi_1 = self.qm[10] + self.qm[11] * (1 / self.tk - 1 / tc) + self.qm[12] * np.log(self.tk / tc)
-        c_phi = c_phi_1 + self.qm[13] * (self.tk - tc)
+        # Pitzer Parameters
+        beta0, beta1, c_phi = self.params
 
         # stoichiometric_coefficients
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
@@ -343,17 +326,15 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         i_str = self.ionic_strength(m)
         x = np.sqrt(i_str)
 
-        beta_0_der = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
-        beta_1_der = 2 * self.qm[9] * self.tk + self.qm[8]
+        # Pitzer Parameters temperature derivative
+        beta_0_der_t, beta_1_der_t, c_phi_der_t = self.params_der_t
 
-        beta_prime = beta_0_der + (2 * beta_1_der / ((2 ** 2) * i_str)) * (1 - (1 + 2 * x) * np.exp(-2 * x))
-
-        c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
+        beta_prime = beta_0_der_t + (2 * beta_1_der_t / ((2 ** 2) * i_str)) * (1 - (1 + 2 * x) * np.exp(-2 * x))
         c_prime = ((nu_prod ** 0.5) / 2) * c_phi_der_t
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
 
-        l_phi = nu * z_prod * (a_h / (2 * 1.2)) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * (m ** 2))
+        l_phi = nu * z_prod * (a_h / (3 * 1.2)) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * (m ** 2))
 
         return l_phi
 
