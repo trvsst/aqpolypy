@@ -37,7 +37,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         super().__init__(tk, pa)
 
         # electrolyte un-instantiated parameters
-        self.mat_stoich, self.cm, self.p_ref, self.qm = self.actual_coefficients()
+        self.mat_stoich, self.p_ref = self.actual_coefficients()
 
         # Pitzer Parameters
         self.params = self.pitzer_parameters()
