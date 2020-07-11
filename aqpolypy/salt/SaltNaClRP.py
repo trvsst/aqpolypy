@@ -133,7 +133,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.cp = 0.5 * self.cq
         self.params_der_p = np.array([self.vp, self.bp, self.cp])
 
-        # Pitzer Parameters pressure derivative
+        # Pitzer Parameters temperature derivative
         self.beta_0_der_t = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
         self.beta_1_der_t = 2 * self.qm[9] * self.tk + self.qm[8]
         self.c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
@@ -148,7 +148,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         :return: fitting coefficients for NaCl (list)
         
         """
-        return [self.mat_stoich, self.cm, self.p_ref, self.qm]
+        return [self.mat_stoich, self.p_ref]
 
     def pitzer_parameters(self):
         """
