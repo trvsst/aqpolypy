@@ -74,15 +74,15 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
         self.tc = 298.15
 
         def Fg(x):
-            f_1 = (self.u[0][x] * self.tk ** 2) / 6 + (self.u[1][x] * self.tk) / 2 + (self.u[2][x] * self.tk ** 2) * (np.log(self.tk) / 2 - 5 / 12) / 3
+            f_1 = (self.u[0][x] * self.tk ** 2) / 6 + (self.u[1][x] * self.tk) / 2 + (self.u[2][x] * self.tk ** 2) * ((np.log(self.tk) / 2) - (5 / 12)) / 3
             f_2 = (self.u[3][x] * self.tk ** 3) / 12 + (self.u[4][x] * self.tk ** 4) / 20 + self.u[5][x] * (self.tk / 2 + (3 * (227 ** 2)) / (2 * self.tk) + 227 * (self.tk - 227) * np.log(self.tk - 227) / self.tk)
-            f_3 = - self.u[6][x] * (2 * (647 - self.tk) * np.log(647 - self.tk) / self.tk + np.log(647 - self.tk))
-            f_4 = - self.k_1[x] / self.tk - self.fl[x] * ((self.tc ** 2) / self.tk) + self.k_2[x] + self.fg[x]
+            f_3 = -self.u[6][x] * (2 * (647 - self.tk) * np.log(647 - self.tk) / self.tk + np.log(647 - self.tk))
+            f_4 = -self.k_1[x] / self.tk - self.fl[x] * ((self.tc ** 2) / self.tk) + self.k_2[x] + self.fg[x]
             return f_1 + f_2 + f_3 + f_4
 
         self.beta0 = Fg(0)
         self.beta1 = Fg(1)
-        self.c_phi = Fg(2)
+        self.c_phi = 2 * Fg(2)
 
         self.params = np.array([self.beta0, self.beta1, self.c_phi])
 
