@@ -109,7 +109,13 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
 
         self.c_phi_1 = self.qm[10] + self.qm[11] * (1 / self.tk - 1 / self.tc) + self.qm[12] * np.log(self.tk / self.tc)
         self.c_phi = self.c_phi_1 + self.qm[13] * (self.tk - self.tc)
-        self.params = np.array([self.beta0, self.beta1, self.c_phi])
+        self.C0 = self.c_phi / 2
+        self.C1 = 0
+        self.C2 = 0
+        self.D0 = 0
+        self.D1 = 0
+        self.D2 = 0
+        self.params = np.array([self.beta0, self.beta1, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
 
         # Pitzer Parameters pressure derivative
         self.pr = self.pa * un.atm_2_bar(1)
