@@ -74,14 +74,19 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
                             [0.000000000000, 0.0000000000000, 0.00000000000, 0.000000000000, 0.000000000000, 0.0000000000000],
                             [-1.11176553000, 1.01000272e1, 1.40556304000e-1, 1.127215570000, 0.000000000000, 0.0000000000000]]])
 
+        self.b = np.array([[ -1.17446972e4, 2.865416060e3, -2.279680760e1, 3.09897542e-2, -1.92379975e-5, 1.674471870e-26, -1.91185804e6],
+                           [ 0.00000000000, 0.00000000000, -4.00100143e-4, 0.00000000000, -2.43204343e-8, -6.04921882e-28, 1.080249060e5],
+                           [ 0.00000000000, 1.19091585e-2, -4.19764987e-4, 7.93310194e-7, 0.000000000000, 0.0000000000000, -1.66310231e3]])
+
         # Pitzer Parameters
+        self.pr = un.atm_2_pascal(self.pa) / 1e6
         self.tc = 298.15
 
         def Fg(x):
             f_1 = self.a[0][0][x] + self.a[0][1][x] * np.log(self.tk) + self.a[0][2][x] * self.tk + self.a[0][3][x] * self.tk ** 2 + self.a[0][4][x] * self.tk ** 3 + self.a[0][5][x] * self.tk ** 10 + self.a[0][6][x] / ((647 - self.tk) ** 2)
             f_2 = self.a[1][0][x] + self.a[1][1][x] * np.log(self.tk) + self.a[1][2][x] * self.tk + self.a[1][3][x] * self.tk ** 2 + self.a[1][4][x] * self.tk ** 3 + self.a[1][5][x] * self.tk ** 10 + self.a[1][6][x] / ((647 - self.tk) ** 2)
             f_3 = self.a[2][0][x] + self.a[2][1][x] * np.log(self.tk) + self.a[2][2][x] * self.tk + self.a[2][3][x] * self.tk ** 2 + self.a[2][4][x] * self.tk ** 3 + self.a[2][5][x] * self.tk ** 10 + self.a[2][6][x] / ((647 - self.tk) ** 2)
-            return f_1 + f_2 * self.pa + f_3 * (self.pa ** 2) / 2
+            return f_1 + f_2 * self.pr + f_3 * (self.pr ** 2) / 2
 
         self.beta0 = Fg(0)
         self.beta1 = Fg(1)
@@ -95,18 +100,20 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
         self.params = np.array([self.beta0, self.beta1, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
 
         # Pitzer Parameters pressure derivative
-        self.pr = self.pa * un.atm_2_bar(1)
-        self.pr_atm = un.atm_2_bar(1)
-
         def Fv(x):
-            f_1 = self.q[0][x] + self.q[1][x] / self.tk + self.q[2][x] * self.tk + self.q[3][x] * self.tk ** 2 + self.q[4][x] / (647 - self.tk)
-            f_2 = self.pr * (self.q[5][x] + self.q[6][x] / self.tk + self.q[7][x] * self.tk + self.q[8][x] * self.tk ** 2 + self.q[9][x] / (647 - self.tk))
-            f_3 = (self.pr ** 2) * (self.q[10][x] + self.q[11][x] / self.tk + self.q[12][x] * self.tk + self.q[13][x] * self.tk ** 2 + self.q[14][x] / (647 - self.tk))
-            return f_1 + f_2 + f_3
+            f_2 = self.a[1][0][x] + self.a[1][1][x] * np.log(self.tk) + self.a[1][2][x] * self.tk + self.a[1][3][x] * self.tk ** 2 + self.a[1][4][x] * self.tk ** 3 + self.a[1][5][x] * self.tk ** 10 + self.a[1][6][x] / ((647 - self.tk) ** 2)
+            f_3 = self.a[2][0][x] + self.a[2][1][x] * np.log(self.tk) + self.a[2][2][x] * self.tk + self.a[2][3][x] * self.tk ** 2 + self.a[2][4][x] * self.tk ** 3 + self.a[2][5][x] * self.tk ** 10 + self.a[2][6][x] / ((647 - self.tk) ** 2)
+            return f_2 + f_3 * self.pr
 
-        self.vp = Fv(0)
-        self.bp = Fv(1)
-        self.cp = 0
+        def Fv_vp():
+            V_1 = self.b[0][0] + self.b[0][1] * np.log(self.tk) + self.b[0][2] * self.tk + self.b[0][3] * self.tk ** 2 + self.b[0][4] * self.tk ** 3 + self.b[0][5] * self.tk ** 10 + self.b[0][6] / ((647 - self.tk) ** 2)
+            V_2 = self.b[1][0] + self.b[1][1] * np.log(self.tk) + self.b[1][2] * self.tk + self.b[1][3] * self.tk ** 2 + self.b[1][4] * self.tk ** 3 + self.b[1][5] * self.tk ** 10 + self.b[1][6] / ((647 - self.tk) ** 2)
+            V_3 = self.b[2][0] + self.b[2][1] * np.log(self.tk) + self.b[2][2] * self.tk + self.b[2][3] * self.tk ** 2 + self.b[2][4] * self.tk ** 3 + self.b[2][5] * self.tk ** 10 + self.b[2][6] / ((647 - self.tk) ** 2)
+            return V_1 + V_2 * self.pr + V_3 * self.pr ** 2
+
+        self.vp = Fv_vp()
+        self.bp = Fv(0)
+        self.cp = Fv(2)
 
         self.params_der_p = np.array([self.vp, self.bp, self.cp])
 
