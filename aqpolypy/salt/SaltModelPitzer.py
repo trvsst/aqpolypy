@@ -115,7 +115,8 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         return h_fun_gamma
 
-    def p_fun_gamma(self, i_str):
+    @staticmethod
+    def p_fun_gamma(a, i_str):
         """
             function in activity coefficient according to Pitzer :cite:`Pitzer1973a`
 
@@ -128,7 +129,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function (float)
             """
         # units are (kg/mol)^{1/2}
-        alpha = self.alpha_b1
+        alpha = a
 
         x = alpha * np.sqrt(i_str)
 
@@ -137,7 +138,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         return p_fun_gamma
 
     @staticmethod
-    def p_fun_gamma_2(i_str):
+    def p_fun_gamma_2(a, i_str):
         """
             function in activity coefficient according to Wang & Pitzer:cite:``
 
@@ -150,7 +151,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function (float)
             """
         # units are (kg/mol)^{1/2}
-        alpha = 2.0
+        alpha = a
 
         x = alpha * i_str
 
@@ -159,7 +160,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         return p_fun_gamma_2
 
     @staticmethod
-    def p_fun_gamma_3(i_str):
+    def p_fun_gamma_3(a, i_str):
         """
             function in activity coefficient according to Wang & Pitzer:cite:``
 
@@ -172,7 +173,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function (float)
             """
         # units are (kg/mol)^{1/2}
-        alpha = 2.0
+        alpha = a
 
         x = alpha * i_str ** 1.5
 
@@ -353,9 +354,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         i_str = self.ionic_strength(m)
 
         val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * self.h_fun_gamma(i_str)
-        val_2 = 2 * m * (nu_prod / nu) * (2 * beta0 + 2 * beta1 * self.p_fun_gamma(i_str))
-        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (3 * C0 + 2 * C1 * self.p_fun_gamma_2(i_str) + 2 * C2 * self.p_fun_gamma_2(i_str))
-        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (4 * D0 + 2 * D1 * self.p_fun_gamma_3(i_str) + 2 * D2 * self.p_fun_gamma_3(i_str))
+        val_2 = 2 * m * (nu_prod / nu) * (2 * beta0 + 2 * beta1 * self.p_fun_gamma(self.alpha_b1, i_str))
+        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (3 * C0 + 2 * C1 * self.p_fun_gamma_2(self.alpha_c1, i_str) + 2 * C2 * self.p_fun_gamma_2(self.alpha_c2, i_str))
+        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (4 * D0 + 2 * D1 * self.p_fun_gamma_3(self.alpha_d1, i_str) + 2 * D2 * self.p_fun_gamma_3(self.alpha_d2, i_str))
 
         log_gamma = val_1 + val_2 + val_3 + val_4
 
