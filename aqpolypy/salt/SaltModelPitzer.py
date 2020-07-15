@@ -44,6 +44,10 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         self.params_der_p = self.pitzer_parameters_der_p()
         self.params_der_t = self.pitzer_parameters_der_t()
 
+        # ionic strength dependence (alpha) & ion-size (b) parameters
+        self.ion_param = self.ion_parameters()
+        self.alpha_b1, self.alpha_b2, self.alpha_c1, self.alpha_c2, self.alpha_d1, self.alpha_d2, self.b_param = self.ion_parameters()
+
         # calculations for stoichiometry coefficients
         # nu_+ + nu_-
         self.nu = np.sum(self.mat_stoich[0])
@@ -72,8 +76,11 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     def pitzer_parameters_der_t(self):
         pass
 
-    @staticmethod
-    def h_fun(i_str):
+    @abstractmethod
+    def ion_parameters(self):
+        pass
+
+    def h_fun(self, i_str):
         """
             Function for apparent molal volume according to Pitzer :cite:`Pitzer1973a`
 
@@ -85,7 +92,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function  (float)
             """
         # units are (kg/mol)^{1/2}
-        b_param = 1.2
+        b_param = self.b_param
         h_fun = 0.5 * np.log(1 + b_param * np.sqrt(i_str)) / b_param
 
         return h_fun
@@ -103,13 +110,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
             :return: value of function (float)
             """
-        b_param = 1.2
+        b_param = self.b_param
         h_fun_gamma = 4 * self.h_fun(i_str) + np.sqrt(i_str) / (1 + b_param * np.sqrt(i_str))
 
         return h_fun_gamma
 
-    @staticmethod
-    def p_fun_gamma(i_str):
+    def p_fun_gamma(self, i_str):
         """
             function in activity coefficient according to Pitzer :cite:`Pitzer1973a`
 
@@ -122,7 +128,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function (float)
             """
         # units are (kg/mol)^{1/2}
-        alpha = 2.0
+        alpha = self.alpha_b1
 
         x = alpha * np.sqrt(i_str)
 
@@ -309,10 +315,10 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         x = np.sqrt(i_str)
         w = i_str ** 1.5
 
-        val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * x / (1 + 1.2 * x)
-        val_2 = 2 * m * (nu_prod / nu) * (beta0 + beta1 * np.exp(-2 * x))
-        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (2 * (C0 + C1 * np.exp(-2 * i_str) + C2 * np.exp(-2 * i_str)))
-        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (3 * (D0 + D1 * np.exp(-2 * w) + D2 * np.exp(-2 * w)))
+        val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * x / (1 + self.b_param * x)
+        val_2 = 2 * m * (nu_prod / nu) * (beta0 + beta1 * np.exp(-self.alpha_b1 * x))
+        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (2 * (C0 + C1 * np.exp(-self.alpha_c1 * i_str) + C2 * np.exp(-self.alpha_c2 * i_str)))
+        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (3 * (D0 + D1 * np.exp(-self.alpha_d1 * w) + D2 * np.exp(-self.alpha_d2 * w)))
 
         osmotic_coefficient = 1 + val_1 + val_2 + val_3 + val_4
 

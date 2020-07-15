@@ -41,6 +41,16 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.m_weight = 58.4428
         self.p_ref = np.array([self.m_weight, self.m_ref, self.y_ref])
 
+        # values for ion strength dependence and ion size constants in the extended Pitzer model
+        self.alpha_b1 = 2.0
+        self.alpha_b2 = 0
+        self.alpha_c1 = 0
+        self.alpha_c2 = 0
+        self.alpha_d1 = 0
+        self.alpha_d2 = 0
+        self.b_param = 1.2
+        self.ion_param = np.array([self.alpha_b1, self.alpha_b2, self.alpha_c1, self.alpha_c2, self.alpha_d1, self.alpha_d2, self.b_param])
+
         self.cm = np.zeros(28)
 
         self.cm[0] = 1.0249125e3
@@ -182,3 +192,6 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
 
         """
         return self.params_der_t
+
+    def ion_parameters(self):
+        return self.ion_param

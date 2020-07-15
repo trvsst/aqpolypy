@@ -40,6 +40,16 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
         self.m_weight = 74.5513
         self.p_ref = np.array([self.m_weight, self.m_ref, self.y_ref])
 
+        # values for ion strength dependence and ion size constants in the extended Pitzer model
+        self.alpha_b1 = 2.0
+        self.alpha_b2 = 0
+        self.alpha_c1 = 0
+        self.alpha_c2 = 0
+        self.alpha_d1 = 0
+        self.alpha_d2 = 0
+        self.b_param = 1.2
+        self.ion_param = np.array([self.alpha_b1, self.alpha_b2, self.alpha_c1, self.alpha_c2, self.alpha_d1, self.alpha_d2, self.b_param])
+
         self.q = np.array([[1.56152e3, 0.0],
                            [-1.69234e5, 0.0],
                            [-4.29918, 9.45015e-8],
@@ -56,19 +66,20 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
                            [1.66987e-8, -6.24996e-15],
                            [-7.22012e-2, 4.16221e-8]])
 
-        self.u = np.array([[-2.10289e-2, 2.20813e-1, 0.0],
-                           [6.03967e-1, -4.61849, 7.64891e-4],
-                           [3.67768e-3, -4.10116e-2, 0.0],
-                           [-7.05537e-6, 1.10445e-4, -1.12131e-8],
-                           [1.97968e-9, -4.73196e-8, 1.72256e-11],
-                           [-2.47588e-3, -2.74120e-2, 0.0],
-                           [1.44160e-1, 3.32883e-1, -5.71188e-3]])
-        self.fl_1 = [6.77136e-4, 9.67854e-4, -4.12364e-5]
-        self.fg_1 = [4.8080e-2, 2.18752e-1, -3.94e-4]
-        self.fl = [6.56838e-4, 9.67854e-4, -4.12364e-5]
-        self.fg = [5.0038e-2, 2.18752e-1, -3.94e-4]
-        self.k_1 = [-2931.268116, 6353.355434, 28.172180]
-        self.k_2 = [-33.953143, 193.004059, -0.125567]
+        self.u = np.array([[-2.10289e-2, 2.208130e-1, 0.000000000],
+                           [6.039670e-1, -4.61849000, 7.648910e-4],
+                           [3.677680e-3, -4.10116e-2, 0.000000000],
+                           [-7.05537e-6, 1.104450e-4, -1.12131e-8],
+                           [1.979680e-9, -4.73196e-8, 1.72256e-11],
+                           [-2.47588e-3, -2.74120e-2, 0.000000000],
+                           [1.441600e-1, 3.328830e-1, -5.71188e-3]])
+
+        self.fl_1 = [6.771360e-4, 9.678540e-4, -4.12364e-5]
+        self.fg_1 = [4.808000e-2, 2.187520e-1, -3.94000e-4]
+        self.fl = [6.56838000e-4, 9.678540e-4, -4.12364e-5]
+        self.fg = [5.00380000e-2, 2.187520e-1, -3.94000e-4]
+        self.k_1 = [-2931.268116, 6353.355434, 28.17218000]
+        self.k_2 = [-33.95314300, 193.0040590, -0.12556700]
 
         # Pitzer Parameters
         self.tc = 298.15
@@ -76,9 +87,10 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
         def Fg(x):
             f_1 = (self.u[0][x] * self.tk ** 2) / 6 + (self.u[1][x] * self.tk) / 2 + (self.u[2][x] * self.tk ** 2) * ((np.log(self.tk) / 2) - (5 / 12)) / 3
             f_2 = (self.u[3][x] * self.tk ** 3) / 12 + (self.u[4][x] * self.tk ** 4) / 20 + self.u[5][x] * (self.tk / 2 + (3 * (227 ** 2)) / (2 * self.tk) + 227 * (self.tk - 227) * np.log(self.tk - 227) / self.tk)
-            f_3 = -self.u[6][x] * (2 * (647 - self.tk) * np.log(647 - self.tk) / self.tk + np.log(647 - self.tk))
-            f_4 = -self.k_1[x] / self.tk - self.fl[x] * ((self.tc ** 2) / self.tk) + self.k_2[x] + self.fg[x]
-            return f_1 + f_2 + f_3 + f_4
+            f_3 = (-self.u[6][x]) * (2 * (647 - self.tk) * np.log(647 - self.tk) / self.tk + np.log(647 - self.tk))
+            f_4 = (-self.k_1[x]) / self.tk - self.fl[x] * ((self.tc ** 2) / self.tk) + self.k_2[x] + self.fg[x]
+            f_sum = f_1 + f_2 + f_3 + f_4
+            return f_sum
 
         self.beta0 = Fg(0)
         self.beta1 = Fg(1)
@@ -158,3 +170,6 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
 
         """
         return self.params_der_t
+
+    def ion_parameters(self):
+        return self.ion_param
