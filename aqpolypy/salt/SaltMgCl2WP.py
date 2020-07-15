@@ -119,12 +119,10 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
 
         # Pitzer Parameters temperature derivative
         def Fl(x):
-            f_1 = (self.u[0][x] * self.tk) / 3 + self.u[1][x] / 2 + self.u[2][x] * self.tk * (np.log(self.tk) - (1 / 3)) / 3
-            f_2 = (self.u[3][x] * self.tk ** 2) / 4 + (self.u[4][x] * self.tk ** 3) / 5
-            f_3 = (self.u[5][x] / (self.tk ** 2)) * (((self.tk - 227) ** 2) / 2 + 454 * (self.tk - 227) + (227 ** 2) * np.log(self.tk - 227))
-            f_4 = (self.u[6][x] / (self.tk ** 2)) * (-(647 - self.tk) + 1294 * np.log(647 - self.tk) + (647 ** 2) / (647 - self.tk))
-            f_5 = self.k_1[x] / (self.tk ** 2) + self.fl[x] * ((self.tc ** 2) / (self.tk ** 2))
-            return f_1 + f_2 + f_3 + f_4 + f_5
+            f_1 = self.a[0][1][x] / self.tk + self.a[0][2][x] + 2 * self.a[0][3][x] * self.tk + 3 * self.a[0][4][x] * self.tk ** 2 + 10 * self.a[0][5][x] * self.tk ** 9 + 2 * self.a[0][6][x] / ((647 - self.tk) ** 3)
+            f_2 = self.a[1][1][x] / self.tk + self.a[1][2][x] + 2 * self.a[1][3][x] * self.tk + 3 * self.a[1][4][x] * self.tk ** 2 + 10 * self.a[1][5][x] * self.tk ** 9 + 2 * self.a[1][6][x] / ((647 - self.tk) ** 3)
+            f_3 = self.a[2][1][x] / self.tk + self.a[2][2][x] + 2 * self.a[2][3][x] * self.tk + 3 * self.a[2][4][x] * self.tk ** 2 + 10 * self.a[2][5][x] * self.tk ** 9 + 2 * self.a[2][6][x] / ((647 - self.tk) ** 3)
+            return f_1 + f_2 * self.pr + f_3 * (self.pr ** 2) / 2
 
         self.beta_0_der_t = Fl(0)
         self.beta_1_der_t = Fl(1)
