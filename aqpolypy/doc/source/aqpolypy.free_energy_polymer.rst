@@ -3,6 +3,14 @@
 Free Energy of Polymers
 =======================
 
+PolymerSolution
+---------------
+
+.. automodule:: aqpolypy.free_energy_polymer.PolymerSolution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 MakeBrushSolvent
 ----------------
