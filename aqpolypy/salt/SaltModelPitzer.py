@@ -131,6 +131,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # units are (kg/mol)^{1/2}
         alpha = a
 
+        if a == 0:
+            return 0
+
         x = alpha * np.sqrt(i_str)
 
         p_fun_gamma = (1 - (1 + x - 0.5 * x ** 2) * np.exp(-x)) / x ** 2
@@ -153,6 +156,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # units are (kg/mol)^{1/2}
         alpha = a
 
+        if a == 0:
+            return 0
+
         x = alpha * i_str
 
         p_fun_gamma_2 = (1 - (1 + x - x ** 2) * np.exp(-x)) / x ** 2
@@ -174,6 +180,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             """
         # units are (kg/mol)^{1/2}
         alpha = a
+
+        if a == 0:
+            return 0
 
         x = alpha * i_str ** 1.5
 
