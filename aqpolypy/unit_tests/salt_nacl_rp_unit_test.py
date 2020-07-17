@@ -55,7 +55,7 @@ class TestSaltNaClRP(unittest.TestCase):
                           [3, 0.08733961077]])
         # testing params up to a precision of 10^-6
         salt_nacl = nacl.NaClPropertiesRogersPitzer(300)
-        test_vals = np.allclose(salt_nacl.p_fun_gamma(param[:, 0]), param[:, 1], 0, 1e-6)
+        test_vals = np.allclose(salt_nacl.p_fun_gamma(2, param[:, 0]), param[:, 1], 0, 1e-6)
         self.assertTrue(test_vals)
 
     def test_params_der_p(self):
