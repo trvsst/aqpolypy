@@ -304,9 +304,13 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
             .. math::
 
-                \\phi = 1 - |z_{+}z_{-}|A_\\phi\\frac{I^{\\frac{1}{2}}}{1+bI^{\\frac{1}{2}}}+m\\frac{2\\nu_{+}\\nu_{-}}
-                {\\nu}\\left(\\beta^{(0)}_{\\pm}+\\beta^{(1)}_{\\pm}e^{-\\alpha I^{\\frac{1}{2}}}\\right)
-                +m^{2}\\frac{2\\left(\\nu_{+}\\nu_{-}\\right)^{\\frac{3}{2}}}{\\nu}C^{\\phi}_{\\pm}
+                \\phi = 1 - |z_{+}z_{-}|A_{\\phi}\\frac{I^{\\frac{1}{2}}}{\\left(1 + bI^{\\frac{1}{2}}\\right)}\\cr
+                +\\frac{2\\left(\\nu_{+}\\nu_{-}\\right)}{\\nu}m\\left[\\beta_{\\pm}^{(0)}+\\beta_{\\pm}^{(1)}e^{
+                -\\alpha_{B1}I^{\\frac{1}{2}}}+ \\beta_{\\pm}^{(2)}e^{-\\alpha_{B2}I^{\\frac{1}{2}}}\\right] \\cr
+                +\\frac{2\\left(\\nu_{+}\\nu_{-}\\right)^{\\frac{3}{2}}}{\\nu}m^{2}\\left[2\\left[C_{\\pm}^{(0)}+
+                C_{\\pm}^{(1)}e^{-\\alpha_{C1}I}+ C_{\\pm}^{(2)}e^{-\\alpha_{C2}I}\\right]\\right] \\cr
+                +\\frac{2\\left(\\nu_{+}\\nu_{-}\\right)^{2}}{\\nu}m^{3}\\left[3\\left[D_{\\pm}^{(0)}+D_{\\pm}^{(1)}e^{
+                -\\alpha_{D1}I^{\\frac{3}{2}}}+ D_{\\pm}^{(2)}e^{-\\alpha_{D2}I^{\\frac{3}{2}}}\\right]\\right] \\cr
 
             :return: osmotic coefficient in SI (float)
             """
