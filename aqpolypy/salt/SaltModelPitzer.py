@@ -143,7 +143,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     @staticmethod
     def p_fun_gamma_2(a, i_str):
         """
-            function in activity coefficient according to Wang & Pitzer:cite:``
+            function in activity coefficient according to Wang & Pitzer:cite:`Wang1998`
 
             .. math::
                 :label: pitzer_function_4
@@ -168,7 +168,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
     @staticmethod
     def p_fun_gamma_3(a, i_str):
         """
-            function in activity coefficient according to Wang & Pitzer:cite:``
+            function in activity coefficient according to Wang & Pitzer:cite:`Wang1998`
 
             .. math::
                 :label: pitzer_function_5
@@ -300,7 +300,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def osmotic_coeff(self, m):
         """
-            Osmotic coefficient according to Pitzer :cite:`Pitzer1973a`
+            Osmotic coefficient according to Wang & Pitzer :cite:`Wang1998`
 
             .. math::
 
@@ -340,7 +340,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def log_gamma(self, m):
         """
-            Activity coefficient according to Pitzer :cite:`Pitzer1973a`
+            Activity coefficient according to Wang & Pitzer :cite:`Wang1998`
 
             .. math::
                 :label: pitzer_activity
