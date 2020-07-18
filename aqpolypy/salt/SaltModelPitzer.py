@@ -345,12 +345,15 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: pitzer_activity
 
-                \\log(\\gamma_{\\pm})=-|z_{+}z_{-}|A_{\\gamma}f_{p2}(I)
-                +m\\frac{2\\nu_{+}\\nu_{-}}{\\nu}\\left(2\\beta^{(0)}_{\\pm}
-                +2\\beta^{(1)}_{\\pm}f_{p3}(I)\\right)
-                +\\frac{3m^2}{2}\\frac{2(\\nu_+\\nu_-)^{3/2}}{\\nu}C^{\\phi}_{\\pm}
+                \\ln \\gamma_{\\pm} = -|z_{+}z_{-}|A_{\\gamma}f_{p2}(I) \\cr
+                + \\frac{2(\\nu_{+}\\nu_{-})}{\\nu} m \\left[2\\beta^{(0)}_{\\pm} + 2\\beta^{(1)}_{\\pm}
+                f_{p3}(\\alpha_{B1}, I) + 2\\beta^{(2)}_{\\pm}f_{p3}(\\alpha_{B2}, I)\\right]\\cr
+                + \\frac{2(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}}{\\nu} m^{2}\\left[3C^{(0)}_{\\pm} + 2C^{(1)}_{\\pm}
+                f_{p4}(\\alpha_{C1}, I) + 2C^{(2)}_{\\pm}f_{p4}(\\alpha_{C2}, I)\\right] \\cr
+                + \\frac{2(\\nu_{+}\\nu_{-})^{2}}{\\nu} m^{3}\\left[4D^{(0)}_{\\pm} + 2D^{(1)}_{\\pm}
+                f_{p5}(\\alpha_{D1}, I) + 2D^{(2)}_{\\pm}f_{p5}(\\alpha_{D2}, I)\\right]
 
-            functions are defined in Eq. :eq:`pitzer_function_2`, :eq:`pitzer_function_3`
+            functions are defined in Eq. :eq:`pitzer_function_2`, :eq:`pitzer_function_3`, :eq:`pitzer_function_4`, :eq:`pitzer_function_5`
 
             :return: activity coefficient (float)
             """
