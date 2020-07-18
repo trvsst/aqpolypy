@@ -123,7 +123,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: pitzer_function_3
 
-                f_{p3}(I)=\\frac{1}{\\alpha^2I}\\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}
+                f_{p3}(\\alpha, I)=\\frac{1}{\\alpha^2I}\\left[1-\\left(1+\\alpha I^{\\frac{1}{2}}
                 -\\frac{\\alpha^2I}{2}\\right)e^{-\\alpha I^{\\frac{1}{2}}}\\right]
 
             :return: value of function (float)
@@ -148,7 +148,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: pitzer_function_4
 
-                f_{p4}(I)=\\frac{1}{\\alpha^2I^2}\\left[1-\\left(1+\\alpha I
+                f_{p4}(\\alpha, I)=\\frac{1}{\\alpha^2I^2}\\left[1-\\left(1+\\alpha I
                 - \\alpha^2I^2 \\right)e^{-\\alpha I}\\right]
 
             :return: value of function (float)
@@ -173,7 +173,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: pitzer_function_5
 
-                f_{p5}(I)=\\frac{1}{\\alpha^2I^3}\\left[1-\\left(1+\\alpha I^{\\frac{3}{2}}
+                f_{p5}(\\alpha, I)=\\frac{1}{\\alpha^2I^3}\\left[1-\\left(1+\\alpha I^{\\frac{3}{2}}
                 -\\frac{3\\alpha^2I^3}{2}\\right)e^{-\\alpha I^{\\frac{3}{2}}}\\right]
 
             :return: value of function (float)
