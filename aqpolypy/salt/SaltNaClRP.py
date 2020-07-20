@@ -144,11 +144,20 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.bp_2_1 = self.cm[19] + self.cm[20] / (self.tk - 227) + self.cm[21] * self.tk + self.cm[22] / (680 - self.tk)
         self.bp_2 = self.bp_2_1 * (self.pr - self.pr_atm) ** 2
 
-        self.bp = self.bp_0 + self.bp_1 + self.bp_2
+        self.beta0_der_p = self.bp_0 + self.bp_1 + self.bp_2
+        self.beta1_der_p = 0
+        self.beta2_der_p = 0
 
         self.cq = self.cm[23] + self.cm[24] / (self.tk - 227) + self.cm[25] * self.tk + self.cm[26] * self.tk ** 2 + self.cm[27] / (680 - self.tk)
         self.cp = 0.5 * self.cq
-        self.params_der_p = np.array([self.vp, self.bp, self.cp])
+        self.C0_der_p = self.cp
+        self.C1_der_p = 0
+        self.C2_der_p = 0
+
+        self.D0_der_p = 0
+        self.D1_der_p = 0
+        self.D2_der_p = 0
+        self.params_der_p = np.array([self.vp, self.beta0_der_p, self.beta1_der_p, self.beta2_der_p, self.C0_der_p, self.C1_der_p, self.C2_der_p, self.D0_der_p, self.D1_der_p, self.D2_der_p])
 
         # Pitzer Parameters temperature derivative
         self.beta0_der_t = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
@@ -204,4 +213,10 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         return self.params_der_t
 
     def ion_parameters(self):
+        """
+        returns the values of the ionic strength dependence (alpha) & ion-size (b) parameters as a list
+
+        :return: ionic strength dependence & ion-size parameters for NaCl (array)
+
+        """
         return self.ion_param
