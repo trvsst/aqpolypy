@@ -33,6 +33,8 @@ class PEOSimple(pa.PolymerProperties):
         self.enty = self.hydrogen_bond_entropy()
         self.ang = 0.0
         self.d_f = 0.0
+        self.a_val = 0.0
+        self.b_val = 0.0
 
         self.p_name = 'Polyethylene Oxide'
 
@@ -45,11 +47,11 @@ class PEOSimple(pa.PolymerProperties):
 
         return self.p_name
 
-    def hydrogen_bond_energy(self, egy=1800):
+    def hydrogen_bond_energy(self, egy=2000):
         """
         Change in internal energy :math:`\\Delta E= E_{water} -  E_{peo}`
 
-        :param egy: Internal energy (default is 1800 K)
+        :param egy: Internal energy (default is 2000 K)
 
         :return: Change in internal energy (in temperature units)
         """
@@ -58,11 +60,13 @@ class PEOSimple(pa.PolymerProperties):
 
         return egy
 
-    def hydrogen_bond_entropy(self, ang= np.pi/5.5):
+    def hydrogen_bond_entropy(self, ang=np.pi/7):
         """
         Change in internal energy :math:`\\Delta S= S_{water} -  S_{peo}`
 
-        :param ang: angle parameterizing the entropy (default is :math:`\\frac{5\\pi}{11)
+        parameterized by :math:`\\alpha`, :math:`\\Delta S = -\\log\\left(\\frac{1-\\cos(\\alpha)}{2}\\right)`
+
+        :param ang: angle parameterizing the entropy (default is :math:`\\frac{\\pi}{7}`
         :return: Change in internal energy (in temperature units)
         """
 
@@ -83,4 +87,19 @@ class PEOSimple(pa.PolymerProperties):
 
         self.d_f = self.egy/temp - self.enty
 
-        return self.df
+        return self.d_f
+
+    def chi(self, temp, a_val=-0.244, b_val=135):
+        """
+        Flory Huggins parameter :math:`\\chi(T)=A + \\frac{B}{T}`
+
+        :param temp: temperature in K
+        :param a_val: parameter A in Flory Huggins parameter
+        :param b_val: parameter B in Flory Huggins parameter
+        :return: Flory Huggins parameter for PEO water (float)
+        """
+
+        self.a_val = a_val
+        self.b_val = b_val
+
+        return self.a_val+self.b_val/temp
