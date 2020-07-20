@@ -190,6 +190,26 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         return p_fun_gamma_2
 
+    @staticmethod
+    def g_fun_phi(x):
+        """
+            function in apparent molal enthalpy according to Wang & Pitzer :cite:`Wang1998`
+
+            .. math::
+                :label: wang_function_1
+
+                g_{p1}(x)=\\frac{\\left[1-\\left(1+x\\right)e^{-x}\\right]}{x^{2}}
+
+            :return: value of function (float)
+            """
+
+        if x == 0:
+            return 0
+
+        g_fun_phi = ((1 - (1 + x)) * np.exp(-x)) / x ** 2
+
+        return g_fun_phi
+
     def ionic_strength(self, m):
         """
             Ionic strength
@@ -380,12 +400,20 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
     def apparent_molal_enthalpy(self, m):
         """
-            Apparent molal enthalpy according to Silvester and Pitzer :cite:`Silvester1977`
+            Apparent molal enthalpy according to Wang and Pitzer :cite:`Wang1998`
 
             .. math::
 
-                ^\\phi L=\\nu |z_{+}z_{-}|\\left(\\frac{A_{H}}{3.6}\\right)\\ln \\left(1 + 1.2 I^{\\frac{1}{2}}\\right)
-                - 2 \\nu_{+} \\nu_{-}RT^{2} \\left(mB^{'}_{\\pm} + m^{2}C^{'}_{\\pm}\\right)
+                L_{\\phi} &=& \\frac{\\nu|z_{+}z_{-}|A_{H}}{3b} \\ln(1+bI^{\\frac{1}{2}}) \\cr &-&2RT^{2}(\\nu_{+}
+                \\nu_{-})m \\left[\\frac{\\partial \\beta^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial
+                \\beta^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)+2\\frac{\\partial \\beta^{(2)}_{\\pm}}{\\partial T}
+                g_{p1}(x)\\right] \\cr &-&2RT^{2}(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}m^{2}\\left[\\frac{\\partial
+                C^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial C^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)+2\\frac{\\partial
+                C^{(2)}_{\\pm}}{\\partial T}g_{p1}(x)\\right] \\cr &-&2RT^{2}(\\nu_{+}\\nu_{-})^{2}m^{3}\\left[
+                \\frac{\\partial D^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial D^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)
+                +2\\frac{\\partial D^{(2)}_{\\pm}}{\\partial T}g_{p1}(x)\\right]
+
+            functions are defined in Eq. :eq:`wang_function_1`
 
             :return: apparent molal enthalpy in SI (float)
             """
@@ -394,17 +422,29 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         # ionic strength
         i_str = self.ionic_strength(m)
-        x = np.sqrt(i_str)
+
+        x_b1 = self.alpha_b1 * i_str ** 0.5
+        x_b2 = self.alpha_b1 * i_str ** 0.5
+        x_c1 = self.alpha_c1 * i_str
+        x_c2 = self.alpha_c2 * i_str
+        x_d1 = self.alpha_d1 * i_str ** 1.5
+        x_d2 = self.alpha_d2 * i_str ** 1.5
 
         # Pitzer Parameters temperature derivative
-        beta_0_der_t, beta_1_der_t, c_phi_der_t = self.params_der_t
+        beta0_der_t, beta1_der_t, beta2_der_t, C0_der_t, C1_der_t, C2_der_t, D0_der_t, D1_der_t, D2_der_t = self.params_der_t
 
-        beta_prime = beta_0_der_t + (2 * beta_1_der_t / ((2 ** 2) * i_str)) * (1 - (1 + 2 * x) * np.exp(-2 * x))
-        c_prime = ((nu_prod ** 0.5) / 2) * c_phi_der_t
+        BL = beta0_der_t + 2 * beta1_der_t * self.g_fun_phi(x_b1) + 2 * beta2_der_t * self.g_fun_phi(x_b2)
+        CL = C0_der_t + 2 * C1_der_t * self.g_fun_phi(x_c1) + 2 * C2_der_t * self.g_fun_phi(x_c2)
+        DL = D0_der_t + 2 * D1_der_t * self.g_fun_phi(x_d1) + 2 * D2_der_t * self.g_fun_phi(x_d2)
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
 
-        l_phi = nu * z_prod * (a_h / (3 * 1.2)) * np.log(1 + 1.2 * x) - 2 * nu_prod * un.r_gas() * (self.tk ** 2) * (m * beta_prime + c_prime * (m ** 2))
+        val_1 = nu * z_prod * (a_h / (3 * self.b_param)) * np.log(1 + self.b_param * np.sqrt(i_str))
+        val_2 = -2 * un.r_gas() * self.tk ** 2 * nu_prod * m * BL
+        val_3 = -2 * un.r_gas() * self.tk ** 2 * nu_prod ** 1.5 * m ** 2 * CL
+        val_4 = -2 * un.r_gas() * self.tk ** 2 * nu_prod ** 2 * m ** 3 * DL
+
+        l_phi = val_1 + val_2 + val_3 + val_4
 
         return l_phi
 
