@@ -113,10 +113,17 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
             return V_1 + V_2 * self.pr + V_3 * self.pr ** 2
 
         self.vp = Fv_vp()
-        self.bp = Fv(0)
-        self.cp = Fv(2)
+        self.beta0_der_p = Fv(0)
+        self.beta1_der_p = Fv(1)
+        self.beta2_der_p = 0
+        self.C0_der_p = Fv(2)
+        self.C1_der_p = Fv(3)
+        self.C2_der_p = Fv(4)
+        self.D0_der_p = Fv(5)
+        self.D1_der_p = 0
+        self.D2_der_p = 0
 
-        self.params_der_p = np.array([self.vp, self.bp, self.cp])
+        self.params_der_p = np.array([self.vp, self.beta0_der_p, self.beta1_der_p, self.beta2_der_p, self.C0_der_p, self.C1_der_p, self.C2_der_p, self.D0_der_p, self.D1_der_p, self.D2_der_p])
 
         # Pitzer Parameters temperature derivative
         def Fl(x):
@@ -175,4 +182,10 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
         return self.params_der_t
 
     def ion_parameters(self):
+        """
+        returns the values of the ionic strength dependence (alpha) & ion-size (b) parameters as a list
+
+        :return: ionic strength dependence & ion-size parameters for MgCl2 (array)
+
+        """
         return self.ion_param
