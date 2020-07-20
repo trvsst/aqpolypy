@@ -115,10 +115,17 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
             return f_1 + f_2 + f_3
 
         self.vp = Fv(0)
-        self.bp = Fv(1)
-        self.cp = 0
+        self.beta0_der_p = Fv(1)
+        self.beta1_der_p = 0
+        self.beta2_der_p = 0
+        self.C0_der_p = 0
+        self.C1_der_p = 0
+        self.C2_der_p = 0
+        self.D0_der_p = 0
+        self.D1_der_p = 0
+        self.D2_der_p = 0
 
-        self.params_der_p = np.array([self.vp, self.bp, self.cp])
+        self.params_der_p = np.array([self.vp, self.beta0_der_p, self.beta1_der_p, self.beta2_der_p, self.C0_der_p, self.C1_der_p, self.C2_der_p, self.D0_der_p, self.D1_der_p, self.D2_der_p])
 
         # Pitzer Parameters temperature derivative
         def Fl(x):
@@ -179,4 +186,10 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
         return self.params_der_t
 
     def ion_parameters(self):
+        """
+        returns the values of the ionic strength dependence (alpha) & ion-size (b) parameters as a list
+
+        :return: ionic strength dependence & ion-size parameters for KCl (array)
+
+        """
         return self.ion_param
