@@ -16,7 +16,7 @@ import aqpolypy.salt.SaltModelPitzer as rp
 
 class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
     """
-    MgCl2 properties following the work of Wang and Pitzer :cite:``
+    MgCl2 properties following the work of Wang and Pitzer :cite:`Wang1998`
 
     """
 

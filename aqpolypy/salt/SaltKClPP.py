@@ -16,7 +16,7 @@ import aqpolypy.salt.SaltModelPitzer as rp
 
 class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
     """
-    KCl properties following the work of Pabalan and Pitzer :cite:``
+    KCl properties following the work of Pabalan and Pitzer :cite:`Pabalan1988`
 
     """
 
