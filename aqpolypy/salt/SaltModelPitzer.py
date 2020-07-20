@@ -388,9 +388,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         i_str = self.ionic_strength(m)
 
         # Pitzer Parameters
-        beta0, beta1, C0, C1, C2, D0, D1, D2 = self.params
+        beta0, beta1, beta2, C0, C1, C2, D0, D1, D2 = self.params
 
-        BY = (2 * beta0 + 2 * beta1 * self.p_fun_gamma(self.alpha_b1, i_str))
+        BY = (2 * beta0 + 2 * beta1 * self.p_fun_gamma(self.alpha_b1, i_str) + 2 * beta2 * self.p_fun_gamma(self.alpha_b2, i_str))
         CY = (3 * C0 + 2 * C1 * self.p_fun_gamma_2(self.alpha_c1, i_str) + 2 * C2 * self.p_fun_gamma_2(self.alpha_c2, i_str))
         DY = (4 * D0 + 2 * D1 * self.p_fun_gamma_3(self.alpha_d1, i_str) + 2 * D2 * self.p_fun_gamma_3(self.alpha_d2, i_str))
 
