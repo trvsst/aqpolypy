@@ -287,8 +287,16 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             .. math::
                 :label: molar_vol
 
-                \\upsilon_{\\phi}(m)=\\upsilon^{\\infty}_1+\\nu|z_{+}z_{-}|A_v h(I)
-                +2\\nu_+\\nu_{-} RT\\left[ m B^{\\nu}_{\\pm}+m^2\\nu_{+}z_{+}C^{\\nu}_{\\pm}  \\right]
+                \\upsilon_{\\phi}(m)=\\upsilon^{\\infty}_1+\\nu|z_{+}z_{-}|A_v h(I) \\cr +2RT(\\nu_{+}\\nu_{-})m\\left[
+                \\frac{\\partial \\beta^{(0)}_{\\pm}}{\\partial P}+2\\frac{\\partial \\beta^{(1)}_{\\pm}}{\\partial P}
+                g_{p1}(x)+2\\frac{\\partial \\beta^{(2)}_{\\pm}}{\\partial P}g_{p1}(x)\\right] \\cr
+                +2RT(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}m^{2}\\left[\\frac{\\partial C^{(0)}_{\\pm}}{\\partial P}+2\\frac{
+                \\partial C^{(1)}_{\\pm}}{\\partial P}g_{p1}(x) + 2\\frac{\\partial C^{(2)}_{\\pm}}{\\partial P}
+                g_{p1}(x)\\right] \\cr +2RT(\\nu_{+}\\nu_{-})^2 m^{3}\\left[\\frac{\\partial D^{(0)}_{\\pm}}
+                {\\partial P} + 2\\frac{\\partial D^{(1)}_{\\pm}}{\\partial P}g_{p1}(x)) + 2\\frac{\\partial
+                D^{(2)}_{\\pm}}{\\partial P}g_{p1}(x)\\right]
+
+            functions are defined in Eq. :eq:`wang_function_1`
 
             :return: Molar volume of electrolyte solution in SI (float)
             """
