@@ -380,19 +380,23 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # pressure is 1 atm
         press = 1
 
-        # Pitzer Parameters
-        beta0, beta1, C0, C1, C2, D0, D1, D2 = self.params
-
         # stoichiometric_coefficients
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # ionic strength
         i_str = self.ionic_strength(m)
 
+        # Pitzer Parameters
+        beta0, beta1, C0, C1, C2, D0, D1, D2 = self.params
+
+        BY = (2 * beta0 + 2 * beta1 * self.p_fun_gamma(self.alpha_b1, i_str))
+        CY = (3 * C0 + 2 * C1 * self.p_fun_gamma_2(self.alpha_c1, i_str) + 2 * C2 * self.p_fun_gamma_2(self.alpha_c2, i_str))
+        DY = (4 * D0 + 2 * D1 * self.p_fun_gamma_3(self.alpha_d1, i_str) + 2 * D2 * self.p_fun_gamma_3(self.alpha_d2, i_str))
+
         val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * self.h_fun_gamma(i_str)
-        val_2 = 2 * m * (nu_prod / nu) * (2 * beta0 + 2 * beta1 * self.p_fun_gamma(self.alpha_b1, i_str))
-        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (3 * C0 + 2 * C1 * self.p_fun_gamma_2(self.alpha_c1, i_str) + 2 * C2 * self.p_fun_gamma_2(self.alpha_c2, i_str))
-        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (4 * D0 + 2 * D1 * self.p_fun_gamma_3(self.alpha_d1, i_str) + 2 * D2 * self.p_fun_gamma_3(self.alpha_d2, i_str))
+        val_2 = 2 * m * (nu_prod / nu) * BY
+        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * CY
+        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * DY
 
         log_gamma = val_1 + val_2 + val_3 + val_4
 
@@ -433,9 +437,9 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # Pitzer Parameters temperature derivative
         beta0_der_t, beta1_der_t, beta2_der_t, C0_der_t, C1_der_t, C2_der_t, D0_der_t, D1_der_t, D2_der_t = self.params_der_t
 
-        BL = beta0_der_t + 2 * beta1_der_t * self.g_fun_phi(x_b1) + 2 * beta2_der_t * self.g_fun_phi(x_b2)
-        CL = C0_der_t + 2 * C1_der_t * self.g_fun_phi(x_c1) + 2 * C2_der_t * self.g_fun_phi(x_c2)
-        DL = D0_der_t + 2 * D1_der_t * self.g_fun_phi(x_d1) + 2 * D2_der_t * self.g_fun_phi(x_d2)
+        BL = (beta0_der_t + 2 * beta1_der_t * self.g_fun_phi(x_b1) + 2 * beta2_der_t * self.g_fun_phi(x_b2))
+        CL = (C0_der_t + 2 * C1_der_t * self.g_fun_phi(x_c1) + 2 * C2_der_t * self.g_fun_phi(x_c2))
+        DL = (D0_der_t + 2 * D1_der_t * self.g_fun_phi(x_d1) + 2 * D2_der_t * self.g_fun_phi(x_d2))
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
 
