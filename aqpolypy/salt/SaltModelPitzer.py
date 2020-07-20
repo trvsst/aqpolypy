@@ -422,12 +422,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
             .. math::
 
-                L_{\\phi} &=& \\frac{\\nu|z_{+}z_{-}|A_{H}}{3b} \\ln(1+bI^{\\frac{1}{2}}) \\cr &-&2RT^{2}(\\nu_{+}
+                L_{\\phi} = \\frac{\\nu|z_{+}z_{-}|A_{H}}{3b} \\ln(1+bI^{\\frac{1}{2}}) \\cr -2RT^{2}(\\nu_{+}
                 \\nu_{-})m \\left[\\frac{\\partial \\beta^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial
                 \\beta^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)+2\\frac{\\partial \\beta^{(2)}_{\\pm}}{\\partial T}
-                g_{p1}(x)\\right] \\cr &-&2RT^{2}(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}m^{2}\\left[\\frac{\\partial
+                g_{p1}(x)\\right] \\cr -2RT^{2}(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}m^{2}\\left[\\frac{\\partial
                 C^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial C^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)+2\\frac{\\partial
-                C^{(2)}_{\\pm}}{\\partial T}g_{p1}(x)\\right] \\cr &-&2RT^{2}(\\nu_{+}\\nu_{-})^{2}m^{3}\\left[
+                C^{(2)}_{\\pm}}{\\partial T}g_{p1}(x)\\right] \\cr -2RT^{2}(\\nu_{+}\\nu_{-})^{2}m^{3}\\left[
                 \\frac{\\partial D^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial D^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)
                 +2\\frac{\\partial D^{(2)}_{\\pm}}{\\partial T}g_{p1}(x)\\right]
 
