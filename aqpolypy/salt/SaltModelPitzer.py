@@ -247,13 +247,13 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         m_r = self.p_ref[1]
         y_r = self.p_ref[2]
 
-        vp, bp, cp = self.params_der_p
+        vp, beta0_der_p, beta1_der_p, beta2_der_p, C0_der_p, C1_der_p, C2_der_p, D0_der_p, D1_der_p, D2_der_p = self.params_der_p
 
         i_str = self.ionic_strength(m_r)
 
         mv_i_0 = vp / m_r - y_r * vol_water
         mv_i_1 = -nu * z_prod * wp.WaterPropertiesFineMillero(self.tk, self.pa).a_v() * self.h_fun(i_str)
-        mv_i_2 = -2 * nu_prod * ct * (m_r * bp + nz_prod_plus * m_r ** 2 * cp)
+        mv_i_2 = -2 * nu_prod * ct * (m_r * beta0_der_p + nz_prod_plus * m_r ** 2 * C0_der_p)
         # this is in cm^3/mol
         mv_i = mv_i_0 + mv_i_1 + mv_i_2
 
