@@ -191,7 +191,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         return p_fun_gamma_2
 
     @staticmethod
-    def g_fun_phi(x):
+    def g_fun_phi(a, i_str):
         """
             function in apparent molal enthalpy according to Wang & Pitzer :cite:`Wang1998`
 
@@ -203,8 +203,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
             :return: value of function (float)
             """
 
-        if x == 0:
+        alpha = a
+
+        if a == 0:
             return 0
+
+        x = alpha * i_str
 
         g_fun_phi = ((1 - (1 + x)) * np.exp(-x)) / x ** 2
 
@@ -309,19 +313,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # ionic strength
         i_str = self.ionic_strength(m)
 
-        x_b1 = self.alpha_b1 * i_str ** 0.5
-        x_b2 = self.alpha_b1 * i_str ** 0.5
-        x_c1 = self.alpha_c1 * i_str
-        x_c2 = self.alpha_c2 * i_str
-        x_d1 = self.alpha_d1 * i_str ** 1.5
-        x_d2 = self.alpha_d2 * i_str ** 1.5
-
         # Pitzer parameters pressure derivative and Vp
         vp, beta0_der_p, beta1_der_p, beta2_der_p, C0_der_p, C1_der_p, C2_der_p, D0_der_p, D1_der_p, D2_der_p = self.params_der_p
 
-        BV = (beta0_der_p + 2 * beta1_der_p * self.g_fun_phi(x_b1) + 2 * beta2_der_p * self.g_fun_phi(x_b2))
-        CV = (C0_der_p + 2 * C1_der_p * self.g_fun_phi(x_c1) + 2 * C2_der_p * self.g_fun_phi(x_c2))
-        DV = (D0_der_p + 2 * D1_der_p * self.g_fun_phi(x_d1) + 2 * D2_der_p * self.g_fun_phi(x_d2))
+        BV = (beta0_der_p + 2 * beta1_der_p * self.g_fun_phi(self.alpha_b1, i_str ** 0.5) + 2 * beta2_der_p * self.g_fun_phi(self.alpha_b1, i_str ** 0.5))
+        CV = (C0_der_p + 2 * C1_der_p * self.g_fun_phi(self.alpha_c1, i_str) + 2 * C2_der_p * self.g_fun_phi(self.alpha_c2, i_str))
+        DV = (D0_der_p + 2 * D1_der_p * self.g_fun_phi(self.alpha_d1, i_str ** 1.5) + 2 * D2_der_p * self.g_fun_phi(self.alpha_d2, i_str ** 1.5))
 
         # infinite molar volume, convert to cm^3/mol
         v_1 = 1e6 * self.molar_vol_infinite_dilution()
@@ -449,19 +446,12 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # ionic strength
         i_str = self.ionic_strength(m)
 
-        x_b1 = self.alpha_b1 * i_str ** 0.5
-        x_b2 = self.alpha_b1 * i_str ** 0.5
-        x_c1 = self.alpha_c1 * i_str
-        x_c2 = self.alpha_c2 * i_str
-        x_d1 = self.alpha_d1 * i_str ** 1.5
-        x_d2 = self.alpha_d2 * i_str ** 1.5
-
         # Pitzer Parameters temperature derivative
         beta0_der_t, beta1_der_t, beta2_der_t, C0_der_t, C1_der_t, C2_der_t, D0_der_t, D1_der_t, D2_der_t = self.params_der_t
 
-        BL = (beta0_der_t + 2 * beta1_der_t * self.g_fun_phi(x_b1) + 2 * beta2_der_t * self.g_fun_phi(x_b2))
-        CL = (C0_der_t + 2 * C1_der_t * self.g_fun_phi(x_c1) + 2 * C2_der_t * self.g_fun_phi(x_c2))
-        DL = (D0_der_t + 2 * D1_der_t * self.g_fun_phi(x_d1) + 2 * D2_der_t * self.g_fun_phi(x_d2))
+        BL = (beta0_der_t + 2 * beta1_der_t * self.g_fun_phi(self.alpha_b1, i_str ** 0.5) + 2 * beta2_der_t * self.g_fun_phi(self.alpha_b1, i_str ** 0.5))
+        CL = (C0_der_t + 2 * C1_der_t * self.g_fun_phi(self.alpha_c1, i_str) + 2 * C2_der_t * self.g_fun_phi(self.alpha_c2, i_str))
+        DL = (D0_der_t + 2 * D1_der_t * self.g_fun_phi(self.alpha_d1, i_str ** 1.5) + 2 * D2_der_t * self.g_fun_phi(self.alpha_d2, i_str ** 1.5))
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
 
