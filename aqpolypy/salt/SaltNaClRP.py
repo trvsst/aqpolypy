@@ -116,6 +116,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.beta0 = self.beta0_1 + self.beta0_2
 
         self.beta1 = self.qm[5] + self.qm[8] * (self.tk - self.tc) + self.qm[9] * (self.tk ** 2 - self.tc ** 2)
+        self.beta2 = 0
 
         self.c_phi_1 = self.qm[10] + self.qm[11] * (1 / self.tk - 1 / self.tc) + self.qm[12] * np.log(self.tk / self.tc)
         self.c_phi = self.c_phi_1 + self.qm[13] * (self.tk - self.tc)
@@ -125,7 +126,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.D0 = 0
         self.D1 = 0
         self.D2 = 0
-        self.params = np.array([self.beta0, self.beta1, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
+        self.params = np.array([self.beta0, self.beta1, self.beta2, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
 
         # Pitzer Parameters pressure derivative
         self.pr = self.pa * un.atm_2_bar(1)
@@ -150,10 +151,19 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.params_der_p = np.array([self.vp, self.bp, self.cp])
 
         # Pitzer Parameters temperature derivative
-        self.beta_0_der_t = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
-        self.beta_1_der_t = 2 * self.qm[9] * self.tk + self.qm[8]
+        self.beta0_der_t = 2 * self.qm[4] * self.tk + self.qm[2] / self.tk - self.qm[1] / (self.tk ** 2) + self.qm[3]
+        self.beta1_der_t = 2 * self.qm[9] * self.tk + self.qm[8]
+        self.beta2_der_t = 0
+
         self.c_phi_der_t = self.qm[12] / self.tk - self.qm[11] / (self.tk ** 2) + self.qm[13]
-        self.params_der_t = np.array([self.beta_0_der_t, self.beta_1_der_t, self.c_phi_der_t])
+        self.C0_der_t = self.c_phi_der_t / 2
+        self.C1_der_t = 0
+        self.C2_der_t = 0
+
+        self.D0_der_t = 0
+        self.D1_der_t = 0
+        self.D2_der_t = 0
+        self.params_der_t = np.array([self.beta0_der_t, self.beta1_der_t, self.beta2_der_t, self.C0_der_t, self.C1_der_t, self.C2_der_t, self.D0_der_t, self.D1_der_t, self.D2_der_t])
 
         super().__init__(tk, pa)
 

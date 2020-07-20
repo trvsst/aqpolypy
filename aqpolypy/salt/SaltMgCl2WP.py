@@ -90,6 +90,7 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
 
         self.beta0 = Fg(0)
         self.beta1 = Fg(1)
+        self.beta2 = 0
         self.C0 = Fg(2)
         self.C1 = Fg(3)
         self.C2 = Fg(4)
@@ -97,7 +98,7 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
         self.D1 = 0
         self.D2 = 0
 
-        self.params = np.array([self.beta0, self.beta1, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
+        self.params = np.array([self.beta0, self.beta1, self.beta2, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
 
         # Pitzer Parameters pressure derivative
         def Fv(x):
@@ -124,10 +125,16 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
             f_3 = self.a[2][1][x] / self.tk + self.a[2][2][x] + 2 * self.a[2][3][x] * self.tk + 3 * self.a[2][4][x] * self.tk ** 2 + 10 * self.a[2][5][x] * self.tk ** 9 + 2 * self.a[2][6][x] / ((647 - self.tk) ** 3)
             return f_1 + f_2 * self.pr + f_3 * (self.pr ** 2) / 2
 
-        self.beta_0_der_t = Fl(0)
-        self.beta_1_der_t = Fl(1)
-        self.c_phi_der_t = Fl(2)
-        self.params_der_t = np.array([self.beta_0_der_t, self.beta_1_der_t, self.c_phi_der_t])
+        self.beta0_der_t = Fl(0)
+        self.beta1_der_t = Fl(1)
+        self.beta2_der_t = 0
+        self.C0_der_t = Fl(2)
+        self.C1_der_t = 0
+        self.C2_der_t = 0
+        self.D0_der_t = 0
+        self.D1_der_t = 0
+        self.D2_der_t = 0
+        self.params_der_t = np.array([self.beta0_der_t, self.beta1_der_t, self.beta2_der_t, self.C0_der_t, self.C1_der_t, self.C2_der_t, self.D0_der_t, self.D1_der_t, self.D2_der_t])
 
         super().__init__(tk, pa)
 

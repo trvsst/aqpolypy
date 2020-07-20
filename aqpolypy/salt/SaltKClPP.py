@@ -94,6 +94,7 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
 
         self.beta0 = Fg(0)
         self.beta1 = Fg(1)
+        self.beta2 = 0
         self.C0 = Fg(2)
         self.C1 = 0
         self.C2 = 0
@@ -101,7 +102,7 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
         self.D1 = 0
         self.D2 = 0
 
-        self.params = np.array([self.beta0, self.beta1, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
+        self.params = np.array([self.beta0, self.beta1, self.beta2, self.C0, self.C1, self.C2, self.D0, self.D1, self.D2])
 
         # Pitzer Parameters pressure derivative
         self.pr = self.pa * un.atm_2_bar(1)
@@ -128,10 +129,16 @@ class KClPropertiesPabalanPitzer(rp.SaltPropertiesPitzer):
             f_5 = self.k_1[x] / (self.tk ** 2) + self.fl[x] * ((self.tc ** 2) / (self.tk ** 2))
             return f_1 + f_2 + f_3 + f_4 + f_5
 
-        self.beta_0_der_t = Fl(0)
-        self.beta_1_der_t = Fl(1)
-        self.c_phi_der_t = Fl(2)
-        self.params_der_t = np.array([self.beta_0_der_t, self.beta_1_der_t, self.c_phi_der_t])
+        self.beta0_der_t = Fl(0)
+        self.beta1_der_t = Fl(1)
+        self.beta2_der_t = 0
+        self.C0_der_t = Fl(2)
+        self.C1_der_t = 0
+        self.C2_der_t = 0
+        self.D0_der_t = 0
+        self.D1_der_t = 0
+        self.D2_der_t = 0
+        self.params_der_t = np.array([self.beta0_der_t, self.beta1_der_t, self.beta2_der_t, self.C0_der_t, self.C1_der_t, self.C2_der_t, self.D0_der_t, self.D1_der_t, self.D2_der_t])
 
         super().__init__(tk, pa)
 
