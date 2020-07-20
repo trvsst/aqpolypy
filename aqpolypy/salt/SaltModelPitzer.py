@@ -337,22 +337,23 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # pressure is 1 atm
         press = 1
 
-        # Pitzer Parameters
-        beta0, beta1, C0, C1, C2, D0, D1, D2 = self.params
-
         # stoichiometric_coefficients
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
         # ionic strength
         i_str = self.ionic_strength(m)
 
-        x = np.sqrt(i_str)
-        w = i_str ** 1.5
+        # Pitzer Parameters
+        beta0, beta1, beta2, C0, C1, C2, D0, D1, D2 = self.params
 
-        val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * x / (1 + self.b_param * x)
-        val_2 = 2 * m * (nu_prod / nu) * (beta0 + beta1 * np.exp(-self.alpha_b1 * x))
-        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * (2 * (C0 + C1 * np.exp(-self.alpha_c1 * i_str) + C2 * np.exp(-self.alpha_c2 * i_str)))
-        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * (3 * (D0 + D1 * np.exp(-self.alpha_d1 * w) + D2 * np.exp(-self.alpha_d2 * w)))
+        B = (beta0 + beta1 * np.exp(-self.alpha_b1 * i_str ** 0.5) + beta2 * np.exp(-self.alpha_b2 * i_str ** 0.5))
+        C = (2 * (C0 + C1 * np.exp(-self.alpha_c1 * i_str) + C2 * np.exp(-self.alpha_c2 * i_str)))
+        D = (3 * (D0 + D1 * np.exp(-self.alpha_d1 * i_str ** 1.5) + D2 * np.exp(-self.alpha_d2 * i_str ** 1.5)))
+
+        val_1 = -z_prod * wp.WaterPropertiesFineMillero(self.tk, press).a_phi() * np.sqrt(i_str) / (1 + self.b_param * np.sqrt(i_str))
+        val_2 = 2 * m * (nu_prod / nu) * B
+        val_3 = (2 * nu_prod ** 1.5 / nu) * m ** 2 * C
+        val_4 = (2 * nu_prod ** 2 / nu) * m ** 3 * D
 
         osmotic_coefficient = 1 + val_1 + val_2 + val_3 + val_4
 
