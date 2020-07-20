@@ -298,20 +298,33 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         # stoichiometric_coefficients
         nu, nu_prod, z_prod, nz_prod_plus = self.mat
 
-        # coefficients V_m, B, C
-        vp, bp, cp = self.params_der_p
-
         # ionic strength
         i_str = self.ionic_strength(m)
+
+        x_b1 = self.alpha_b1 * i_str ** 0.5
+        x_b2 = self.alpha_b1 * i_str ** 0.5
+        x_c1 = self.alpha_c1 * i_str
+        x_c2 = self.alpha_c2 * i_str
+        x_d1 = self.alpha_d1 * i_str ** 1.5
+        x_d2 = self.alpha_d2 * i_str ** 1.5
+
+        # Pitzer parameters pressure derivative and Vp
+        vp, beta0_der_p, beta1_der_p, beta2_der_p, C0_der_p, C1_der_p, C2_der_p, D0_der_p, D1_der_p, D2_der_p = self.params_der_p
+
+        BV = (beta0_der_p + 2 * beta1_der_p * self.g_fun_phi(x_b1) + 2 * beta2_der_p * self.g_fun_phi(x_b2))
+        CV = (C0_der_p + 2 * C1_der_p * self.g_fun_phi(x_c1) + 2 * C2_der_p * self.g_fun_phi(x_c2))
+        DV = (D0_der_p + 2 * D1_der_p * self.g_fun_phi(x_d1) + 2 * D2_der_p * self.g_fun_phi(x_d2))
 
         # infinite molar volume, convert to cm^3/mol
         v_1 = 1e6 * self.molar_vol_infinite_dilution()
 
         val_1 = v_1 + nu * z_prod * wp.WaterPropertiesFineMillero(self.tk, self.pa).a_v() * self.h_fun(i_str)
-        val_2 = 2 * nu_prod * ct * (bp * m + nz_prod_plus * cp * m ** 2)
+        val_2 = 2 * nu_prod * ct * m * BV
+        val_3 = 2 * nu_prod ** 1.5 * ct * m ** 2 * CV
+        val_4 = 2 * nu_prod ** 2 * ct * m ** 3 * DV
 
         # molar volume in cm^3/mol
-        val = val_1 + val_2
+        val = val_1 + val_2 + val_3 + val_4
 
         # return in m^3/mol
         molar_vol = 1e-6 * val
