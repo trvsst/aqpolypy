@@ -43,3 +43,19 @@ SaltMgCl2WP
     :undoc-members:
     :show-inheritance:
 
+SaltMgSO4PP
+-----------
+
+.. automodule:: aqpolypy.salt.SaltMgSO4PP
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+SaltNa2SO4PP
+------------
+
+.. automodule:: aqpolypy.salt.SaltNa2SO4PP
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
