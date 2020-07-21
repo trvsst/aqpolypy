@@ -71,10 +71,10 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 3] = param[:, 3] / 2
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals1 = np.allclose(salt_nacl.params_der_p[1], param[:, 2], 0, 1e-2)
-        test_vals2 = np.allclose(salt_nacl.params_der_p[2], param[:, 3], 0, 1e-2)
-        self.assertTrue(test_vals1)
-        self.assertTrue(test_vals2)
+        test_vals1 = np.allclose(salt_nacl.params_der_p[1], param[:, 2], 0, 1e-8)
+        test_vals2 = np.allclose(salt_nacl.params_der_p[4], param[:, 3], 0, 1e-8)
+        self.assertTrue(test_vals1, salt_nacl.params_der_p[1])
+        self.assertTrue(test_vals2, salt_nacl.params_der_p[4])
 
     def test_stoichiometry_coeffs(self):
         # parameters in stoichiometry coefficient[nu = 2, nu_prod = 1, z_prod = 1, nz_prod_plus = 1]
@@ -110,8 +110,8 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 2] = param[:, 2] / 1e6
         # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose(salt_nacl.molar_vol_infinite_dilution(), param[:, 2], 0, 1e-2)
-        self.assertTrue(test_vals)
+        test_vals = np.allclose(salt_nacl.molar_vol_infinite_dilution(), param[:, 2], 0, 1e-8)
+        self.assertTrue(test_vals, salt_nacl.molar_vol_infinite_dilution())
 
     def test_density_sol(self):
         # parameters in [temperature (C), pressure (bar), molality, specific volume of NaCl(aq) cm^3/g]
@@ -131,8 +131,8 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 3] = (1 / param[:, 3]) * 1e3
         # testing params up to a precision of 10^-1
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose(salt_nacl.density_sol(param[:, 2]), param[:, 3], 0, 1e-1)
-        self.assertTrue(test_vals)
+        test_vals = np.allclose(salt_nacl.density_sol(param[:, 2]), param[:, 3], 0, 1e-2)
+        self.assertTrue(test_vals, str(salt_nacl.density_sol(param[:, 2])) + " & " + str(param[:, 3]))
 
     def test_molar_vol(self):
         # parameters in [temperature (C), pressure (bar), molality, molar volume cm^3/mol]
@@ -152,8 +152,8 @@ class TestSaltNaClRP(unittest.TestCase):
         param[:, 3] = param[:, 3] / 1e6
         # testing params up to a precision of 10^-9
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose(salt_nacl.molar_vol(param[:, 2]), param[:, 3], 0, 1e-9)
-        self.assertTrue(test_vals)
+        test_vals = np.allclose(salt_nacl.molar_vol(param[:, 2]), param[:, 3], 0, 1e-11)
+        self.assertTrue(test_vals, salt_nacl.molar_vol(param[:, 2]))
 
     def test_osmotic_coeff(self):
         # parameters in [temperature (C), molality, osmotic coefficient]
