@@ -139,7 +139,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         self.aw = self.aw_term_1 + self.aw_term_2 + self.aw_term_3
 
         # enthalpy coefficient
-        self.a_h = -9 * self.osmotic_coefficient * un.r_gas() * self.tk * (1 + self.tk * (1 / self.dielectricConstant) * self.dielectricConstant_der_t + self.tk * (self.aw / 3))
+        self.enthalpy_coefficient = -9 * self.osmotic_coefficient * un.r_gas() * self.tk * (1 + self.tk * (1 / self.dielectricConstant) * self.dielectricConstant_der_t + self.tk * (self.aw / 3))
 
     def density(self):
         """
@@ -210,11 +210,11 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
             """
         return self.app_molal_vol
 
-    def enthalpy_coefficient(self):
+    def a_h(self):
         """
             Enthalpy coefficient according to Silvester and Pitzer :cite:`Silvester1977`
 
             :return: enthalpy coefficient in SI
             :rtype: float
             """
-        return self.a_h
+        return self.enthalpy_coefficient
