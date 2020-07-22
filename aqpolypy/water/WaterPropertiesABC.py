@@ -92,7 +92,7 @@ class WaterProperties(ABC):
         pass
 
     @abstractmethod
-    def enthalpy_coefficient(self):
+    def a_h(self):
         """
         Abstract method: calculates the enthalpy coefficient of water defined by
 
