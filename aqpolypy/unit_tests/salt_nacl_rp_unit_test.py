@@ -166,10 +166,10 @@ class TestSaltNaClRP(unittest.TestCase):
                           [100, 0.2, 0.698]])
         # converting to [temperature (K), molality, activity coefficient]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
-        # testing params up to a precision of 10^-3
+        # testing params up to a precision of 10^-2
         salt_nacl = nacl.NaClPropertiesRogersPitzer(param[:, 0])
-        test_vals = np.allclose(np.exp(salt_nacl.log_gamma(param[:, 1])), param[:, 2], 0, 1e-3)
-        self.assertTrue(test_vals, str(np.exp(salt_nacl.log_gamma(param[:, 1]))) + " & " + str(param[:, 2]))
+        test_vals = np.allclose(np.exp(salt_nacl.log_gamma(param[:, 1])), param[:, 2], 0, 1e-2)
+        self.assertTrue(test_vals)
 
     def test_apparent_molal_enthalpy(self):
         # parameters in [temperature (C), molality, apparent relative molal enthalpy (cal/mol)]
