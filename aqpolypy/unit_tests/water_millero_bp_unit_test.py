@@ -117,7 +117,7 @@ class TestWaterMilleroBP(unittest.TestCase):
         self.assertTrue(test_vals)
 
     # Testing enthalpy coefficient (Bradley Pitzer)
-    def test_enthalpy_coefficient(self):
+    def test_a_h(self):
         # enthalpy coefficient [temperature(C), Pressure(bar), enthalpy coeff (AH / RT)] Bradley & Pitzer TABLE III
         param = np.array([[10, 100, 0.641],
                           [60, 100, 1.180],
@@ -129,8 +129,8 @@ class TestWaterMilleroBP(unittest.TestCase):
         param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         # testing enthalpy coeff up to a precision of 10^-2
         wfm = fm.WaterPropertiesFineMillero(param[:, 0], param[:, 1])
-        test_vals = np.allclose(((2 / 3) * wfm.enthalpy_coefficient()) / (un.r_gas() * param[:, 0]), param[:, 2], 0, 1e-2)
-        self.assertTrue(test_vals, ((2 / 3) * wfm.enthalpy_coefficient()) / (un.r_gas() * param[:, 0]))
+        test_vals = np.allclose(((2 / 3) * wfm.a_h()) / (un.r_gas() * param[:, 0]), param[:, 2], 0, 1e-2)
+        self.assertTrue(test_vals, ((2 / 3) * wfm.a_h()) / (un.r_gas() * param[:, 0]))
 
 
 if __name__ == '__main__':
