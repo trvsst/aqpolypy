@@ -159,7 +159,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
             """
         pass
 
-    def enthalpy_coefficient(self):
+    def a_h(self):
         """
             Enthalpy coefficient unavailable for this model
             """
