@@ -453,7 +453,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         CL = (C0_der_t + 2 * C1_der_t * self.g_fun_phi(self.alpha_c1, i_str) + 2 * C2_der_t * self.g_fun_phi(self.alpha_c2, i_str))
         DL = (D0_der_t + 2 * D1_der_t * self.g_fun_phi(self.alpha_d1, i_str ** 1.5) + 2 * D2_der_t * self.g_fun_phi(self.alpha_d2, i_str ** 1.5))
 
-        a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).enthalpy_coefficient()
+        a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).a_h()
 
         val_1 = nu * z_prod * (a_h / (3 * self.b_param)) * np.log(1 + self.b_param * np.sqrt(i_str))
         val_2 = -2 * un.r_gas() * self.tk ** 2 * nu_prod * m * BL
