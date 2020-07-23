@@ -139,7 +139,7 @@ class WaterPropertiesFineMillero(wp.WaterProperties):
         self.aw = self.aw_term_1 + self.aw_term_2 + self.aw_term_3
 
         # enthalpy coefficient
-        self.enthalpy_coefficient = -9 * self.osmotic_coefficient * un.r_gas() * self.tk * (1 + self.tk * (1 / self.dielectricConstant) * self.dielectricConstant_der_t + self.tk * (self.aw / 3))
+        self.enthalpy_coefficient = -6 * self.osmotic_coefficient * un.r_gas() * self.tk * (1 + self.tk * (1 / self.dielectricConstant) * self.dielectricConstant_der_t + self.tk * (self.aw / 3))
 
     def density(self):
         """

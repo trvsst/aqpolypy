@@ -427,7 +427,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
             .. math::
 
-                L_{\\phi} = \\frac{\\nu|z_{+}z_{-}|A_{H}}{3b} \\ln(1+bI^{\\frac{1}{2}}) \\cr -2RT^{2}(\\nu_{+}
+                L_{\\phi} = \\frac{\\nu|z_{+}z_{-}|A_{H}}{2b} \\ln(1+bI^{\\frac{1}{2}}) \\cr -2RT^{2}(\\nu_{+}
                 \\nu_{-})m \\left[\\frac{\\partial \\beta^{(0)}_{\\pm}}{\\partial T}+2\\frac{\\partial
                 \\beta^{(1)}_{\\pm}}{\\partial T}g_{p1}(x)+2\\frac{\\partial \\beta^{(2)}_{\\pm}}{\\partial T}
                 g_{p1}(x)\\right] \\cr -2RT^{2}(\\nu_{+}\\nu_{-})^{\\frac{3}{2}}m^{2}\\left[\\frac{\\partial
@@ -455,7 +455,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         a_h = wp.WaterPropertiesFineMillero(self.tk, self.pa).a_h()
 
-        val_1 = nu * z_prod * (a_h / (3 * self.b_param)) * np.log(1 + self.b_param * np.sqrt(i_str))
+        val_1 = nu * z_prod * (a_h / (2 * self.b_param)) * np.log(1 + self.b_param * np.sqrt(i_str))
         val_2 = -2 * un.r_gas() * self.tk ** 2 * nu_prod * m * BL
         val_3 = -2 * un.r_gas() * self.tk ** 2 * nu_prod ** 1.5 * m ** 2 * CL
         val_4 = -2 * un.r_gas() * self.tk ** 2 * nu_prod ** 2 * m ** 3 * DL
