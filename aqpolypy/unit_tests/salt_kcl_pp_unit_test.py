@@ -148,7 +148,7 @@ class TestSaltKClPP(unittest.TestCase):
         # converting to [temperature (K), molality, apparent relative molal enthalpy (kJ/mol)]
         param[:, 0] = un.celsius_2_kelvin(param[:, 0])
         # testing params up to a precision of 10^-2
-        salt_kcl = kcl.KClPropertiesPabalanPitzer(param[:, 0], 1 / un.atm_2_bar(1))
+        salt_kcl = kcl.KClPropertiesPabalanPitzer(param[:, 0], (1 / un.atm_2_bar(1)))
         test_vals = np.allclose(salt_kcl.apparent_molal_enthalpy(param[:, 1]) / 1e3, param[:, 2], 0, 1e-2)
         self.assertTrue(test_vals, str(salt_kcl.apparent_molal_enthalpy(param[:, 1]) / 1e3) + " & " + str(param[:, 2]))
 
