@@ -79,22 +79,6 @@ class TestSaltMgSO4PP(unittest.TestCase):
         test_vals = np.allclose(salt_mgso4.ionic_strength(param[:, 0]), param[:, 1], 0, 1e-6)
         self.assertTrue(test_vals)
 
-    def test_molar_vol_infinite_dilution(self):
-        # parameters in [temperature (C), pressure (bar), partial molal volume of solute cm^3/mol]
-        param = np.array([[70, 1, 1.781e1],
-                          [60, 1, 1.791e1],
-                          [90, 1, 1.710e1],
-                          [80, 400, 1.884e1],
-                          [60, 800, 2.024e1]])
-        # converting to [temperature (K), pressure (atm), partial molal volume of solute m^3/mol]
-        param[:, 0] = un.celsius_2_kelvin(param[:, 0])
-        param[:, 1] = param[:, 1] / un.atm_2_bar(1)
-        param[:, 2] = param[:, 2] / 1e6
-        # testing params up to a precision of 10^-8
-        salt_mgso4 = mgso4.MgSO4PropertiesPhutelaPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose(salt_mgso4.molar_vol_infinite_dilution(), param[:, 2], 0, 1e-8)
-        self.assertTrue(test_vals)
-
     def test_density_sol(self):
         # parameters in [temperature (K), pressure (bar), molality, density of solution g/cm^3]
         param = np.array([[323.90, 22.3, 0.0723, 0.99720],
