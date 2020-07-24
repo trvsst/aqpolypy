@@ -320,10 +320,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
         CV = (C0_der_p + 2 * C1_der_p * self.g_fun_phi(self.alpha_c1, i_str) + 2 * C2_der_p * self.g_fun_phi(self.alpha_c2, i_str))
         DV = (D0_der_p + 2 * D1_der_p * self.g_fun_phi(self.alpha_d1, i_str ** 1.5) + 2 * D2_der_p * self.g_fun_phi(self.alpha_d2, i_str ** 1.5))
 
-        # infinite molar volume, convert to cm^3/mol
-        v_1 = 1e6 * self.molar_vol_infinite_dilution()
-
-        val_1 = v_1 + nu * z_prod * wp.WaterPropertiesFineMillero(self.tk, self.pa).a_v() * self.h_fun(i_str)
+        val_1 = vp + nu * z_prod * wp.WaterPropertiesFineMillero(self.tk, self.pa).a_v() * self.h_fun(i_str)
         val_2 = 2 * nu_prod * ct * m * BV
         val_3 = 2 * nu_prod ** 1.5 * ct * m ** 2 * CV
         val_4 = 2 * nu_prod ** 2 * ct * m ** 3 * DV

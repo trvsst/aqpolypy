@@ -12,6 +12,7 @@
 
 import numpy as np
 import aqpolypy.units.units as un
+import aqpolypy.water.WaterMilleroBP as bp
 import aqpolypy.salt.SaltModelPitzer as rp
 
 
@@ -136,7 +137,7 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.vp_1 = (self.pr - self.pr_atm) * (self.cm[4] + self.cm[5] * self.tk + self.cm[6] * self.tk ** 2)
         self.vp_2 = (self.pr - self.pr_atm) ** 2 * (self.cm[7] + self.cm[8] * self.tk)
 
-        self.vp = self.vp_0 + self.vp_1 + self.vp_2
+        self.vp_sum = self.vp_0 + self.vp_1 + self.vp_2
 
         self.bp_0 = self.cm[9] + self.cm[10] / (self.tk - 227) + self.cm[11] * self.tk + self.cm[12] * self.tk ** 2 + self.cm[13] / (680 - self.tk)
         self.bp_1_1 = self.cm[14] + self.cm[15] / (self.tk - 227) + self.cm[16] * self.tk + self.cm[17] * self.tk ** 2
@@ -157,6 +158,27 @@ class NaClPropertiesRogersPitzer(rp.SaltPropertiesPitzer):
         self.D0_der_p = 0
         self.D1_der_p = 0
         self.D2_der_p = 0
+
+        # calculates the molar volume at infinite dilution (vp)
+
+        # the factor 10 is the conversion from J to bar cm^3
+        self.ct = 10 * un.r_gas() * self.tk
+
+        # molar volume water in cm^3/mol
+        self.vol_water = 1e6 * bp.WaterPropertiesFineMillero(self.tk, self.pa).molar_volume()
+
+        self.mv_i_0 = self.vp_sum / self.m_ref - self.y_ref * self.vol_water
+        self.mv_i_1 = -2 * bp.WaterPropertiesFineMillero(self.tk, self.pa).a_v() * (0.5 * np.log(1 + self.b_param * np.sqrt(self.m_ref)) / self.b_param)
+        self.mv_i_2 = -2 * self.ct * (self.m_ref * self.beta0_der_p + self.m_ref ** 2 * self.C0_der_p)
+        # this is in cm^3/mol
+        self.mv_i = self.mv_i_0 + self.mv_i_1 + self.mv_i_2
+
+        # return in SI m^3
+        self.molar_vol_infinite_dilution = 1e-6 * self.mv_i
+
+        # infinite molar volume, convert to cm^3/mol
+        self.vp = 1e6 * self.molar_vol_infinite_dilution
+
         self.params_der_p = np.array([self.vp, self.beta0_der_p, self.beta1_der_p, self.beta2_der_p, self.C0_der_p, self.C1_der_p, self.C2_der_p, self.D0_der_p, self.D1_der_p, self.D2_der_p])
 
         # Pitzer Parameters temperature derivative
