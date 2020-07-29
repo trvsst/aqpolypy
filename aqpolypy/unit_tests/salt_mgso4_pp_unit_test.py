@@ -95,8 +95,8 @@ class TestSaltMgSO4PP(unittest.TestCase):
         param[:, 1] = param[:, 1] / un.atm_2_bar(1)
         # testing params up to a precision of 10^-5
         salt_mgso4 = mgso4.MgSO4PropertiesPhutelaPitzer(param[:, 0], param[:, 1])
-        test_vals = np.allclose((salt_mgso4.density_sol(param[:, 2])) * 1e3, param[:, 3], 0, 1e-5)
-        self.assertTrue(test_vals, (salt_mgso4.density_sol(param[:, 2])) * 1e3)
+        test_vals = np.allclose((salt_mgso4.density_sol(param[:, 2])) / 1e3, param[:, 3], 0, 1e-5)
+        self.assertTrue(test_vals, str((salt_mgso4.density_sol(param[:, 2])) * 1e3) + " & " + str(param[:, 3]))
 
     def test_molar_vol(self):
         # parameters in [temperature (C), pressure (bar), molality, molar volume cm^3/mol]

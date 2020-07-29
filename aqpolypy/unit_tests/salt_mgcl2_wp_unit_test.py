@@ -114,7 +114,7 @@ class TestSaltMgCl2WP(unittest.TestCase):
         # testing params up to a precision of 10^-4
         salt_mgcl2 = mgcl2.MgCl2PropertiesWangPitzer(373.15)
         test_vals = np.allclose(salt_mgcl2.osmotic_coeff(param[:, 0]), param[:, 1], 0, 1e-4)
-        self.assertTrue(test_vals, salt_mgcl2.osmotic_coeff(param[:, 0]))
+        self.assertTrue(test_vals, str(salt_mgcl2.osmotic_coeff(param[:, 0])) + " & " + str(param[:, 1]))
 
     def test_log_gamma(self):
         # parameters in [molality, activity coefficient]
@@ -131,7 +131,7 @@ class TestSaltMgCl2WP(unittest.TestCase):
         # testing params up to a precision of 10^-4
         salt_mgcl2 = mgcl2.MgCl2PropertiesWangPitzer(373.15)
         test_vals = np.allclose(salt_mgcl2.log_gamma(param[:, 0]), param[:, 1], 0, 1e-4)
-        self.assertTrue(test_vals, salt_mgcl2.log_gamma(param[:, 0]))
+        self.assertTrue(test_vals, str(salt_mgcl2.log_gamma(param[:, 0])) + " & " + str(param[:, 1]))
 
     def test_apparent_molal_enthalpy(self):
         # parameters in [molality, apparent relative molal enthalpy (kJ/mol)]
@@ -148,7 +148,7 @@ class TestSaltMgCl2WP(unittest.TestCase):
         # testing params up to a precision of 10^-2
         salt_mgcl2 = mgcl2.MgCl2PropertiesWangPitzer(373.15, 5e6 / un.atm_2_pascal(1))
         test_vals = np.allclose(salt_mgcl2.apparent_molal_enthalpy(param[:, 0]) / 1e3, param[:, 1], 0, 1e-2)
-        self.assertTrue(test_vals, salt_mgcl2.apparent_molal_enthalpy(param[:, 0]) / 1e3)
+        self.assertTrue(test_vals, str(salt_mgcl2.apparent_molal_enthalpy(param[:, 0]) / 1e3) + " & " + str(param[:, 1]))
 
 
 if __name__ == '__main__':

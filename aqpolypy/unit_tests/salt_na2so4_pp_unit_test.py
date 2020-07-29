@@ -96,7 +96,7 @@ class TestSaltNa2SO4PP(unittest.TestCase):
         # testing params up to a precision of 10^-5
         salt_na2so4 = na2so4.Na2SO4PropertiesPhutelaPitzer(param[:, 0], param[:, 1])
         test_vals = np.allclose((salt_na2so4.density_sol(param[:, 2])) * 1e3, param[:, 3], 0, 1e-5)
-        self.assertTrue(test_vals)
+        self.assertTrue(test_vals, str((salt_na2so4.density_sol(param[:, 2])) * 1e3) + " & " + str(param[:, 3]))
 
     def test_molar_vol(self):
         # parameters in [temperature (C), pressure (bar), molality, molar volume cm^3/mol]
