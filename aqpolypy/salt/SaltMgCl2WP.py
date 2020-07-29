@@ -113,13 +113,13 @@ class MgCl2PropertiesWangPitzer(rp.SaltPropertiesPitzer):
             return V_1 + V_2 * self.pr + V_3 * self.pr ** 2
 
         self.vp = Fv_vp()
-        self.beta0_der_p = Fv(0)
-        self.beta1_der_p = Fv(1)
+        self.beta0_der_p = ((Fv(0) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
+        self.beta1_der_p = ((Fv(1) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
         self.beta2_der_p = 0
-        self.C0_der_p = Fv(2)
-        self.C1_der_p = Fv(3)
-        self.C2_der_p = Fv(4)
-        self.D0_der_p = Fv(5)
+        self.C0_der_p = ((Fv(2) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
+        self.C1_der_p = ((Fv(3) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
+        self.C2_der_p = ((Fv(4) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
+        self.D0_der_p = ((Fv(5) / 1e6) * un.atm_2_pascal(1)) / un.atm_2_bar(1)
         self.D1_der_p = 0
         self.D2_der_p = 0
 
