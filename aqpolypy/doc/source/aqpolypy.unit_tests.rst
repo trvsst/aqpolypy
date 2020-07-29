@@ -45,6 +45,38 @@ salt_nacl_rp_unit_test
     :undoc-members:
     :show-inheritance:
 
+salt_kcl_pp_unit_test
+---------------------
+
+.. automodule:: aqpolypy.unit_tests.salt_kcl_pp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+salt_mgcl2_wp_unit_test
+-----------------------
+
+.. automodule:: aqpolypy.unit_tests.salt_mgcl2_wp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+salt_na2so4_pp_unit_test
+------------------------
+
+.. automodule:: aqpolypy.unit_tests.salt_na2so4_pp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+salt_mgso4_pp_unit_test
+-----------------------
+
+.. automodule:: aqpolypy.unit_tests.salt_mgso4_pp_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 bjerrum_unit_test
 -----------------
 
