@@ -75,6 +75,8 @@ class PolymerSolutionSalts(object):
 
 	:param c: concentration of ions (both + and -) mols/litre (M)
         :param ion_size: Ion diameter (in Angstrom)
+        :param phi_w: math:`1 - \\phi_p - \\phi_+ - \\phi_-`
+        :param phi_1: math:`\\phi_+ + \\phi_-`
         :return: value of free energy (float)
         """
 
