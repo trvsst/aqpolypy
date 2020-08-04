@@ -23,7 +23,7 @@ class PolymerSolutionSalts(object):
     Defines a solution with polymers with hydrogen bonds following the model :cite:`Dormidontova2002`
     """
 
-    def __init__(self, v_p, v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac=np.array([1, 1, 0])):
+    def __init__(self, v_p, v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac=np.array([1, 1])):
         """
         The constructor
 
@@ -39,16 +39,16 @@ class PolymerSolutionSalts(object):
 
         :param v_p: polymer parameters
         :param v_s: salt parameters
-        :param v_w: volume of water in :math:``\\A^3``
+        :param v_w: volume of water in :math:`a^3`
         :param df_w: free energy change upon formation of hydrogen bond in water (in :math:`k_BT` units)
         :param x_ini: fraction of polymer hydrogen bonds
         :param p_ini: fraction of water hydrogen bonds
         :param n_k: number of Kuhn lengths for the polymer
-        :param chi_p: a Flory Huggins parameter with the temperature dependence:math:`\\chi_p=A_p+\\frac{B_p}{T}`
+        :param chi_p: a Flory Huggins parameter with the temperature dependence :math:`\\chi_p=A_p+\\frac{B_p}{T}`
         :param chi_e: a Flory Huggins parameter between polymer and electrolytes
         :param param_s: microscopic salt parameters
-        :param b_o: object of water class
-        :param b_fac: B_factors for the different species in units of ion_size
+        :param b_o: object of water class  :class:`Bjerrum <aqpolypy.salts_theory.Bjerrum>`
+        :param b_fac: B_factors for the different species in units of ion_size to calculate the freen energy of hard-core repulsion 
         """
 
         # concentration in mols/litre
@@ -97,11 +97,11 @@ class PolymerSolutionSalts(object):
 
         # salt free energy
         self.bjerrum_object = b_o
-        self.dhfree = dh.DebyeHuckel(self.bjerrum_object).free_energy_db_excess(self.conc, self.i_size)
+        self.dh_free = dh.DebyeHuckel(self.bjerrum_object).free_energy_db_excess(self.conc, self.i_size)
 
         # hard core free energy
         self.b_fac = b_fac
-        self.hcfree = hc.HardCore(b_fac=self.b_fac).free_energy_hc_excess(self.conc, self.i_size)
+        self.hc_free = hc.HardCore(b_fac=self.b_fac).free_energy_hc_excess(self.conc, self.i_size)
 
     def free(self):
         """

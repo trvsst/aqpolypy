@@ -14,7 +14,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Unit Tests" href="aqpolypy.unit_tests.html" />
+    <link rel="next" title="Salt" href="aqpolypy.salt.html" />
     <link rel="prev" title="Units" href="aqpolypy.units.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -33,7 +33,353 @@
           <div class="body" role="main">
             
   <div class="section" id="water">
-<h1>Water<a class="headerlink" href="#water" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Water<a class="headerlink" href="#water" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-aqpolypy.water.WaterPropertiesABC">
+<span id="waterpropertiesabc"></span><h2>WaterPropertiesABC<a class="headerlink" href="#module-aqpolypy.water.WaterPropertiesABC" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">module</dt>
+<dd class="field-odd"><p>WaterPropertiesABC</p>
+</dd>
+<dt class="field-even">platform</dt>
+<dd class="field-even"><p>Unix, Windows, OS</p>
+</dd>
+<dt class="field-odd">synopsis</dt>
+<dd class="field-odd"><p>Abstract class used for deriving child classes</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties">
+<em class="property">class </em><code class="sig-prename descclassname">aqpolypy.water.WaterPropertiesABC.</code><code class="sig-name descname">WaterProperties</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tk</strong> – temperature in kelvin</p></li>
+<li><p><strong>pa</strong> – pressure in atmospheres</p></li>
+</ul>
+</dd>
+<dt class="field-even">Instantiate</dt>
+<dd class="field-even"><p>temperature, pressure, molecular weight, polarizability, dipole moment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.a_h">
+<em class="property">abstract </em><code class="sig-name descname">a_h</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.a_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the enthalpy coefficient of water defined by</p>
+<p><img class="math" src="_images/math/8e19896c2c7a2087a75955569866794d0cec190d.png" alt="A_{H}=-9A_{\phi}\left[1+T\left(\frac{\partial \ln D}{\partial T}\right)_{P}+\frac{T\alpha_{w}}{3}\right]"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.a_phi">
+<em class="property">abstract </em><code class="sig-name descname">a_phi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.a_phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the osmotic coefficient of water defined by</p>
+<p><img class="math" src="_images/math/87fa3737dafd96caaad178c0645fefcb2f15ccd5.png" alt="A_{\phi}=\frac{1}{3}\left(\frac{2\pi N_A\rho_w l_B}{10^3}\right)^{1/2}
+\left(\frac{e^2}{4\pi \varepsilon_0 \varepsilon_r}\right)^{3/2}"/></p>
+<p>dimensionless because it is normalized to reference molality of <img class="math" src="_images/math/7e0c74794e7294c4414a5e6fb4f184ce4d48d99d.png" alt="\sqrt{m^{\ominus}}"/>
+with <img class="math" src="_images/math/885e1520e52ec02c4c6c2f25dc8deb4196b53be6.png" alt="m^{\ominus}=\mbox{kg mol}^{-1}"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.a_v">
+<em class="property">abstract </em><code class="sig-name descname">a_v</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.a_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the apparent molal volume of water defined by</p>
+<p><img class="math" src="_images/math/b879039919ca18399b029b409048b09bc58bfba5.png" alt="A_{v}=-2A_{\phi}RT[3\left(\frac{\partial\varepsilon}{\partial P}+\beta_w\right)"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.compressibility">
+<em class="property">abstract </em><code class="sig-name descname">compressibility</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.compressibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the isothermal compressibility of water</p>
+<p><img class="math" src="_images/math/23009a114ef974266fbc722614e170eb1e2da17f.png" alt="\beta_T = -\frac{1}{V}\left(\frac{\partial V}{\partial P} \right)_T"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.density">
+<em class="property">abstract </em><code class="sig-name descname">density</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the density of water <img class="math" src="_images/math/2d6114f6b6a4976305a038fa8fbd48bbe85d7f8b.png" alt="\rho_w"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.dielectric_constant">
+<em class="property">abstract </em><code class="sig-name descname">dielectric_constant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.dielectric_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the relative dielectric constant <img class="math" src="_images/math/9c63b6558de6e4ba779875767c7344198671aee8.png" alt="\varepsilon_{r}"/></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterPropertiesABC.WaterProperties.molar_volume">
+<em class="property">abstract </em><code class="sig-name descname">molar_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties.molar_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method: calculates the molar volume <img class="math" src="_images/math/30a00e4061fce3c8ab7f9059c48103e21055c8ce.png" alt="\upsilon_w"/></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-aqpolypy.water.WaterMilleroAW">
+<span id="watermilleroaw"></span><h2>WaterMilleroAW<a class="headerlink" href="#module-aqpolypy.water.WaterMilleroAW" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">module</dt>
+<dd class="field-odd"><p>WaterMilleroAW</p>
+</dd>
+<dt class="field-even">platform</dt>
+<dd class="field-even"><p>Unix, Windows, OS</p>
+</dd>
+<dt class="field-odd">synopsis</dt>
+<dd class="field-odd"><p>Derived water properties class utilizing Fine &amp; Millero and Archer &amp; Wang calculations</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero">
+<em class="property">class </em><code class="sig-prename descclassname">aqpolypy.water.WaterMilleroAW.</code><code class="sig-name descname">WaterPropertiesFineMillero</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties" title="aqpolypy.water.WaterPropertiesABC.WaterProperties"><code class="xref py py-class docutils literal notranslate"><span class="pre">aqpolypy.water.WaterPropertiesABC.WaterProperties</span></code></a></p>
+<p>Water properties following the work of Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id2">[FM73]</a>
+Dilectric constant from Archer and Wang <a class="bibtex reference internal" href="aqpolypy.html#archer1990" id="id3">[AW90]</a></p>
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tk</strong> – temperature in kelvin</p></li>
+<li><p><strong>pa</strong> – pressure in atmospheres</p></li>
+</ul>
+</dd>
+<dt class="field-even">Instantiate</dt>
+<dd class="field-even"><p>temperature, pressure, molecular weight, polarizability, dipole moment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_h">
+<code class="sig-name descname">a_h</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enthalpy coefficient unavailable for this model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_phi">
+<code class="sig-name descname">a_phi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Osmotic coefficient unavailable for this model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_v">
+<code class="sig-name descname">a_v</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.a_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apparent molal volume unavailable for this model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.compressibility">
+<code class="sig-name descname">compressibility</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.compressibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Water compressibility according to Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id4">[FM73]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>compressibility of water in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.density">
+<code class="sig-name descname">density</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Water density according to Fine Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id5">[FM73]</a></p>
+<p>restricted to temperatures in range [0, 100]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>water density in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+<p>TODO: include warning if the temperature is outside [0,100]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.dielectric_constant">
+<code class="sig-name descname">dielectric_constant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.dielectric_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dielectric constant according to Archer and Wang <a class="bibtex reference internal" href="aqpolypy.html#archer1990" id="id6">[AW90]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dielectric constant in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.molar_volume">
+<code class="sig-name descname">molar_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroAW.WaterPropertiesFineMillero.molar_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Molar volume of water according to Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id7">[FM73]</a></p>
+<p>restricted to temperatures in range [0, 100]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>water molar volume in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+<p>TODO: include warning if the temperature is outside [0,100]</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-aqpolypy.water.WaterMilleroBP">
+<span id="watermillerobp"></span><h2>WaterMilleroBP<a class="headerlink" href="#module-aqpolypy.water.WaterMilleroBP" title="Permalink to this headline">¶</a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">module</dt>
+<dd class="field-odd"><p>WaterMilleroBP</p>
+</dd>
+<dt class="field-even">platform</dt>
+<dd class="field-even"><p>Unix, Windows, OS</p>
+</dd>
+<dt class="field-odd">synopsis</dt>
+<dd class="field-odd"><p>Derived water properties class utilizing Fine &amp; Millero and Bradley &amp; Pitzer calculations</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero">
+<em class="property">class </em><code class="sig-prename descclassname">aqpolypy.water.WaterMilleroBP.</code><code class="sig-name descname">WaterPropertiesFineMillero</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aqpolypy.water.WaterPropertiesABC.WaterProperties" title="aqpolypy.water.WaterPropertiesABC.WaterProperties"><code class="xref py py-class docutils literal notranslate"><span class="pre">aqpolypy.water.WaterPropertiesABC.WaterProperties</span></code></a></p>
+<p>Water properties following the work of Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id8">[FM73]</a>
+Dielectric constant from Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id9">[BP79]</a>
+Apparent molal volume from Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id10">[BP79]</a>
+Osmotic coefficient from Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id11">[BP79]</a></p>
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">tk</em>, <em class="sig-param">pa=1</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tk</strong> – temperature in kelvin</p></li>
+<li><p><strong>pa</strong> – pressure in atmospheres</p></li>
+</ul>
+</dd>
+<dt class="field-even">Instantiate</dt>
+<dd class="field-even"><p>temperature, pressure, molecular weight, polarizability, dipole moment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_h">
+<code class="sig-name descname">a_h</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enthalpy coefficient according to Silvester and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#silvester1977" id="id12">[SP77]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>enthalpy coefficient in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_phi">
+<code class="sig-name descname">a_phi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_phi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Osmotic coefficient according to Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id13">[BP79]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>osmotic coefficient in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_v">
+<code class="sig-name descname">a_v</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.a_v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apparent molal volume according to Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id14">[BP79]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>apparent molal volume in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.compressibility">
+<code class="sig-name descname">compressibility</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.compressibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Water compressibility according to Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id15">[FM73]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>compressibility of water in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.density">
+<code class="sig-name descname">density</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Water density according to Fine Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id16">[FM73]</a></p>
+<p>restricted to temperatures in range [0, 100]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>water density in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+<p>TODO: include warning if the temperature is outside [0,100]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.dielectric_constant">
+<code class="sig-name descname">dielectric_constant</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.dielectric_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dielectric constant according to Bradley and Pitzer <a class="bibtex reference internal" href="aqpolypy.html#bradley1979" id="id17">[BP79]</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dielectric constant in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.molar_volume">
+<code class="sig-name descname">molar_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterMilleroBP.WaterPropertiesFineMillero.molar_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Molar volume of water according to Fine and Millero <a class="bibtex reference internal" href="aqpolypy.html#fine1973" id="id18">[FM73]</a></p>
+<p>restricted to temperatures in range [0, 100]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>water molar volume in SI</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+<p>TODO: include warning if the temperature is outside [0,100]</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -57,7 +403,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="aqpolypy.html">Stable Python Packages</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="aqpolypy.units.html">Units</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Water</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.salt.html">Salt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.salts_theory.html">Salts Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.polymer.html">Polymer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.free_energy_polymer.html">Free Energy of Polymers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.wigner_seitz_cell.html">Wigner-Seitz Cell</a></li>
 <li class="toctree-l2"><a class="reference internal" href="aqpolypy.unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aqpolypy.html#bibliography">Bibliography</a></li>
 </ul>
 </li>
 </ul>
@@ -68,7 +420,7 @@
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="aqpolypy.html">Stable Python Packages</a><ul>
       <li>Previous: <a href="aqpolypy.units.html" title="previous chapter">Units</a></li>
-      <li>Next: <a href="aqpolypy.unit_tests.html" title="next chapter">Unit Tests</a></li>
+      <li>Next: <a href="aqpolypy.salt.html" title="next chapter">Salt</a></li>
   </ul></li>
   </ul></li>
 </ul>
