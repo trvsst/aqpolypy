@@ -3,14 +3,6 @@
 Free Energy of Polymers
 =======================
 
-PolymerSolution
----------------
-
-.. automodule:: aqpolypy.free_energy_polymer.PolymerSolution
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 MakeBrushSolvent
 ----------------
@@ -37,7 +29,7 @@ BinaryBrushSuperLattice
     :show-inheritance:
     
 PolymerSolution
------------------------
+---------------
 
 .. automodule:: aqpolypy.free_energy_polymer.PolymerSolution
     :members:
@@ -45,7 +37,7 @@ PolymerSolution
     :show-inheritance:
     
 PolymerSolutionSalts
------------------------
+--------------------
 
 .. automodule:: aqpolypy.free_energy_polymer.PolymerSolutionSalts
     :members:
