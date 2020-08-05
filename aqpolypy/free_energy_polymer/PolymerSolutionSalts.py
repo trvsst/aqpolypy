@@ -39,7 +39,7 @@ class PolymerSolutionSalts(object):
 
         :param v_p: polymer parameters
         :param v_s: salt parameters
-        :param v_w: volume of water in :math:`a^3`
+        :param v_w: volume of water in :math:`\\AA^3`
         :param df_w: free energy change upon formation of hydrogen bond in water (in :math:`k_BT` units)
         :param x_ini: fraction of polymer hydrogen bonds
         :param p_ini: fraction of water hydrogen bonds
