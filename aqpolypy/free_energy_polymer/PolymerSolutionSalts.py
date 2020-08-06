@@ -41,7 +41,7 @@ class PolymerSolutionSalts(object):
         :param b_fac: B_factors for the different species in units of ion_size in hard-core repulsion
 
         the parameter v_s is given by
-        :math:`(c_s, \\frac{\\upsilon_w}{\\upsilon_+}, \\frac{\\upsilon_w}{\\upsilon_-}, \\Delta F_a, \\Delta F_p)`
+        :math:`(c_s, \\frac{\\upsilon_w}{\\upsilon_+}, \\frac{\\upsilon_w}{\\upsilon_-}, \\Delta F_a, \\Delta F_b)`
 
         where :math:`c_s` is the concentration in Molar units
         """
@@ -117,7 +117,7 @@ class PolymerSolutionSalts(object):
         f_as_2_1 = lg(self.p, self.p) + lg(1 - self.f_a - self.p, 1 - self.f_a - self.p) - self.p * self.df_w
         f_as_2 = 2 * self.phi_w * f_as_2_1
 
-        z_val = (1 - self.f_b - self. p - self.x * self.u_p * self.phi_p) / self.phi_w
+        z_val = (1 - self.f_b - self. p - self.x * self.u_p * self.phi_p / self.phi_w)
         f_as_3 = 2 * self.phi_w * lg(z_val, z_val)
         f_as_4 = -2 * self.phi_w * lg(self.x * self.u_p * self.phi_p / self.phi_w + self.p, 2 * self.phi_w / np.exp(1))
         f_as_5_1 = (np.log(gamma(self.h_a + 1)) - self.df_a) * self.f_a
@@ -125,11 +125,11 @@ class PolymerSolutionSalts(object):
         f_as_5 = self.phi_w * (f_as_5_1 + f_as_5_2)
         f_as_6_1 = lg(1 - self.f_a - self.f_b, 1 - self.f_a - self.f_b)
         f_as_6_2 = lg(1 - self.f_a, 1 - self.f_a) + lg(1 - self.f_b, 1 - self.f_b)
-        f_as_6 = self.phi_w * (f_as_6_1 + f_as_6_2)
+        f_as_6 = self.phi_w * (f_as_6_1 - f_as_6_2)
         f_as_7 = self.phi_w * (self.f_a + self.f_b) * np.log(self.phi_w / np.exp(1))
 
         f_dh = self.dh_free.free_energy_db_excess(self.conc, self.i_size)
-        f_hc = self.hc_free.free_energy_hc_excess(self.conc, self.i_size)
+        f_hc = np.sum(self.hc_free.free_energy_hc_excess(self.conc, self.i_size))
 
         f_ref_all = f_ref_11 + f_ref_12 + f_ref_13 + f_ref_2
         f_int_all = f_int_1 + f_int_2
