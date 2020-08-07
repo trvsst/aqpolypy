@@ -181,11 +181,8 @@ class PolymerSolutionSalts(object):
         mu_11 = - 2 * self.phi_w * (self.dydp + self.dyda + self.dydb) * np.log(self.p / (1 -self.f_a - self.p) * np.exp( - self.df_w) / z_val / 2 / self.phi_w)
         mu_12 = - self.phi_w * (self.df_adp + self.df_ada + self.df_adb) * np.log((1 - self.f_a) / (1 -self.f_a - self.f_b) * np.exp( - self.df_a) / (1 -self.f_a - self.p)**2 / self.phi_w)
         mu_13 = - self.phi_w * (self.df_bdp + self.df_bda + self.df_bdb) * np.log((1 - self.f_b) / (1 -self.f_a - self.f_b) * np.exp( - self.df_b) / z_val **2 / self.phi_w)
-
-        mu_dh = self.dh_free.pressure_db_excess(self.conc, self.i_size)
-        mu_hc = np.sum(self.hc_free.pressure_hc_excess(self.conc, self.i_size))
         
-        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_10 + mu_11 + mu_12 + mu_13 + mu_dh + mu_hc
+        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_10 + mu_11 + mu_12 + mu_13 
         
     def chem_potential_pm(self):
         """
@@ -215,10 +212,9 @@ class PolymerSolutionSalts(object):
         mu_8 = - self.phi_w * (self.df_bdp * u_pm + self.df_bda / self.u_b + self.df_bdb / self.u_a) * np.log(
             (1 - self.f_b) / (1 - self.f_a - self.f_b) * np.exp(- self.df_b) / z_val ** 2 / self.phi_w)
 
-        mu_dh = self.dh_free.pressure_db_excess(self.conc, self.i_size)
         mu_hc = np.sum(self.hc_free.pressure_hc_excess(self.conc, self.i_size))
 
-        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_dh + mu_hc
+        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_hc
 
     def chem_potential_p(self):
         """
@@ -249,9 +245,8 @@ class PolymerSolutionSalts(object):
         mu_9 = - self.n / self.u_p * self.phi_w * (self.df_bda + self.df_bdb) * np.log(
             (1 - self.f_b) / (1 - self.f_a - self.f_b) * np.exp(- self.df_b) / z_val ** 2 / self.phi_w)
 
-        mu_dh = self.dh_free.pressure_db_excess(self.conc, self.i_size)
-        mu_hc = np.sum(self.hc_free.pressure_hc_excess(self.conc, self.i_size))
+        mu_dh = self.dh_free.pressure_dh_excess(self.conc, self.i_size)
 
-        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_dh + mu_hc
+        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_dh
         
         
