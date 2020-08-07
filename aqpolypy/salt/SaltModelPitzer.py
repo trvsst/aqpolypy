@@ -210,7 +210,7 @@ class SaltPropertiesPitzer(sp.SaltProperties, ABC):
 
         x = alpha * i_str
 
-        g_fun_phi = ((1 - (1 + x)) * np.exp(-x)) / x ** 2
+        g_fun_phi = (1 - (1 + x) * np.exp(-x)) / x ** 2
 
         return g_fun_phi
 
