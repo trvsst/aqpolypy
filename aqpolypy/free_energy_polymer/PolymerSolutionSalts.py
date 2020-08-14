@@ -100,12 +100,12 @@ class PolymerSolutionSalts(object):
 
         # Derivative of parameters
         self.df_adp = self.f_a / self.phi_w
-        self.df_ada = self.f_a * (1 / self.phi_a + 1/self.phi_w)
+        self.df_ada = self.f_a * (1 / self.phi_a + 1 / self.phi_w)
         self.df_adb = self.f_a / self.phi_w
 
         self.df_bdp = self.f_b / self.phi_w
         self.df_bda = self.f_b / self.phi_w
-        self.df_bdb = self.f_b * (1 / self.phi_b + 1/self.phi_w)
+        self.df_bdb = self.f_b * (1 / self.phi_b + 1 / self.phi_w)
 
         self.dxdp = - self.x / self.phi_p
         self.dxda = 0
@@ -153,7 +153,7 @@ class PolymerSolutionSalts(object):
         f_as_all = f_as_1 + f_as_2 + f_as_3 + f_as_4 + f_as_5 + f_as_6 + f_as_7
 
         return f_ref_all + f_int_all + f_as_all + f_dh + f_hc
-        
+
     def chem_potential_w(self):
         """
         Reduced chemical potential  for water :math:`\\frac{\\mu_w}{k_B T}=\\frac{1}{k_B T}(f- \\phi_p \\frac{\\partial f}{\\partial \\phi_p}- \\phi_+ \\frac{\\partial f}{\\partial \\phi_+}- \\phi_- \\frac{\\partial f}{\\partial \\phi_-}`
@@ -161,60 +161,66 @@ class PolymerSolutionSalts(object):
         :return: value of chemical potential (float)
         """
 
+        mu_0 = - self.u_p * self.phi_p / self.n - self.u_a * self.phi_a - self.u_b * self.phi_b - self.phi_w - self.chi_e * self.phi_1 * self.phi_p
         mu_1_1 = np.log(self.phi_w)
-        mu_1_2 = self.chi_p * self.phi_p * (self.phi_p +self.phi_1)
+        mu_1_2 = self.chi_p * self.phi_p * (self.phi_p + self.phi_1)
 
-        mu_2 = -2 * self.phi_1 * self.u_p * (lg(1- self.x, 1- self.x) + lg(self.x, self.x) -self.x * self.df_p)
+        mu_2 = 0 
         mu_3 = 2 * (lg(1 - self.f_a - self.p, 1 - self.f_a - self.p) + lg(self.p, self.p) - self.p * self.df_w)
 
         z_val = (1 - self.f_b - self. p - self.x * self.u_p * self.phi_p / self.phi_w)
-        mu_4 = lg(z_val, z_val)
-        mu_5 = 2 * (self.phi_p + self.phi_1 ) * self.x * self.u_p * (1 - self.phi_1) / self.phi_w * np.log (z_val)
+        mu_4 = 2 * lg(z_val, z_val)
+        mu_5 = 2 * (self.phi_p + self.phi_1) * self.x * self.u_p * (1 - self.phi_1) / self.phi_w * np.log(z_val)
 
         mu_6 = (np.log(gamma(self.h_a + 1)) - self.df_a) * self.f_a + (np.log(gamma(self.h_b + 1)) - self.df_b) * self.f_b
         mu_7 = (lg(1 - self.f_a - self.f_b, 1 - self.f_a - self.f_b) - lg(1 - self.f_a, 1 - self.f_a) - lg(1 - self.f_b, 1 - self.f_b))
 
-        mu_8 = - (self.f_a + self.f_b) * (np.log(self.phi_w) + self.phi_w)
-        mu_9 = - 2 * self.phi_1 * (self.x * self.u_p - self.p) * np.log(2 * self.phi_w)
+        mu_8 = - (self.f_a + self.f_b) * (np.log(self.phi_w) - self.phi_w)
+        mu_9 = - 2 * (- self.x * self.u_p * self.phi_1 + self.p) * np.log(2 * self.phi_w) + 2 * self.phi_w * (self.x * self.u_p * self.phi_p / self.phi_w + self.p)
 
-        mu_10 = - 2 * self.u_p * self.phi_p * (self.dxdp + self.dxda + self.dxdb) * np.log(self.x / (1 - self.x) * np.exp( - self.df_p) / z_val / 2 / self.phi_w)
-        mu_11 = - 2 * self.phi_w * (self.dydp + self.dyda + self.dydb) * np.log(self.p / (1 -self.f_a - self.p) * np.exp( - self.df_w) / z_val / 2 / self.phi_w)
-        mu_12 = - self.phi_w * (self.df_adp + self.df_ada + self.df_adb) * np.log((1 - self.f_a) / (1 -self.f_a - self.f_b) * np.exp( - self.df_a) / (1 -self.f_a - self.p)**2 / self.phi_w)
-        mu_13 = - self.phi_w * (self.df_bdp + self.df_bda + self.df_bdb) * np.log((1 - self.f_b) / (1 -self.f_a - self.f_b) * np.exp( - self.df_b) / z_val **2 / self.phi_w)
-        
-        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_10 + mu_11 + mu_12 + mu_13 
-        
+        mu_10 = - 2 * self.u_p * self.phi_p * (self.phi_p * self.dxdp + self.phi_a * self.dxda + self.phi_b * self.dxdb) * np.log(self.x / (1 - self.x) * np.exp(- self.df_p) / z_val / 2 / self.phi_w)
+        mu_11 = - 2 * self.phi_w * (self.phi_p * self.dydp + self.phi_a * self.dyda + self.phi_b * self.dydb) * np.log(self.p / (1 - self.f_a - self.p) * np.exp(- self.df_w) / z_val / 2 / self.phi_w)
+
+        mu_12 = - self.phi_w * (self.phi_p * self.df_adp + self.phi_a * self.df_ada + self.phi_b * self.df_adb) * np.log((1 - self.f_a) / (1 - self.f_a - self.f_b) * \
+                np.exp(- self.df_a - 1 + np.log(gamma(self.h_a + 1))) / (1 - self.f_a - self.p)**2 / self.phi_w)
+
+        mu_13 = - self.phi_w * (self.phi_p * self.df_bdp + self.phi_a * self.df_bda + self.phi_b * self.df_bdb) * np.log((1 - self.f_b) / (1 - self.f_a - self.f_b) * \
+                np.exp(- self.df_b - 1 + np.log(gamma(self.h_b + 1))) / z_val ** 2 / self.phi_w)
+
+        return mu_0 + mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_10 + mu_11 + mu_12 + mu_13
+
     def chem_potential_pm(self):
         """
         Reduced chemical potential  for the ions :math:`\\frac{1}{2}( \\frac{ \\upsilon_+}{ \\upsilon_w}  \\frac{ \\mu_w}{k_B T} +  \\frac{ \\upsilon_+}{ \\upsilon_w} \\frac{1}{k_B T} \\frac{ \\partial f}{ \\partial  \\phi_+}+ \\frac{ \\upsilon_-}{ \\upsilon_w}  \\frac{ \\mu_w}{k_B T} +  \\frac{ \\upsilon_-}{ \\upsilon_w} \\frac{1}{k_B T} \\frac{ \\partial f}{ \\partial  \\phi_-})`
 
         :return: value of chemical potential (float)
         """
-        u_pm = (1 / self.u_a + 1/ self.u_b)
-        z_val = (1 - self.f_b - self.p - self.x * self.u_p * self.phi_p / self.phi_w)
+        u_pm = (1 / self.u_a + 1 / self.u_b)
+        z_val = (1 - self.f_b - self.p - self.x * self.u_p * self.phi_p / self.phi_w) 
 
-        mu_1_1 = np.log(self.phi_a * self.phi_b)
-        mu_1_2 = u_pm * (self.chi_p * self.phi_w + self.chi_e * self.phi_p)
+        mu_0 = - u_pm * self.u_p / 2 * self.phi_p / self.n - u_pm * self.u_a / 2 * self.phi_a - u_pm * self.u_b / 2 * self.phi_b
+        mu_1_1 = np.log(self.phi_a * self.phi_b) / 2 - u_pm / 2 * self.phi_w
+        mu_1_2 = - u_pm / 2 * self.chi_p * self.phi_w * self.phi_p - u_pm / 2 * self.chi_e * self.phi_p * (1 - self.phi_p)
 
-        mu_2 = 2 * u_pm * (1 - self.phi_1 * self.u_p) * (lg(1 - self.x, 1 - self.x) + lg(self.x, self.x) - self.x * self.df_p)
-        mu_3 = 2 * u_pm * (self.phi_p +self.phi_1) * self.x * self.u_p * (1 - self.phi_1) / self.phi_w * np.log(z_val)
+        mu_2 = - self.x * u_pm * self.u_p * (1 - self.phi_1) * np.log(z_val)
 
-        mu_4 = - 2 * u_pm * (1 +  self.phi_1) * (self.x * self.u_p - self.p) * np.log(2 * self.phi_w)
+        mu_3 = - self.x * u_pm * self.u_p * (1 - self.phi_1) * np.log(2 * self.phi_w) + u_pm * self.phi_w * (self.x * self.u_p *self.phi_p / self.phi_w - self.p) 
 
+        mu_4 = - self.u_p * self.phi_p * (self.dxdp * u_pm * self.phi_p + self.dxda * (u_pm * self.phi_a - 1/ self.u_a) + self.dxdb * (u_pm * self.phi_b - 1/ self.u_b)) * \
+               np.log(self.x / (1 - self.x) * np.exp(- self.df_p) / z_val / 2 / self.phi_w)
 
-        mu_5 = - 2 * self.u_p * self.phi_p * (self.dxdp * u_pm + self.dxda / self.u_b + self.dxdb / self.u_a) * np.log(
-            self.x / (1 - self.x) * np.exp(- self.df_p) / z_val / 2 / self.phi_w)
-        mu_6 = - 2 * self.phi_w * (self.dydp * u_pm + self.dyda / self.u_b + self.dydb / self.u_a) * np.log(
-            self.p / (1 - self.f_a - self.p) * np.exp(- self.df_w) / z_val / 2 / self.phi_w)
-        mu_7 = - self.phi_w * (self.df_adp * u_pm + self.df_ada / self.u_b + self.df_adb / self.u_a) * np.log(
-            (1 - self.f_a) / (1 - self.f_a - self.f_b) * np.exp(- self.df_a) / (
-                        1 - self.f_a - self.p) ** 2 / self.phi_w)
-        mu_8 = - self.phi_w * (self.df_bdp * u_pm + self.df_bda / self.u_b + self.df_bdb / self.u_a) * np.log(
-            (1 - self.f_b) / (1 - self.f_a - self.f_b) * np.exp(- self.df_b) / z_val ** 2 / self.phi_w)
+        mu_5 = - self.phi_w * (self.dydp * u_pm * self.phi_p + self.dyda * (u_pm * self.phi_a - 1/ self.u_a) + self.dydb * (u_pm * self.phi_b - 1/ self.u_b)) * \
+               np.log(self.p / (1 - self.f_a - self.p) * np.exp(- self.df_w) / z_val / 2 / self.phi_w)
+
+        mu_6 = - self.phi_w / 2 * (self.df_adp * u_pm * self.phi_p + self.df_ada * (u_pm * self.phi_a - 1/ self.u_a) + self.df_adb * (u_pm * self.phi_b - 1/ self.u_b)) * \
+               np.log((1 - self.f_a) / (1 - self.f_a - self.f_b) * np.exp(- self.df_a - 1 + np.log(gamma(self.h_a + 1))) / (1 - self.f_a - self.p) ** 2 / self.phi_w)
+
+        mu_7 = - self.phi_w / 2 * (self.df_bdp * u_pm * self.phi_p + self.df_bda * (u_pm * self.phi_a - 1/ self.u_a) + self.df_bdb * (u_pm * self.phi_b - 1/ self.u_b)) * \
+               np.log((1 - self.f_b) / (1 - self.f_a - self.f_b) *  np.exp(- self.df_b - 1 + np.log(gamma(self.h_b + 1))) / z_val ** 2 / self.phi_w)
 
         mu_hc = np.sum(self.hc_free.pressure_hc_excess(self.conc, self.i_size))
 
-        return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_hc
+        return mu_0 + mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_hc
 
     def chem_potential_p(self):
         """
@@ -224,29 +230,29 @@ class PolymerSolutionSalts(object):
         """
 
         z_val = (1 - self.f_b - self.p - self.x * self.u_p * self.phi_p / self.phi_w)
-        mu_1_1 = np.log(self.phi_p / self.n)
-        mu_1_2 = self.n / self.u_p * (self.chi_p * self.phi_w * (1 - self.phi_p) + self.chi_e * self.phi_1)
+        mu_1_1 = np.log(self.phi_p / self.n / np.exp(1)) - self.n * self.u_a / self.u_p * self.phi_a - self.n * self.u_b / self.u_p * self.phi_b
+        mu_1_2 =  self.n / self.u_p * (1 - self.phi_p) * (self.chi_p * self.phi_w  + self.chi_e * self.phi_1)
 
-        mu_2 = 2 * self.n * (1 - self.phi_1) * (lg(1 - self.x, 1 - self.x) + lg(self.x, self.x) - self.x * self.df_p)
-        mu_3 = 2 * self.n * (self.phi_p +self.phi_1) * self.x * (1 - self.phi_1) /self.phi_w * np.log(z_val)
+        mu_2 = 2 * self.n * (lg(1 - self.x, 1 - self.x) + lg(self.x, self.x) - self.x * self.df_p)
+        mu_3 = - 2 * self.n * self.x * (1 - self.phi_1) * np.log(z_val)
 
-        mu_4 = - self.n / self.u_p * (self.f_a + self.f_b) * self.phi_w
+        mu_4 = self.n / self.u_p * (self.f_a + self.f_b) * self.phi_w
 
-        mu_5 = - 2 * self.n / self.u_p * (1 +  self.phi_1) * (self.x * self.u_p - self.p) * np.log(2 * self.phi_w)
+        mu_5 = - 2 * self.n * self.x * (1 - self.phi_1) * np.log(2 * self.phi_w) + 2 * self.n / self.u_p * (self.x * self.u_p - self.p) * self.phi_w
 
+        mu_6 = - 2 * self.n * self.phi_p * ((self.phi_p-1) * self.dxdp + self.dxda + self.dxdb) * \
+               np.log(self.x / (1 - self.x) * np.exp(- self.df_p) / z_val / 2 / self.phi_w)
 
-        mu_6 = - 2 * self.n * self.phi_p * ( self.dxda + self.dxdb) * np.log(
-            self.x / (1 - self.x) * np.exp(- self.df_p) / z_val / 2 / self.phi_w)
-        mu_7 = - 2 * self.n / self.u_p * self.phi_w * (self.dyda + self.dydb) * np.log(
-            self.p / (1 - self.f_a - self.p) * np.exp(- self.df_w) / z_val / 2 / self.phi_w)
-        mu_8 = - self.n / self.u_p * self.phi_w * (self.df_ada + self.df_adb) * np.log(
-            (1 - self.f_a) / (1 - self.f_a - self.f_b) * np.exp(- self.df_a) / (
-                        1 - self.f_a - self.p) ** 2 / self.phi_w)
-        mu_9 = - self.n / self.u_p * self.phi_w * (self.df_bda + self.df_bdb) * np.log(
-            (1 - self.f_b) / (1 - self.f_a - self.f_b) * np.exp(- self.df_b) / z_val ** 2 / self.phi_w)
+        mu_7 = - 2 * self.n / self.u_p * self.phi_w * ((self.phi_p-1) * self.dydp + self.dyda + self.dydb) * \
+               np.log(self.p / (1 - self.f_a - self.p) * np.exp(- self.df_w) / z_val / 2 / self.phi_w)
 
-        mu_dh = self.dh_free.pressure_dh_excess(self.conc, self.i_size)
+        mu_8 = - self.n / self.u_p * self.phi_w * ((self.phi_p-1) * self.df_adp + self.df_ada + self.df_adb) * \
+               np.log((1 - self.f_a) / (1 - self.f_a - self.f_b) * np.exp(- self.df_a) / (1 - self.f_a - self.p) ** 2 / self.phi_w)
+
+        mu_9 = - self.n / self.u_p * self.phi_w * ((self.phi_p-1) * self.df_bdp + self.df_bda + self.df_bdb) * \
+               np.log((1 - self.f_b) / (1 - self.f_a - self.f_b) * np.exp(- self.df_b) / z_val ** 2 / self.phi_w)
+
+        mu_dh = self.dh_free.pressure_db_excess(self.conc, self.i_size)
 
         return mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6 + mu_7 + mu_8 + mu_9 + mu_dh
-        
-        
+
