@@ -164,10 +164,9 @@ class PolymerSolutionSalts(object):
         :return: value of chemical potential (float)
         """
 
-        mu_0 = - self.u_p * self.phi_p / self.n - self.u_a * self.phi_a -\
-               self.u_b * self.phi_b - self.phi_w - self.chi_e * self.phi_1 * self.phi_p
-        mu_1_1 = np.log(self.phi_w)
-        mu_1_2 = self.chi_p * self.phi_p * (self.phi_p + self.phi_1)
+        mu_0 = - self.u_p * self.phi_p / self.n - self.u_a * self.phi_a - self.u_b * self.phi_b    
+        mu_1_1 = np.log(self.phi_w) - self.phi_w
+        mu_1_2 = self.chi_p * self.phi_p * (self.phi_p + self.phi_1) - self.chi_e * self.phi_1 * self.phi_p
 
         mu_2 = 0
         mu_3 = 2 * (lg(1 - self.f_a - self.p, 1 - self.f_a - self.p)
