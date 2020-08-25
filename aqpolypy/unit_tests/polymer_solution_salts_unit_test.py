@@ -143,10 +143,6 @@ class TestPolymerwithSalts(unittest.TestCase):
         b_o = bj.Bjerrum(wa)
         b_fac=np.array([0, 0])
 
-        wa = aw.WaterPropertiesFineMillero(tk=300, pa=1)
-        b_o = bj.Bjerrum(wa)
-        b_fac = np.array([0, 0])
-
         phi_val = np.linspace(1e-1, 0.8, num_pnts)/100
         potential = np.zeros_like(phi_val)
 
