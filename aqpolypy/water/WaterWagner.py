@@ -1,3 +1,14 @@
+"""
+:module: WaterWagner
+:platform: Unix, Windows, OS
+:synopsis: Derived water properties class utilizing IAPWS-95 formulation calculations
+
+.. moduleauthor:: Alex Travesset <trvsst@ameslab.gov>, May2020
+.. history:
+..                Kevin Marin <marink2@tcnj.edu>, May2020
+..                  - Added general calculations needed to derive the free energy
+"""
+
 import numpy as np
 
 
