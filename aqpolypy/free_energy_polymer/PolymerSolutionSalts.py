@@ -43,7 +43,9 @@ class PolymerSolutionSalts(object):
         :param chi_p: Flory Huggins parameter
         :param chi_e: Virial parameter between polymer and electrolytes
         :param param_s: microscopic salt parameters :math:\
-        `(h_a, h_b, d_a, d_b)` (hydration number and diameter)
+        `(h_a, h_b,d_a, d_b, m_a, m_b )` (number of water molecules \
+        forming the hydration shell, diameter, maximum number of water \
+        molecules that maybe bound to each ion)
         :param b_o: object of water class  :class:`Bjerrum \
         <aqpolypy.salts_theory.Bjerrum>`
         :param b_fac: B_factors for the different species in units of \
@@ -81,6 +83,9 @@ class PolymerSolutionSalts(object):
         # hydration numbers
         self.h_a = param_s[0]
         self.h_b = param_s[1]
+        self.m_a = param_s[4]
+        self.m_b = param_s[5]
+
 
         # fraction of hydration bonds (in water:x, in polymer:y)
         self.x = x_ini
@@ -169,6 +174,14 @@ class PolymerSolutionSalts(object):
 
         f_as_7_0 = np.log(self.phi_w / np.exp(1))
         f_as_7 = - self.phi_w * (self.f_a + self.f_b) * f_as_7_0
+        
+        A_a = self.m_a * self.u_a * self.phi_a / self.phi_w
+        B_b = self.m_b * self.u_b * self.phi_b / self.phi_w
+        f_as_0_1 = ((A_a - self.f_a) * np.log(1 - self.f_a / A_a) 
+                    + self.f_a * np.log(self.f_a / A_a))
+        f_as_0_2 = ((B_b - self.f_b) * np.log(1 - self.f_b / B_b) 
+                    + self.f_b * np.log(self.f_b / B_b))                    
+        f_as_0 = self.phi_w * (f_as_0_1 + f_as_0_2) 
 
         f_dh = self.dh_free.free_energy_db_excess(self.conc, self.i_size)
         f_hc = np.sum(
@@ -176,7 +189,8 @@ class PolymerSolutionSalts(object):
 
         f_ref_all = f_ref_11 + f_ref_12 + f_ref_13 + f_ref_2
         f_int_all = f_int_1 + f_int_2
-        f_as_all = f_as_1 + f_as_2 + f_as_3 + f_as_4 + f_as_5 + f_as_6 + f_as_7
+        f_as_all = (f_as_1 + f_as_2 + f_as_3 + f_as_4 + f_as_5 
+                    + f_as_6 + f_as_7 + f_as_0)
 
         return f_ref_all + f_int_all + f_as_all + f_dh + f_hc
 
@@ -244,7 +258,8 @@ class PolymerSolutionSalts(object):
         mu_12_b_1 = (1 - self.f_a) / (1 - self.f_a - self.f_b)
         mu_12_b_2 = np.exp(- self.df_a - 1 + np.log(gamma(self.h_a + 1)))
         mu_12_b_3 = (1 - self.f_a - self.p) ** 2 * self.phi_w
-        mu_12_b = np.log(mu_12_b_1 * mu_12_b_2 / mu_12_b_3)
+        mu_12_b_4 = self.h_a / (self.m_a - self. h_a)
+        mu_12_b = np.log(mu_12_b_4 * mu_12_b_1 * mu_12_b_2 / mu_12_b_3)
         mu_12 = - self.phi_w * mu_12_a * mu_12_b
 
         mu_13_a = (self.phi_p * self.df_bdp
@@ -253,7 +268,12 @@ class PolymerSolutionSalts(object):
         mu_13_b = (1 - self.f_b) / (1 - self.f_a - self.f_b)
         mu_13_c = np.exp(- self.df_b - 1 + np.log(gamma(self.h_b + 1)))
         mu_13_d = z_val ** 2 * self.phi_w
-        mu_13 = - self.phi_w * mu_13_a * np.log(mu_13_b * mu_13_c / mu_13_d)
+        mu_13_e = self.h_b / (self.m_b - self. h_b)
+        mu_13_f = np.log(mu_13_e * mu_13_b * mu_13_c / mu_13_d)
+        mu_13 = - self.phi_w * mu_13_a * mu_13_f
+        
+        mu_14 = (self.f_a * np.log(self.h_a / (self.m_a - self.h_a)) 
+                 + self.f_b * np.log(self.h_b / (self.m_b - self.h_b)))
 
         mu_dh = self.dh_free.pot_chem_db_excess(self.conc, self.i_size)
         mu_hc = self.hc_free.pot_chem_hc_excess(self.conc, self.i_size)
@@ -272,7 +292,7 @@ class PolymerSolutionSalts(object):
 
         return (mu_0 + mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4 + mu_5 + mu_6
                 + mu_7 + mu_8 + mu_9 + mu_10 + mu_11 + mu_12 + mu_13
-                + mu_dh_0 + mu_hc_0)
+                + mu_dh_0 + mu_hc_0 + mu_14)
 
     def chem_potential_pm(self):
         """
@@ -325,23 +345,28 @@ class PolymerSolutionSalts(object):
         mu_6_0 = np.exp(- self.df_a - 1 + np.log(gamma(self.h_a + 1)))
         mu_6_2_0 = (1 - self.f_a) / (1 - self.f_a - self.f_b)
         mu_6_2_1 = (1 - self.f_a - self.p)
-        mu_6_2 = np.log(mu_6_2_0 * mu_6_0 / (mu_6_2_1) ** 2 / self.phi_w)
-        mu_6 = - self.phi_w / 2 * (mu_6_1 * mu_6_2)
+        mu_6_2_2 = self.h_a / (self.m_a - self. h_a)
+        mu_6_2 = mu_6_2_2 * mu_6_2_0 * mu_6_0 / (mu_6_2_1) ** 2 / self.phi_w
+        mu_6 = - self.phi_w / 2 * (mu_6_1 * np.log(mu_6_2))
 
         mu_7_1 = (self.df_bdp * u_pm * self.phi_p
                  + self.df_bda * (u_pm * self.phi_a - 1 / self.u_a)
                  + self.df_bdb * (u_pm * self.phi_b - 1 / self.u_b))
         mu_7_0 = np.exp(- self.df_b - 1 + np.log(gamma(self.h_b + 1)))
         mu_7_2_0 = (1 - self.f_b) / (1 - self.f_a - self.f_b)
-        mu_7_2 = np.log(mu_7_2_0 * mu_7_0 / z_val ** 2 / self.phi_w)
-        mu_7 = - self.phi_w / 2 * (mu_7_1 * mu_7_2)
+        mu_7_2_1 = self.h_b / (self.m_b - self. h_b)
+        mu_7_2 = mu_7_2_1 * mu_7_2_0 * mu_7_0 / z_val ** 2 / self.phi_w
+        mu_7 = - self.phi_w / 2 * (mu_7_1 * np.log(mu_7_2))
+        
+        mu_8 = (0.5 * self.m_a * np.log(1 - self.h_a / self.m_a) 
+                + 0.5 * self.m_b * np.log(1 - self.h_b / self.m_b))
 
         mu_dh = self.dh_free.pot_chem_db_excess(self.conc, self.i_size)
         mu_hc_0 = self.hc_free.pot_chem_hc_excess(self.conc, self.i_size)
         mu_hc = np.trace(mu_hc_0) * 0.5
 
         return (mu_0 + mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4
-                + mu_5 + mu_6 + mu_7 + mu_dh + mu_hc)
+                + mu_5 + mu_6 + mu_7 + mu_dh + mu_hc + mu_8)
 
     # @property
     def chem_potential_p(self):
@@ -391,14 +416,17 @@ class PolymerSolutionSalts(object):
         mu_8_1 = ((self.phi_p - 1) * self.df_adp
                   + self.phi_a * self.df_ada + self.phi_b * self.df_adb)
         mu_8_2_0 = (1 - self.f_a) / (1 - self.f_a - self.f_b)
-        mu_8_2 = mu_8_2_0 * mu_8_0 / (1 - self.f_a - self.p) ** 2 / self.phi_w
+        mu_8_2_1 = self.h_a / (self.m_a - self. h_a)
+        mu_8_3 = mu_8_2_1 * mu_8_2_0 * mu_8_0
+        mu_8_2 = mu_8_3 / (1 - self.f_a - self.p) ** 2 / self.phi_w
         mu_8 = - self.n / self.u_p * self.phi_w * (mu_8_1) * np.log(mu_8_2)
 
         mu_9_0 = np.exp(- self.df_b - 1 + np.log(gamma(self.h_b + 1)))
         mu_9_1 = ((self.phi_p - 1) * self.df_bdp
                   + self.phi_a * self.df_bda + self.phi_b * self.df_bdb)
         mu_9_2_0 = (1 - self.f_b) / (1 - self.f_a - self.f_b)
-        mu_9_2 = mu_9_2_0 * mu_9_0 / z_val ** 2 / self.phi_w
+        mu_9_2_1 = self.h_b / (self.m_b - self. h_b)
+        mu_9_2 = mu_9_2_1 * mu_9_2_0 * mu_9_0 / z_val ** 2 / self.phi_w
         mu_9 = - self.n / self.u_p * self.phi_w * (mu_9_1) * np.log(mu_9_2)
 
         mu_dh = self.dh_free.pot_chem_db_excess(self.conc, self.i_size)
