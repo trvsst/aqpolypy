@@ -57,7 +57,7 @@ class PolymerSolutionSalts(object):
         :math:`(c_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
         \\frac{\\upsilon_w}{\\upsilon_-}, \\Delta F_a, \\Delta F_b)`
 
-        where :math:`c_s` is the concentration in Molar units
+        where :math:`c_s` is the concentration in mol/kg
         """
 
 
@@ -70,16 +70,15 @@ class PolymerSolutionSalts(object):
         self.u_a = v_s[1]
         self.u_b = v_s[2]
 
-        self.v_a = 1.8068689246447816e-05 / self.u_a  # m^3/mol
-        self.v_b = 1.8068689246447816e-05 / self.u_b
+        self.D_w = 55.509
 
         # volume fractions
         self.phi_p = v_p[0]
         self.v_w = v_w
 
-        self.V_a = self.conc * self.v_a * self.v_w # m^3
-        self.V_b = self.conc * self.v_b * self.v_w # m^3
-        self.V_w = self.v_w * 1e-3 # m^3
+        self.V_a = self.conc / self.u_a / self.D_w 
+        self.V_b = self.conc / self.u_b / self.D_w 
+        self.V_w = 1 
         self.V_all = (self.V_a + self.V_b + self.V_w) / (1 - self.phi_p)
 
         self.phi_a = self.V_a / self.V_all
