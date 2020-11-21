@@ -19,6 +19,9 @@ import aqpolypy.salts_theory.HardCore as hc
 
 from scipy.optimize import fsolve
 
+import aqpolypy.units.concentration as con
+import aqpolypy.water.WaterMilleroBP as wbp
+import aqpolypy.salt.SaltNaClRP as nacl
 
 class PolymerSolutionSalts(object):
     """
@@ -27,7 +30,7 @@ class PolymerSolutionSalts(object):
     """
 
     def __init__(
-                 self, v_p, v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e,
+                 self, v_p, v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e,
                  param_s, b_o, b_fac=np.array([1, 1])):
 
         """
@@ -36,7 +39,7 @@ class PolymerSolutionSalts(object):
         :param v_p: polymer parameters :math:`(\\phi_p, \\frac{\\upsilon_w} \
         {\\upsilon_p}, \\Delta F_p)`
         :param v_s: salt parameters (see definition below)
-        :param v_w: volume of water in Liter
+        :param temp: temprature in Kelvin
         :param df_w: free energy change upon formation of hydrogen bond \
         in water (in :math:`k_BT` units)
         :param x_ini: fraction of polymer hydrogen bonds
@@ -61,9 +64,24 @@ class PolymerSolutionSalts(object):
         """
 
 
-        # concentration in mols/litre
-        self.conc = v_s[0]
-        #self.conc_ang = un.mol_lit_2_mol_angstrom(self.conc)
+        # concentration in mols/kg
+        self.conc_l = v_s[0]
+
+        # concentration in mols/kg
+
+        self.T = temp
+
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
+        obj_water_bp = wbp.WaterPropertiesFineMillero(self.T)
+
+        v_solvent = obj_water_bp.molar_volume()
+        m_solvent = obj_water_bp.MolecularWeight
+        v_solute = salt_nacl.molar_vol(self.conc_l)
+
+        self.conc = con.molarity_2_molality(self.conc_l,
+                                            v_solvent, 
+                                            v_solute,
+                                            m_solvent)                                  
 
         # molecular volumes
         self.u_p = v_p[1]
@@ -74,11 +92,10 @@ class PolymerSolutionSalts(object):
 
         # volume fractions
         self.phi_p = v_p[0]
-        self.v_w = v_w
 
-        self.V_a = self.conc / self.u_a / self.D_w 
-        self.V_b = self.conc / self.u_b / self.D_w 
-        self.V_w = 1 
+        self.V_a = self.conc_l / self.u_a / self.D_w
+        self.V_b = self.conc_l / self.u_b / self.D_w 
+        self.V_w = 1
         self.V_all = (self.V_a + self.V_b + self.V_w) / (1 - self.phi_p)
 
         self.phi_a = self.V_a / self.V_all
@@ -378,7 +395,6 @@ class PolymerSolutionSalts(object):
 
         return (mu_0 + mu_1_1 + mu_1_2 + mu_2 + mu_3 + mu_4
                 + mu_5 + mu_6 + mu_7 + mu_dh + mu_hc + mu_8)
-
 
     # @property
     def chem_potential_p(self):

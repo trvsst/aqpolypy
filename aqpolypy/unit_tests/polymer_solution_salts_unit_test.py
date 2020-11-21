@@ -31,7 +31,7 @@ class TestPolymerwithSalts(unittest.TestCase):
                            -2.12242993842, -1.8864760909, -1.64476928859, -1.39395014167, -1.12803135003])                   
         v_p = np.array([0.4, 1/3, 10/3])
         v_s = np.array([1e-12, 1, 1, -100/3, -100/3])
-        v_w = 1000
+        temp = 298
         df_w = 10/3
         x_ini = 0.1
         p_ini = 0.2
@@ -48,7 +48,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
 
             free[ind] = polymer_sol.free()
 
@@ -65,14 +65,12 @@ class TestPolymerwithSalts(unittest.TestCase):
         #                   -1.24638883097259, -1.00714166588399, -0.759175894742952, -0.496523119999612]) - 1.1894435910007868e-07
 
 
-        f_comp = np.array([-3.2541077688, -3.02632566569, -2.7989368304, -2.57132031715, -2.34266087176,
-                           -2.11187841481, -1.87749197665, -1.6373591854, -1.38812205068, -1.1237953745])+\
-                 np.array([-1.96167772e-04, -1.79225281e-04, -1.62282790e-04, -1.45340298e-04,
-                           -1.28397807e-04, -1.11455316e-04, -9.45128245e-05, -7.75703332e-05,
-                           -6.06278419e-05, -4.36853506e-05])
+        f_comp = np.array([-3.25435775411, -3.02655415914, -2.79914382161, -2.57150579465, -2.34282482276, 
+                           -2.11202082484, -1.87761282905, -1.6374584606, -1.38819972495, -1.12385141787]) - 1.2e-07
+
         v_p = np.array([0.4, 1/3, 10/3])
-        v_s = np.array([0.002* 55.509 * 1.8068689246447816e-05 * 1e3, 1, 1, -100/3, -100/3])
-        v_w = 1
+        v_s = np.array([0.002 , 1, 1, -100/3, -100/3])
+        temp = 298
         df_w = 10/3
         x_ini = 0.1
         p_ini = 0.2
@@ -89,7 +87,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
 
             free[ind] = polymer_sol.free()
         self.assertTrue(np.allclose(free, f_comp, rtol=0.0, atol=1e-9))
@@ -101,14 +99,12 @@ class TestPolymerwithSalts(unittest.TestCase):
 
         num_pnts = 10
 
-        f_comp = np.array([14.4816154981, 13.2123176787, 11.9393699444, 10.6630564967, 9.38377892507,
-                           8.10209747504, 6.81882145408, 5.53519536283, 4.25332825777, 2.97741368404]) +\
-                 np.array([-0.18589876, -0.1700971 , -0.15429545, -0.13849379, -0.12269214,
-                           -0.10689048, -0.09108883, -0.07528717, -0.05948552, -0.04368386])
+        f_comp = np.array([14.2490865827, 12.9997832414, 11.7468389769, 10.4905389126, 9.23128576646, 
+                           7.96964119543, 6.70641631518, 5.44285800741, 4.18107853461, 2.92527560925]) - 0.00323722
 
         v_p = np.array([0.4, 1/3, 10/3])
-        v_s = np.array([2* 55.509 * 1.8068689246447816e-05 * 1e3, 1, 1, -100/3, -100/3])
-        v_w = 1
+        v_s = np.array([2 , 1, 1, -100/3, -100/3])
+        temp = 298
         df_w = 10/3
         x_ini = 0.1
         p_ini = 0.2
@@ -125,11 +121,11 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
 
             free[ind] = polymer_sol.free()
 
-        self.assertTrue(np.allclose(free, f_comp, rtol=0.0, atol=1e-4))
+        self.assertTrue(np.allclose(free, f_comp, rtol=0.0, atol=1e-9))
 
     def test_potential_w(self):
         """
@@ -166,7 +162,7 @@ class TestPolymerwithSalts(unittest.TestCase):
 
         v_p = np.array([1e-12, 1/3, 10/3]);
         v_s = np.array([0.002, 1, 1, -100/3, -100/3]);
-        v_w = 1;
+        temp = 298;
         df_w = 10/3;
         x_ini = 0.1;
         p_ini = 0.2;
@@ -182,18 +178,22 @@ class TestPolymerwithSalts(unittest.TestCase):
 
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
             potential_w[ind] = polymer_sol.chem_potential_w()
             potential_p[ind] = polymer_sol.chem_potential_p()
             potential_pm[ind] = polymer_sol.chem_potential_pm()
    
-        self.assertTrue(np.allclose(potential_w, w_comp + np.array([2.27639941e-06, 2.06938213e-06, 1.86236717e-06, 1.65535453e-06,
-                                                                    1.44834421e-06, 1.24133621e-06, 1.03433053e-06, 8.27327167e-07,
-                                                                    6.20326127e-07, 4.13327408e-07]), rtol=0.0, atol=1e-14))
-        self.assertTrue(np.allclose(potential_p, p_comp + np.array([0.00068292, 0.00062081, 0.00055871, 0.00049661, 0.0004345 ,
-                                                                    0.0003724 , 0.0003103 , 0.0002482 , 0.0001861 , 0.000124  ]), rtol=0.0, atol=1e-8))        
-        self.assertTrue(np.allclose(potential_pm, pm_comp + np.array([-0.03693459, -0.03693459, -0.03693459, -0.03693459, -0.03693459,
-                                                                      -0.03693459, -0.03693459, -0.03693459, -0.03693459, -0.03693459]), rtol=0.0, atol=1e-10))
+        dw = np.array([2.27937423e-06, 2.07205435e-06, 1.86473679e-06, 1.65742156e-06,
+                      1.45010865e-06, 1.24279806e-06, 1.03548980e-06, 8.28183859e-07,
+                      6.20880244e-07, 4.13578953e-07])
+        dp = np.array([0.00068381, 0.00062162, 0.00055942, 0.00049723, 0.00043503,
+                       0.00037284, 0.00031065, 0.00024846, 0.00018626, 0.00012407])
+        dpm = np.array([-0.03698858, -0.03698858, -0.03698858, -0.03698858, -0.03698858,
+                        -0.03698858, -0.03698858, -0.03698858, -0.03698858, -0.03698858])
+                                
+        self.assertTrue(np.allclose(potential_w, w_comp + dw , rtol=0.0, atol=1e-14))
+        self.assertTrue(np.allclose(potential_p, p_comp + dp, rtol=0.0, atol=1e-8))        
+        self.assertTrue(np.allclose(potential_pm, pm_comp + dpm, rtol=0.0, atol=1e-8))
 
     def test_potential_w_s(self):
         """
@@ -225,16 +225,16 @@ class TestPolymerwithSalts(unittest.TestCase):
              p_comp[ind] = ANS[ind,1]
              pm_comp[ind] = ANS[ind,2]
      
-        dw = np.array([0.00084132, 0.0019485 , 0.00329787, 0.00483809, 0.00653818,
-                       0.00837689, 0.01033852, 0.01241092, 0.01458429, 0.01685058])
-        dp = np.array([0.25239634, 0.5845499 , 0.98936146, 1.45142742, 1.9614538 ,
-                       2.51306643, 3.10155735, 3.72327504, 4.37528687, 5.05517512])                
-        dpm = np.array([-0.24568162, -0.32019591, -0.37713575, -0.42431342, -0.46507381,
-                        -0.50121373, -0.53382924, -0.56364657, -0.59117584, -0.61679129])
+        dw = np.array([0.00084295, 0.00195326, 0.00330759, 0.00485477, 0.00656396,
+                       0.00841404, 0.01038942, 0.01247803, 0.01467017, 0.01695787])
+        dp = np.array([0.25288514, 0.5859783 , 0.99227758, 1.4564309 , 1.96918775,
+                       2.52421116, 3.11682561, 3.74340813, 4.40105159, 5.08736119])
+        dpm = np.array([-0.24621277, -0.32107304, -0.37838624, -0.42596403, -0.46714903,
+                        -0.50373585, -0.5368187 , -0.56712218, -0.59515504, -0.62129035])
 
         v_p = np.array([0.004, 1/3, 10/3]);
         v_s = np.array([0.002, 1, 1, -100/3, -100/3]);
-        v_w = 1;
+        temp = 298;
         df_w = 10/3;
         x_ini = 0.1;
         p_ini = 0.2;
@@ -251,7 +251,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         c_val = np.linspace(0.1, 0.8, num_pnts)
 
         for ind, c_s in enumerate(c_val):
-            polymer_sol = Pss.PolymerSolutionSalts(v_p, np.array([c_s, 1, 1, -100/3, -100/3]), v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(v_p, np.array([c_s, 1, 1, -100/3, -100/3]), temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
             potential_w[ind] = polymer_sol.chem_potential_w()
             potential_p[ind] = polymer_sol.chem_potential_p()
             potential_pm[ind] = polymer_sol.chem_potential_pm()
@@ -274,7 +274,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         
         v_p = np.array([0.004, 1/3, 10/3]);
         v_s = np.array([0.002, 1, 1, -100/3, -100/3]);
-        v_w = 1000;
+        temp = 298;
         df_w = 10/3;
         x_ini = 0.1;
         p_ini = 0.2;
@@ -288,7 +288,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         b_fac=np.array([1, 1])
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, v_w, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e, param_s, b_o, b_fac)
             potential_w[ind] = polymer_sol.chem_potential_w()
             potential_p[ind] = polymer_sol.chem_potential_p()
             potential_pm[ind] = polymer_sol.chem_potential_pm()
@@ -323,7 +323,7 @@ class TestPolymerwithSalts(unittest.TestCase):
                          + u_a * phi_b * potential_pm[ind]
                          + phi_w * potential_w[ind])
 
-        self.assertTrue(np.allclose(F_com, f_com, rtol=0.0, atol=1e-14))
+        self.assertTrue(np.allclose(F_com, f_com, rtol=0.0, atol=1e-15))
 
         
 if __name__ == '__main__':
