@@ -62,12 +62,12 @@ class PolymerSolutionSalts(object):
 
         where :math:`c_s` is the concentration in mol/kg
         """
+        #concentration of salt (NaCl)
 
-
-        # concentration in mols/kg
+        # concentration in mol/kg
         self.conc_l = v_s[0]
 
-        # concentration in mols/kg
+        # concentration in mol/L
 
         self.T = temp
 
@@ -78,17 +78,19 @@ class PolymerSolutionSalts(object):
         m_solvent = obj_water_bp.MolecularWeight
         v_solute = salt_nacl.molar_vol(self.conc_l)
 
-        self.conc = con.molarity_2_molality(self.conc_l,
+        self.conc = con.molality_2_molarity(self.conc_l,
                                             v_solvent, 
                                             v_solute,
-                                            m_solvent)                                  
+                                            m_solvent)  
+                                                                         
+                               
 
         # molecular volumes
         self.u_p = v_p[1]
         self.u_a = v_s[1]
         self.u_b = v_s[2]
 
-        self.D_w = 55.509
+        self.D_w = 55.509 # mol/kg water
 
         # volume fractions
         self.phi_p = v_p[0]
@@ -102,6 +104,7 @@ class PolymerSolutionSalts(object):
         self.phi_b = self.V_b / self.V_all
         self.phi_w = self.V_w / self.V_all
         self.phi_1 = self.phi_a + self.phi_b
+
 
         # polymer and polymer interaction parameters
         self.n = n_k
