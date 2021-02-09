@@ -35,7 +35,7 @@ class TestWaterWagner(unittest.TestCase, ww.WaterWagner):
 
         # testing phi_r up to a precision of 10^-8
         water = ww.WaterWagner(param[:, 0], param[:, 1])
-        test_val = np.allclose(water.phi_tau(), param[:, 2], 0, 1e-8)
+        test_val = np.allclose(water.phi_r(), param[:, 2], 0, 1e-8)
         self.assertTrue(test_val)
 
 
