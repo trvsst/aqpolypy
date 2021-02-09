@@ -48,7 +48,7 @@ class WaterWagner:
 
         return phi_o
 
-    def phi_tau(self):
+    def phi_r(self):
         a = np.array([[0.0, 1, -0.5, 0.12533547935523e-1],
                       [0.0, 1, 0.875, 0.78957634722828e1],
                       [0.0, 1, 1, -0.87803203303561e1],
@@ -165,15 +165,15 @@ class WaterWagner:
         term_3 = g_3(0, 3)
         term_4 = g_4(0, 2)
 
-        phi_tau = term_1 + term_2 + term_3 + term_4
+        phi_r = term_1 + term_2 + term_3 + term_4
 
-        return phi_tau
+        return phi_r
 
     def free_energy(self):
         # Helmholtz free energy
 
         ideal_gas = self.phi_naught()
-        residual = self.phi_tau()
+        residual = self.phi_r()
 
         helmholtz_free_energy = ideal_gas + residual
 
