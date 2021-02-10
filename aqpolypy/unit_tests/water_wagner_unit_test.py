@@ -7,6 +7,7 @@
 .. history:
 ..                Kevin Marin <marink2@tcnj.edu>, May2020
 ..                  - Created test for ideal gas part and residual part
+..                  - Created test for residual part delta derivative
 """
 import numpy as np
 import unittest
@@ -36,6 +37,17 @@ class TestWaterWagner(unittest.TestCase, ww.WaterWagner):
         # testing phi_r up to a precision of 10^-8
         water = ww.WaterWagner(param[:, 0], param[:, 1])
         test_val = np.allclose(water.phi_r(), param[:, 2], 0, 1e-8)
+        self.assertTrue(test_val)
+
+    # Testing residual part delta derivative
+    def test_phi_r_der_del(self):
+        # [density, temperature(K), phi_r_der_del] Wagner TABLE 6.6
+        param = np.array([[838.025, 500, -0.364366650],
+                          [358, 647, -0.714012024]])
+
+        # testing phi_r_der_del up to a precision of 10^-8
+        water = ww.WaterWagner(param[:, 0], param[:, 1])
+        test_val = np.allclose(water.phi_r_der_del(), param[:, 2], 0, 1e-8)
         self.assertTrue(test_val)
 
 
