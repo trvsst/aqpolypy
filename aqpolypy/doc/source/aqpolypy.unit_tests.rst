@@ -38,7 +38,7 @@ water_millero_bp_unit_test
     :show-inheritance:
 
 water_wagner_unit_test
---------------------------
+----------------------
 
 .. automodule:: aqpolypy.unit_tests.water_wagner_unit_test
     :members:
