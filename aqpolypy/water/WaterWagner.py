@@ -99,70 +99,61 @@ class WaterWagner:
                       [6, 3, 50, -0.55711118565645e-9],
                       [6, 6, 44, -0.19905718354408],
                       [6, 6, 46, 0.31777497330738],
-                      [6, 6, 50, -0.11841182425981]])
+                      [6, 6, 50, -0.11841182425981],
+                      [0.0, 3, 0, -0.31306260323435e2, 20, 150, 1.21, 1],
+                      [0.0, 3, 1, 0.31546140237781e2, 20, 150, 1.21, 1],
+                      [0.0, 3, 4, -0.25213154341695e4, 20, 250, 1.25, 1]], dtype=object)
 
-        def f_1(x):
+        def f(x):
             func = a[x][3] * self.delta ** a[x][1] * self.tau ** a[x][2]
+            return func
+
+        def h(x):
+            func = np.exp(-a[x][4] * (self.delta - a[x][7]) ** 2 - a[x][5] * (self.tau - a[x][6]) ** 2)
             return func
 
         def g_1(i, n):
             t1 = 0
             for x in range(i, n):
-                t1 = t1 + f_1(x)
+                t1 = t1 + f(x)
             return t1
-
-        def f_2(x):
-            func = a[x][3] * self.delta ** a[x][1] * self.tau ** a[x][2] * np.exp(-self.delta ** a[x][0])
-            return func
 
         def g_2(i, n):
             t2 = 0
             for x in range(i, n):
-                t2 = t2 + f_2(x)
+                t2 = t2 + f(x) * np.exp(-self.delta ** a[x][0])
             return t2
-
-        b = np.array([[0.0, 3, 0, -0.31306260323435e2, 20, 150, 1.21, 1],
-                      [0.0, 3, 1, 0.31546140237781e2, 20, 150, 1.21, 1],
-                      [0.0, 3, 4, -0.25213154341695e4, 20, 250, 1.25, 1]])
-
-        def f_3(x):
-            func = b[x][3] * self.delta ** b[x][1] * self.tau ** b[x][2]
-            return func
-
-        def h_3(x):
-            func = np.exp(-b[x][4] * (self.delta - b[x][7]) ** 2 - b[x][5] * (self.tau - b[x][6]) ** 2)
-            return func
 
         def g_3(i, n):
             t3 = 0
             for x in range(i, n):
-                t3 = t3 + (f_3(x) * h_3(x))
+                t3 = t3 + (f(x) * h(x))
             return t3
 
         c = np.array([[3.5, 0.85, 0.2, -0.14874640856724, 28, 700, 0.32, 0.3],
                       [3.5, 0.95, 0.2, 0.31806110878444, 32, 800, 0.32, 0.3]])
 
-        def f_4(x):
-            func = ((1 - self.tau) + c[x][6] * ((self.delta - 1) ** 2) ** (1 / (2 * c[x][7]))) ** 2
+        def theta(x):
+            func = (1 - self.tau) + c[x][6] * ((self.delta - 1) ** 2) ** (1 / (2 * c[x][7]))
             return func
 
-        def h_4(x):
-            func = c[x][2] * ((self.delta - 1) ** 2) ** c[x][0]
+        def delta(x):
+            func = theta(x) ** 2 + c[x][2] * ((self.delta - 1) ** 2) ** c[x][0]
             return func
 
-        def j_4(x):
+        def psi(x):
             func = np.exp(-c[x][4] * (self.delta - 1) ** 2 - c[x][5] * (self.tau - 1) ** 2)
             return func
 
         def g_4(i, n):
             t4 = 0
             for x in range(i, n):
-                t4 = t4 + (c[x][3] * (f_4(x) + h_4(x)) ** c[x][1] * self.delta * j_4(x))
+                t4 = t4 + (c[x][3] * delta(x) ** c[x][1] * self.delta * psi(x))
             return t4
 
         term_1 = g_1(0, 7)
         term_2 = g_2(7, 51)
-        term_3 = g_3(0, 3)
+        term_3 = g_3(51, 54)
         term_4 = g_4(0, 2)
 
         phi_r = term_1 + term_2 + term_3 + term_4
