@@ -10,13 +10,15 @@
 """
 
 import numpy as np
+from scipy import optimize
 
 
 class WaterWagner:
 
-    def __init__(self, d, t):
-        self.d = d
+    def __init__(self, t, p=1, d=1):
         self.t = t
+        self.p = p
+        self.d = d
 
         self.tc = 647.096
         self.dc = 322
@@ -283,6 +285,21 @@ class WaterWagner:
         phi_r_der_del = term_1 + term_2 + term_3 + term_4
 
         return phi_r_der_del
+
+    def density(self):
+        a = 800
+        b = 1000
+
+        def f(x):
+            term_1 = WaterWagner(self.t, self.p, x).phi_r_der_del() * ((x ** 2) / self.dc)
+            term_2 = x
+            term_3 = self.p / (self.R * 1000 * self.t)
+            func = term_1 + term_2 - term_3
+            return func
+
+        density = optimize.brentq(f, a, b)
+
+        return density
 
     def free_energy(self):
         # Helmholtz free energy
