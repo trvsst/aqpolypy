@@ -288,7 +288,7 @@ class WaterWagner:
 
     def density(self):
         a = 800
-        b = 1000
+        b = 1200
 
         def f(x):
             term_1 = WaterWagner(self.t, self.p, x).phi_r_der_del() * ((x ** 2) / self.dc)
