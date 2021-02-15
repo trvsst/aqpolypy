@@ -15,7 +15,7 @@ from scipy import optimize
 
 class WaterWagner:
 
-    def __init__(self, t, p=1, d=1):
+    def __init__(self, t, p=1, d=float("NaN")):
         self.t = t
         self.p = p
         self.d = d
