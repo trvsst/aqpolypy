@@ -286,10 +286,24 @@ class WaterWagner:
 
         return phi_r_der_del
 
-    def density(self):
-        a = 800
-        b = 1200
+    def density_brentq(self):
 
+        # pressure from Pa to MPa
+        p = self.p / 1000000
+
+        # boundaries
+        scalar_1 = 6.37e-6 + -4.01e-6 * np.log(p)
+        scalar_2 = -9.22e-3 + 4.16e-3 * np.log(p)
+        scalar_3 = 3.53 + -1.43 * np.log(p)
+        scalar_4 = 597 + 163 * np.log(p)
+
+        bound_func = scalar_1 * self.t ** 3 + scalar_2 * self.t ** 2 + scalar_3 * self.t + scalar_4
+        scope = 30
+
+        a = bound_func - scope
+        b = bound_func + scope
+
+        # brentq root finding method
         def f(x):
             term_1 = WaterWagner(self.t, self.p, x).phi_r_der_del() * ((x ** 2) / self.dc)
             term_2 = x
@@ -300,6 +314,23 @@ class WaterWagner:
         density = optimize.brentq(f, a, b)
 
         return density
+
+    def density_fsolve(self):
+        a = 600
+        b = 1200
+
+        scope = np.array([600, 1200])
+
+        def f(x):
+            term_1 = WaterWagner(self.t, self.p, x).phi_r_der_del() * ((x ** 2) / self.dc)
+            term_2 = x
+            term_3 = self.p / (self.R * 1000 * self.t)
+            func = term_1 + term_2 - term_3
+            return func
+
+        density = optimize.fsolve(f, scope)
+
+        return density[-1]
 
     def free_energy(self):
         # Helmholtz free energy
