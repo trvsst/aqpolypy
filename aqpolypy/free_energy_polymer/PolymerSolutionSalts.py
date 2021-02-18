@@ -163,11 +163,12 @@ class PolymerSolutionSalts(object):
 
     def free(self):
         """
-        Free energy of a polymer in solution :math: \
-        `\\frac{F \\upsilon}{V k_B T}=\\frac{f}{k_B T}`
-        (per unit volume (volume in units of :math: \
-        `\\upsilon_w` and in :math:`k_B T` units)
-
+        Free energy of a polymer in solution 
+        Free energy of a polymer in solution \
+        :math:`\\frac{F \\upsilon}{V k_B T}=\
+        \\frac{f}{k_B T}`
+        (per unit volume in :math:`k_B T` units)\
+        
         :return: value of free energy (float)
         """
 
@@ -228,10 +229,10 @@ class PolymerSolutionSalts(object):
     def chem_potential_w(self):
         """
         Reduced chemical potential \
-        for water :math:`\\frac{\\mu_w}{k_B T}=\\frac{1}{k_B T}
+        of water :math:`\\frac{\\mu_w}{k_B T}=\\frac{1}{k_B T}
         (f- \\phi_p \\frac{\\partial f}{\\partial \\phi_p}- \
         \\phi_+ \\frac{\\partial f}{\\partial \\phi_+} -
-        \\phi_- \\frac{\\partial f}{\\partial \\phi_-}`
+        \\phi_- \\frac{\\partial f}{\\partial \\phi_-})`
 
         :return: value of chemical potential (float)
         """
@@ -327,7 +328,7 @@ class PolymerSolutionSalts(object):
 
     def chem_potential_pm(self):
         """
-        Reduced chemical potential  for the ions\
+        Reduced chemical potential of ions\
         :math:`\\frac{1}{2}( \\frac{ \\upsilon_+}{ \\upsilon_w}\
         \\frac{ \\mu_w}{k_B T} + \
         \\frac{ \\upsilon_+}{ \\upsilon_w} \\frac{1}{k_B T}\
@@ -402,11 +403,10 @@ class PolymerSolutionSalts(object):
     # @property
     def chem_potential_p(self):
         """
-        Reduced chemical potential  for the polymers\
-        :math:` \\frac{N \\upsilon_p}{ \\upsilon_w}
-          \\frac{ \\mu_w}{k_B T} +
-            \\frac{N \\upsilon_p}{ \\upsilon_w} \\frac{1}{k_B T}\
-            \\frac{ \\partial f}{ \\partial  \\phi_p}`
+        Reduced chemical potential of polymers\
+        :math: `\\frac{ \\upsilon_p}{N \\upsilon_w}\\frac{ \\mu_w}{k_B T} +\
+        \\frac{N \\upsilon_p}{ \\upsilon_w} \\frac{1}{k_B T} \
+        \\frac{ \\partial f}{ \\partial  \\phi_p}`
 
         :return: value of chemical potential (float)
         """
