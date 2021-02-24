@@ -10,14 +10,28 @@
 """
 
 import numpy as np
+import aqpolypy.units.units as un
 from scipy import optimize
 
 
 class WaterWagner:
+    """
+    Water properties following the work of Wagner :cite:
 
-    def __init__(self, t, p=1, d=float("NaN")):
+    """
+
+    def __init__(self, t, pa=1, d=float("NaN")):
+        """
+        constructor
+
+        :param tk: temperature in kelvin
+        :param pa: pressure in atmospheres
+        :param d: density in SI
+        :instantiate: temperature and pressure
+
+        """
         self.t = t
-        self.p = p
+        self.p = un.atm_2_pascal(pa)
         self.d = d
 
         self.tc = 647.096
