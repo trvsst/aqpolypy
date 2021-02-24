@@ -88,8 +88,8 @@ class TestWaterWagner(unittest.TestCase, ww.WaterWagner):
                           [340, 10, 983.84],
                           [370, 10, 965.139]])
 
-        # converting parameters to [temperature (K), pressure (Pa), density (SI)]
-        param[:, 1] = param[:, 1] * 1000000
+        # converting parameters to [temperature (K), pressure (atm), density (SI)]
+        param[:, 1] = (param[:, 1] * 1000000) / un.atm_2_pascal(1)
 
         for i in param:
             # testing density up to a precision of 10^-2
