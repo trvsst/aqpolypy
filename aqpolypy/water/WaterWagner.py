@@ -312,7 +312,7 @@ class WaterWagner:
         scalar_4 = 597 + 163 * np.log(p)
 
         bound_func = scalar_1 * self.t ** 3 + scalar_2 * self.t ** 2 + scalar_3 * self.t + scalar_4
-        scope = 30
+        scope = 15
 
         a = bound_func - scope
         b = bound_func + scope
@@ -330,8 +330,8 @@ class WaterWagner:
         return density
 
     def density_fsolve(self):
-        a = 600
-        b = 1200
+        a = 1
+        b = 2000
 
         scope = np.array([600, 1200])
 
