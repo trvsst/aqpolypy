@@ -27,3 +27,11 @@ WaterMilleroBP
     :undoc-members:
     :show-inheritance:
 
+WaterWagner
+-----------
+
+.. automodule:: aqpolypy.water.WaterWagner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
