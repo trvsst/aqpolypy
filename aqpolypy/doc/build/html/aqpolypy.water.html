@@ -3,7 +3,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
     <title>Water &#8212; aqpolypy 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -32,9 +33,9 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="water">
+  <section id="water">
 <span id="id1"></span><h1>Water<a class="headerlink" href="#water" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-aqpolypy.water.WaterPropertiesABC">
+<section id="module-aqpolypy.water.WaterPropertiesABC">
 <span id="waterpropertiesabc"></span><h2>WaterPropertiesABC<a class="headerlink" href="#module-aqpolypy.water.WaterPropertiesABC" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">module</dt>
@@ -119,8 +120,8 @@ with <img class="math" src="_images/math/885e1520e52ec02c4c6c2f25dc8deb4196b53be
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-aqpolypy.water.WaterMilleroAW">
+</section>
+<section id="module-aqpolypy.water.WaterMilleroAW">
 <span id="watermilleroaw"></span><h2>WaterMilleroAW<a class="headerlink" href="#module-aqpolypy.water.WaterMilleroAW" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">module</dt>
@@ -236,8 +237,8 @@ Dilectric constant from Archer and Wang <a class="bibtex reference internal" hre
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-aqpolypy.water.WaterMilleroBP">
+</section>
+<section id="module-aqpolypy.water.WaterMilleroBP">
 <span id="watermillerobp"></span><h2>WaterMilleroBP<a class="headerlink" href="#module-aqpolypy.water.WaterMilleroBP" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">module</dt>
@@ -379,8 +380,8 @@ Osmotic coefficient from Bradley and Pitzer <a class="bibtex reference internal"
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-aqpolypy.water.WaterWagner">
+</section>
+<section id="module-aqpolypy.water.WaterWagner">
 <span id="waterwagner"></span><h2>WaterWagner<a class="headerlink" href="#module-aqpolypy.water.WaterWagner" title="Permalink to this headline">¶</a></h2>
 <dl class="field-list simple">
 <dt class="field-odd">module</dt>
@@ -395,12 +396,25 @@ Osmotic coefficient from Bradley and Pitzer <a class="bibtex reference internal"
 </dl>
 <dl class="class">
 <dt id="aqpolypy.water.WaterWagner.WaterWagner">
-<em class="property">class </em><code class="sig-prename descclassname">aqpolypy.water.WaterWagner.</code><code class="sig-name descname">WaterWagner</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">p=1</em>, <em class="sig-param">d=nan</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterWagner.WaterWagner" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">aqpolypy.water.WaterWagner.</code><code class="sig-name descname">WaterWagner</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">pa=1</em>, <em class="sig-param">d=nan</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterWagner.WaterWagner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Water properties following the work of Wagner :cite:</p>
 <dl class="method">
 <dt id="aqpolypy.water.WaterWagner.WaterWagner.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">p=1</em>, <em class="sig-param">d=nan</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterWagner.WaterWagner.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">pa=1</em>, <em class="sig-param">d=nan</em><span class="sig-paren">)</span><a class="headerlink" href="#aqpolypy.water.WaterWagner.WaterWagner.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tk</strong> – temperature in kelvin</p></li>
+<li><p><strong>pa</strong> – pressure in atmospheres</p></li>
+<li><p><strong>d</strong> – density in SI</p></li>
+</ul>
+</dd>
+<dt class="field-even">Instantiate</dt>
+<dd class="field-even"><p>temperature and pressure</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -435,8 +449,8 @@ Osmotic coefficient from Bradley and Pitzer <a class="bibtex reference internal"
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
           </div>

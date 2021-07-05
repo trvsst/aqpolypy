@@ -9,11 +9,8 @@
 import unittest
 import numpy as np
 
-#import aqpolypy.free_energy_polymer.PolymerSolutionSalts_full as Pss
+import aqpolypy.free_energy_polymer.PolymerSolution as Pss_2
 import aqpolypy.free_energy_polymer.PolymerSolutionSalts as Pss
-
-#import aqpolypy.salts_theory.Bjerrum as bj
-#import aqpolypy.water.WaterMilleroAW as aw
 
 import aqpolypy.units.units as un
 
@@ -43,7 +40,9 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p,  param_s)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p,  param_s)
 
             free[ind] = polymer_sol.free()
 
@@ -79,7 +78,9 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, param_s)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
 
             free[ind] = polymer_sol.free()
         self.assertTrue(np.allclose(free, f_comp, rtol=0.0, atol=1e-11))
@@ -111,7 +112,9 @@ class TestPolymerwithSalts(unittest.TestCase):
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, param_s)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
 
             free[ind] = polymer_sol.free()
 
@@ -163,10 +166,12 @@ class TestPolymerwithSalts(unittest.TestCase):
 
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, param_s)
-            potential_w[ind] = polymer_sol.chem_potential_w()
-            potential_s[ind] = polymer_sol.chem_potential_s()
-            potential_p[ind] = polymer_sol.chem_potential_p()
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
+            potential_w[ind] = polymer_sol.chem_potential_w_full()
+            potential_s[ind] = polymer_sol.chem_potential_s_full()
+            potential_p[ind] = polymer_sol.chem_potential_p_full()
    
         dw = np.array([0.00113843, 0.00113843, 0.00113843, 0.00113843, 0.00113843,
                       0.00113843, 0.00113843, 0.00113843, 0.00113843, 0.00113843])
@@ -236,10 +241,13 @@ class TestPolymerwithSalts(unittest.TestCase):
         c_val = np.linspace(0.1, 0.8, num_pnts)
 
         for ind, c_s in enumerate(c_val):
-            polymer_sol = Pss.PolymerSolutionSalts(v_p, np.array([c_s, 1, 1, -100/3, -100/3]), temp, df_w, x_ini, p_ini, n_k, chi_p, param_s)
-            potential_w[ind] = polymer_sol.chem_potential_w()
-            potential_s[ind] = polymer_sol.chem_potential_s()
-            potential_p[ind] = polymer_sol.chem_potential_p()
+            polymer_sol = Pss.PolymerSolutionSalts(v_p, 
+                                                   np.array([c_s, 1, 1, -100/3, -100/3]), 
+                                                   temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
+            potential_w[ind] = polymer_sol.chem_potential_w_full()
+            potential_s[ind] = polymer_sol.chem_potential_s_full()
+            potential_p[ind] = polymer_sol.chem_potential_p_full()
 
         self.assertTrue(np.allclose(potential_w, w_comp + dw, rtol=0.0, atol=1e-8)) #-15
         self.assertTrue(np.allclose(potential_s, s_comp + ds, rtol=0.0, atol=1e-8))   #-12     
@@ -269,7 +277,9 @@ class TestPolymerwithSalts(unittest.TestCase):
         param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
 
         for ind, phi_p in enumerate(phi_val):
-            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), v_s, temp, df_w, x_ini, p_ini, n_k, chi_p, param_s)
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
             potential_w[ind] = polymer_sol.chem_potential_w()
             potential_p[ind] = polymer_sol.chem_potential_p()
             potential_s[ind] = polymer_sol.chem_potential_s()
@@ -304,6 +314,136 @@ class TestPolymerwithSalts(unittest.TestCase):
 
         self.assertTrue(np.allclose(F_com, f_com, rtol=0.0, atol=1e-14))
 
+    def test_no_salt(self):
+        """
+            checks if free energy, chemical potential, hydrogen bonds returns to Dormidontova when no salt
+        """
+        v_p = np.array([0.4, 1/3, 10/3])
+        v_s = np.array([1e-12, 1, 1, -100/3, -100/3])
+        temp = 298
+        df_w = 10/3
+        x_ini = 0.1
+        p_ini = 0.2
+        n_k = 100
+        chi_p = 0.5
+        chi_e = 0
+        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])  
+        num_pnts = 10
+
+        phi_val = np.linspace(1e-1, 0.8, num_pnts)
+        free_comp = np.zeros_like(phi_val) #free energy of full model
         
+        w_comp = np.zeros_like(phi_val) #chemical potential  of full model
+        p_comp = np.zeros_like(phi_val)
+        s_comp = np.zeros_like(phi_val)
+        
+        free_comp_2 = np.zeros_like(phi_val) #free energy  of Dormidontova model
+        
+        w_comp_2 = np.zeros_like(phi_val) #chemical potential of Dormidontova model
+        p_comp_2 = np.zeros_like(phi_val)
+        s_comp_2 = np.zeros_like(phi_val)
+        
+        x_comp = np.zeros_like(phi_val) #fraction of hydrogen bonds full model
+        y_comp = np.zeros_like(phi_val)       
+        ha_comp = np.zeros_like(phi_val)
+        hb_comp = np.zeros_like(phi_val) 
+        
+        x_comp_2 = np.zeros_like(phi_val) #fraction of hydrogen bonds Dormidontova model
+        y_comp_2 = np.zeros_like(phi_val)    
+        
+        for ind, phi_p in enumerate(phi_val):
+            Polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s)
+            polymer_sol_2 = Pss_2.PolymerSolution(phi_p, x_ini, p_ini, n_k, 
+                                                  v_p[1], chi_p, df_w, v_p[2])     
+            
+            x_comp[ind],y_comp[ind],ha_comp[ind],hb_comp[ind] = \
+                Polymer_sol.solv_eqns_f2(x_ini, p_ini, param_s[0], param_s[1])
+
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_comp[ind], y_comp[ind], 
+                                                   n_k, chi_p, 
+                                                   np.array([ha_comp[ind], hb_comp[ind], 1, 1, 8, 8, 1, 1]))
+            
+            x_comp_2[ind] = polymer_sol_2.solv_eqns(x_ini,p_ini)[0]
+            y_comp_2[ind] = polymer_sol_2.solv_eqns(x_ini,p_ini)[1]
+            
+            free_comp[ind] = polymer_sol.free()
+            
+            w_comp[ind] = polymer_sol.chem_potential_w_full()
+            s_comp[ind] = polymer_sol.chem_potential_s_full()
+            p_comp[ind] = polymer_sol.chem_potential_p_full()
+            
+            free_comp_2[ind] = polymer_sol_2.free()
+            
+            p_comp_2[ind] = polymer_sol_2.chem_potential()
+            #s_comp_2[ind] = polymer_sol_2.chem_potential_pm()
+            w_comp_2[ind] = polymer_sol_2.osm_pressure()        
+
+        self.assertTrue(np.allclose(free_comp_2, free_comp , rtol=0.0, atol=1e-12))
+        self.assertTrue(np.allclose(w_comp_2, - w_comp , rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(p_comp_2, (p_comp / n_k * v_p[1] - w_comp ), rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(x_comp, x_comp_2, rtol=0.0, atol=1e-11))
+        self.assertTrue(np.allclose(y_comp, y_comp_2, rtol=0.0, atol=1e-11))
+        
+    def test_full_chemical_potential(self):
+        """
+            checks if the chemical potential are correct when Eqn 301) is satisfied
+        """
+        v_p = np.array([0.4, 1/3, 10/3])
+        v_s = np.array([0.02, 1, 1, -100/3, -100/3])
+        temp = 298
+        df_w = 10/3
+        x_ini = 0.1
+        p_ini = 0.2
+        n_k = 100
+        chi_p = 0.5
+        chi_e = 0
+        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])  
+        num_pnts = 10
+
+        phi_val = np.linspace(1e-1, 0.8, num_pnts)
+        
+        w_comp = np.zeros_like(phi_val) #fchemical potential of full model
+        p_comp = np.zeros_like(phi_val)
+        s_comp = np.zeros_like(phi_val)
+        
+        
+        w_comp_2 = np.zeros_like(phi_val) #chemical potential with x,y,f solved form Eqn 301)
+        p_comp_2 = np.zeros_like(phi_val)
+        s_comp_2 = np.zeros_like(phi_val)
+        
+        x_comp = np.zeros_like(phi_val) #fraction of hydrogen bonds full model
+        y_comp = np.zeros_like(phi_val)       
+        ha_comp = np.zeros_like(phi_val)
+        hb_comp = np.zeros_like(phi_val)         
+        
+        for ind, phi_p in enumerate(phi_val):
+            Polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s) 
+            
+            x_comp[ind],y_comp[ind],ha_comp[ind],hb_comp[ind] = \
+                Polymer_sol.solv_eqns_f2(x_ini, p_ini, param_s[0], param_s[1])
+
+            polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_comp[ind], y_comp[ind], 
+                                                   n_k, chi_p, 
+                                                   np.array([ha_comp[ind], hb_comp[ind], 1, 1, 8, 8, 1, 1]))           
+            
+            w_comp[ind] = polymer_sol.chem_potential_w_full()
+            s_comp[ind] = polymer_sol.chem_potential_s_full()
+            p_comp[ind] = polymer_sol.chem_potential_p_full()
+            
+            
+            p_comp_2[ind] = polymer_sol.chem_potential_p()
+            s_comp_2[ind] = polymer_sol.chem_potential_s()
+            w_comp_2[ind] = polymer_sol.chem_potential_w()
+      
+        self.assertTrue(np.allclose(w_comp_2, w_comp , rtol=0.0, atol=1e-11))
+        self.assertTrue(np.allclose(p_comp_2/n_k, p_comp/n_k, rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(s_comp_2, s_comp, rtol=0.0, atol=1e-10))
+                                                    
 if __name__ == '__main__':
     unittest.main()
