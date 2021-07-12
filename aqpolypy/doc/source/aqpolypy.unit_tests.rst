@@ -141,7 +141,14 @@ polymer_solution_unit_test
     :undoc-members:
     :show-inheritance:
 
+polymer_solution_salts_unit_test
+---------------------------------
 
+.. automodule:: aqpolypy.unit_tests.polymer_solution_salts_unit_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    
 icosahedra_unit_test
 --------------------
 

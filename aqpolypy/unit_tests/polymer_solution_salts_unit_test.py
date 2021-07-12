@@ -50,7 +50,7 @@ class TestPolymerwithSalts(unittest.TestCase):
 
     def test_free_p(self):
         """
-            checks free energy as a function of math:`\\phi_p`
+            checks free energy as a function of :math:`(\\phi_p)`
         """
 
         num_pnts = 10
@@ -122,7 +122,7 @@ class TestPolymerwithSalts(unittest.TestCase):
 
     def test_potential_w(self):
         """
-            checks chemical potential as a function of math:`\\phi_p`
+            checks chemical potential as a function of :math:`(\\phi_p)`
         """
 
         num_pnts = 10
@@ -189,7 +189,7 @@ class TestPolymerwithSalts(unittest.TestCase):
 
     def test_potential_w_s(self):
         """
-            checks chemical potential of water as a function of math:`c_s`
+            checks chemical potential of water as a function of :math:`(m_s)`
         """
 
         num_pnts = 10
@@ -255,7 +255,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         
     def test_potential_df(self):
         """
-            checks if chemical potentials add up give freee nergy
+            checks if chemical potentials add up give free energy
         """
         num_pnts = 10
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
@@ -316,7 +316,8 @@ class TestPolymerwithSalts(unittest.TestCase):
 
     def test_no_salt(self):
         """
-            checks if free energy, chemical potential, hydrogen bonds returns to Dormidontova when no salt
+            checks if free energy, chemical potential, hydrogen 
+            bonds returns to Dormidontova when there is no salt
         """
         v_p = np.array([0.4, 1/3, 10/3])
         v_s = np.array([1e-12, 1, 1, -100/3, -100/3])
@@ -352,14 +353,14 @@ class TestPolymerwithSalts(unittest.TestCase):
         y_comp_2 = np.zeros_like(phi_val)    
         
         for ind, phi_p in enumerate(phi_val):
-            Polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+            Polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, param_s)
             polymer_sol_2 = Pss_2.PolymerSolution(phi_p, x_ini, p_ini, n_k, 
                                                   v_p[1], chi_p, df_w, v_p[2])     
             
             x_comp[ind],y_comp[ind],ha_comp[ind],hb_comp[ind] = \
-                Polymer_sol.solv_eqns_f2(x_ini, p_ini, param_s[0], param_s[1])
+                Polymer_sol.solv_eqns_exact(x_ini, p_ini, param_s[0], param_s[1])
 
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_comp[ind], y_comp[ind], 
@@ -420,12 +421,12 @@ class TestPolymerwithSalts(unittest.TestCase):
         hb_comp = np.zeros_like(phi_val)         
         
         for ind, phi_p in enumerate(phi_val):
-            Polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
+            Polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, param_s) 
             
             x_comp[ind],y_comp[ind],ha_comp[ind],hb_comp[ind] = \
-                Polymer_sol.solv_eqns_f2(x_ini, p_ini, param_s[0], param_s[1])
+                Polymer_sol.solv_eqns_exact(x_ini, p_ini, param_s[0], param_s[1])
 
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_comp[ind], y_comp[ind], 
@@ -444,6 +445,224 @@ class TestPolymerwithSalts(unittest.TestCase):
         self.assertTrue(np.allclose(w_comp_2, w_comp , rtol=0.0, atol=1e-11))
         self.assertTrue(np.allclose(p_comp_2/n_k, p_comp/n_k, rtol=0.0, atol=1e-10))
         self.assertTrue(np.allclose(s_comp_2, s_comp, rtol=0.0, atol=1e-10))
-                                                    
+        
+    def test_solver_small_m(self):
+        """
+            checks if the solver are correct when ther is no salt
+        """
+        v_p = np.array([1e-12, 30/129.43, 10/3]);
+        v_s = np.array([1e-12, 30/48.41,30/48.41 , 5, 5]);
+        temp = 298
+        df_w = 10/3
+        x_ini = 0.1
+        p_ini = 0.2
+        n_k = 100
+        chi_p = 0.5
+        chi_e = 0  
+        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        
+        num_puts = 10
+
+
+
+        phi_val = np.linspace(1e-1, 0.8, num_puts)
+
+        
+        x_comp = np.zeros_like(phi_val)
+        y_comp = np.zeros_like(phi_val)       
+        ha_comp = np.zeros_like(phi_val)
+        hb_comp = np.zeros_like(phi_val) 
+        fa_comp = np.zeros_like(phi_val)
+        fb_comp = np.zeros_like(phi_val) 
+        
+        x_comp_2 = np.zeros_like(phi_val)
+        y_comp_2 = np.zeros_like(phi_val)       
+        ha_comp_2 = np.zeros_like(phi_val)
+        hb_comp_2 = np.zeros_like(phi_val) 
+
+        
+        x_comp_3 = np.zeros_like(phi_val)
+        y_comp_3 = np.zeros_like(phi_val)       
+        fa_comp_3 = np.zeros_like(phi_val)
+        fb_comp_3 = np.zeros_like(phi_val)         
+   
+        
+        x_comp_4 = np.zeros_like(phi_val)
+        y_comp_4 = np.zeros_like(phi_val)       
+        fa_comp_4 = np.zeros_like(phi_val)
+        fb_comp_4 = np.zeros_like(phi_val)  
+        
+        x_comp_5 = np.zeros_like(phi_val)
+        y_comp_5 = np.zeros_like(phi_val)       
+        fa_comp_5 = np.zeros_like(phi_val)
+        fb_comp_5 = np.zeros_like(phi_val) 
+        
+        for ind, phi_p in enumerate(phi_val):
+            polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s) 
+            
+            x_comp[ind],y_comp[ind] = \
+                polymer_sol.solv_eqns_xy(x_ini, p_ini)           
+            
+            ha_comp[ind],hb_comp[ind] = \
+                polymer_sol.solv_eqns_h(param_s[0], param_s[1])   
+            
+            x_comp_2[ind],y_comp_2[ind],ha_comp_2[ind],hb_comp_2[ind] = \
+                polymer_sol.solv_eqns_exact(x_ini, p_ini, param_s[0], param_s[1])
+
+            x_comp_3[ind],y_comp_3[ind],fa_comp_3[ind],fb_comp_3[ind] = \
+                polymer_sol.solv_eqns_small_m(x_ini, p_ini, param_s[0], param_s[1])    
+            
+            fa_comp[ind],fb_comp[ind] = polymer_sol.f_plus_minus([ha_comp[ind],hb_comp[ind]])
+               
+
+            x_comp_4[ind],y_comp_4[ind],fa_comp_4[ind],fb_comp_4[ind]= \
+                polymer_sol.xy_firstorder(x_ini, p_ini)                      
+ 
+        self.assertTrue(np.allclose(x_comp, x_comp_2 , rtol=0.0, atol=1e-11))
+        self.assertTrue(np.allclose(y_comp, y_comp_2 , rtol=0.0, atol=1e-11))
+        self.assertTrue(np.allclose(ha_comp, ha_comp_2 , rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(hb_comp, hb_comp_2 , rtol=0.0, atol=1e-9))     
+                                                           
+        self.assertTrue(np.allclose(x_comp, x_comp_3 , rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(y_comp, y_comp_3 , rtol=0.0, atol=1e-10))
+        self.assertTrue(np.allclose(fa_comp, fa_comp_3 , rtol=0.0, atol=1e-9))
+        self.assertTrue(np.allclose(fb_comp, fb_comp_3 , rtol=0.0, atol=1e-9))
+        
+    def test_solver_perturbative(self):
+        """
+            checks if the first and second order solver are correct 
+        """ 
+
+        con_ini = 1e-12
+        con_fin = 0.02
+        num_steps = 10
+        con = np.linspace(con_ini, con_fin, num_steps) 
+    
+        v_p = np.array([1e-12, 30/129.43, 10/3]);
+        v_s = np.array([1e-12, 30/48.41,30/48.41 , 5, 5]);
+        temp = 298
+        df_w = 10/3
+        x = 0.1
+        p = 0.2
+        n_k = 100
+        chi_p = 0.5
+        chi_e = 0  
+        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+
+
+        x_sol = np.zeros_like(con) # exact
+        p_sol = np.zeros_like(con)
+        a_sol = np.zeros_like(con)
+        b_sol = np.zeros_like(con)
+        f_a = np.zeros_like(con)
+        f_b = np.zeros_like(con)       
+        
+        X_sol = np.zeros_like(con) #perturbative
+        P_sol = np.zeros_like(con)  
+        F_a = np.zeros_like(con)
+        F_b = np.zeros_like(con)
+
+        
+        X2_sol = np.zeros_like(con) #second order
+        P2_sol = np.zeros_like(con) #second order
+        FA2_sol = np.zeros_like(con) #second order
+        FB2_sol = np.zeros_like(con) #second order      
+          
+        for ind, co in enumerate(con):
+
+            
+            
+            polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(v_p, np.array([co, 30/48.41,30/48.41 , 5, 5])
+                                                   , temp, df_w, x, p, 
+                                                   n_k, chi_p, param_s) 
+                      
+            x_sol[ind] = polymer_sol.solv_eqns_exact(x, p, param_s[0], param_s[1])[0]
+            p_sol[ind] = polymer_sol.solv_eqns_exact(x, p, param_s[0], param_s[1])[1]            
+            a_sol[ind] = polymer_sol.solv_eqns_exact(x, p, param_s[0], param_s[1])[2]
+            b_sol[ind] = polymer_sol.solv_eqns_exact(x, p, param_s[0], param_s[1])[3]
+            
+            f_a[ind],f_b[ind] = polymer_sol.f_plus_minus([a_sol[ind], b_sol[ind]])
+            
+            if ind == 0:
+                x_0 = polymer_sol.solv_eqns_small_m(x, p, param_s[0], param_s[1])[0]
+                y_0 = polymer_sol.solv_eqns_small_m(x, p, param_s[0], param_s[1])[1]
+            
+            X_sol[ind] = x_0 + polymer_sol.xy_firstorder(x_0, y_0)[0]
+            P_sol[ind] = y_0 + polymer_sol.xy_firstorder(x_0, y_0)[1]                        
+
+            F_a[ind] = polymer_sol.xy_firstorder(x_0, y_0)[2]
+            F_b[ind] = polymer_sol.xy_firstorder(x_0, y_0)[3]           
+
+ 
+            X2_sol[ind], P2_sol[ind], FA2_sol[ind], FB2_sol[ind] =  \
+                polymer_sol.xy_secondorder(x_0, y_0)
+                
+        self.assertTrue(np.allclose(f_a, F_a, rtol=0.0, atol=1e-5))
+        self.assertTrue(np.allclose(f_b, F_b, rtol=0.0, atol=1e-5))
+        self.assertTrue(np.allclose(X_sol, x_sol , rtol=0.0, atol=1e-6))
+        self.assertTrue(np.allclose(P_sol, p_sol , rtol=0.0, atol=1e-5))     
+                                                           
+        self.assertTrue(np.allclose(f_a, F_a + FA2_sol, rtol=0.0, atol=1e-5))
+        self.assertTrue(np.allclose(f_b, F_b + FB2_sol , rtol=0.0, atol=1e-5))
+        self.assertTrue(np.allclose(X_sol + X2_sol, x_sol , rtol=0.0, atol=1e-6))
+        self.assertTrue(np.allclose(P_sol + P2_sol, p_sol , rtol=0.0, atol=1e-6))     
+
+    def test_f_2_h(self):
+        """
+            checks if the function converts f to h correctly
+        """ 
+        v_p = np.array([1e-12, 30/129.43, 10/3]);
+        v_s = np.array([1e-12, 30/48.41,30/48.41 , 5, 5]);
+        temp = 298
+        df_w = 10/3
+        x_ini = 0.1
+        p_ini = 0.2
+        n_k = 100
+        chi_p = 0.5
+        chi_e = 0 ########  
+        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        
+        num_puts = 10
+
+ 
+
+        #u_s = 1/(1 / v_s[1] + 1 /v_s[2])
+        #nu_a = param_s[6]
+        #nu_b = param_s[7]
+
+        phi_val = np.linspace(1e-1, 0.8, num_puts)
+
+        
+        x_comp = np.zeros_like(phi_val)
+        y_comp = np.zeros_like(phi_val)       
+        ha_comp = np.zeros_like(phi_val)
+        hb_comp = np.zeros_like(phi_val) 
+        fa_comp = np.zeros_like(phi_val)
+        fb_comp = np.zeros_like(phi_val) 
+        
+     
+        ha_comp_2 = np.zeros_like(phi_val)
+        hb_comp_2 = np.zeros_like(phi_val) 
+
+
+        
+        for ind, phi_p in enumerate(phi_val):
+            polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
+                                                   v_s, temp, df_w, x_ini, p_ini, 
+                                                   n_k, chi_p, param_s) 
+            
+
+            x_comp[ind],y_comp[ind],ha_comp[ind],hb_comp[ind] = \
+                polymer_sol.solv_eqns_exact(x_ini, p_ini, param_s[0], param_s[1])  
+            
+            fa_comp[ind],fb_comp[ind] = polymer_sol.f_plus_minus([ha_comp[ind],hb_comp[ind]])
+            
+            ha_comp_2[ind],hb_comp_2[ind] = polymer_sol.h_plus_minus([fa_comp[ind],fb_comp[ind]])
+       
+        self.assertTrue(np.allclose(ha_comp, ha_comp_2 , rtol=0.0, atol=1e-14))
+        self.assertTrue(np.allclose(hb_comp, hb_comp_2 , rtol=0.0, atol=1e-15))          
+                                                                                         
 if __name__ == '__main__':
     unittest.main()

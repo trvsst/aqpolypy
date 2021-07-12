@@ -18,22 +18,23 @@ import aqpolypy.units.concentration as con
 import aqpolypy.water.WaterMilleroBP as wbp
 import aqpolypy.salt.SaltNaClRP as nacl
 
-class PolymerSolutionSalts(object):
+
+class Polymer_hydrogen_bond_shell_solver(object):
     """
-    Defines a solution with polymers with hydrogen bonds generalizing the \
-    model :cite:`Dormidontova2002`
+    Different way to solve the hydrogen bonds and number \
+    of water molecules forming the hydration shell
     """
 
     def __init__(
-                 self, v_p, v_s, temp, df_w, x_ini, p_ini, n_k, chi_p,
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p,
                  param_s):
 
         """
         The constructor, with the following parameters
 
-        :param v_p: polymer parameters :math:`(\\phi_p, \\frac{\\upsilon_w} \
+        :param param_poly: polymer parameters :math:`(\\phi_p, \\frac{\\upsilon_w} \
         {\\upsilon_p}, \\Delta F_p)`
-        :param v_s: salt parameters (see definition below)
+        :param param_salt: salt parameters (see definition below)
         :param temp: temprature in Kelvin
         :param df_w: free energy change upon formation of hydrogen bond \
         in water (in :math:`k_BT` units)
@@ -47,16 +48,461 @@ class PolymerSolutionSalts(object):
         forming the hydration shell, diameter, maximum number of water \
         molecules that maybe bound to each ion,  the number of ions per salt)
 
-        the parameter v_s is given by
-        :math:`(c_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
+        the parameter param_salt is given by
+        :math:`(m_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
         \\frac{\\upsilon_w}{\\upsilon_-}, \\Delta F_a, \\Delta F_b)`
 
-        where :math:`c_s` is the concentration in mol/kg
+        where :math:`m_s` is the concentration in mol/kg
+        """
+
+        #concentration of salt (NaCl)
+
+        # concentration in mol/kg
+        self.conc_l = param_salt[0]
+
+        # molecular volumes
+        self.u_p = param_poly[1]
+        self.u_a = param_salt[1]
+        self.u_b = param_salt[2]
+        self.u_s = 1 / (1 / self.u_a + 1 /self.u_b)
+
+        self.D_w = 55.509 # mol/kg water
+
+        # volume fractions
+        self.phi_p = param_poly[0]
+
+        self.param_salt = self.conc_l / self.u_s / self.D_w
+        self.V_w = 1
+        self.V_all = (self.param_salt + self.V_w) / (1 - self.phi_p)
+
+        self.phi_s = self.param_salt / self.V_all
+        self.phi_w = self.V_w / self.V_all
+
+        # polymer and polymer interaction parameters
+        self.n = n_k
+
+        # hydration numbers
+        self.h_a = param_s[0]
+        self.h_b = param_s[1]
+        self.m_a = param_s[4]
+        self.m_b = param_s[5]
+
+        # number of ions per salt
+        self.nu_a = param_s[6]
+        self.nu_b = param_s[7]
+        self.nu = self.nu_a + self.nu_a
+
+        # fraction of hydration bonds (in water:x, in polymer:y)
+        self.x = x_ini
+        self.p = p_ini
+
+
+        # relative free energies of water association
+        self.df_w = df_w
+        self.df_p = param_poly[2]
+        self.df_a = param_salt[3]
+        self.df_b = param_salt[4]
+
+
+        # fraction of water in each ion size
+        self.f_a = self.h_a * self.nu_a * self.u_s * self.phi_s / self.phi_w
+        self.f_b = self.h_b * self.nu_b * self.u_s * self.phi_s / self.phi_w
+        
+
+    def eqns_xy(self, val):
+        """
+        Equations determining the fraction of hydrogen bonds x, y
+        when :math:`(f_+, f_-)` is samll
+
+        :param val: ndarray containing x,p
+        :return: equations (ndarray)
+        """
+
+        x, p = val
+
+        fac = 2 * self.phi_w * (1 - p - x * self.u_p * self.phi_p / self.phi_w)
+
+        eqn1 = np.exp(self.df_p) * (1 - x) * fac
+        eqn2 = np.exp(self.df_w) * (1 - p) * fac
+
+        return np.array([x - eqn1, p - eqn2])
+
+    def solv_eqns_xy(self, x, p):
+        """
+        Solution to the equations defining the fraction of hydrogen bonds x, y
+        when :math:`(f_+, f_-)` is samll
+
+        :param x: initial value for fraction of polymer hydrogen bonds
+        :param p: initial value for fraction of water hydrogen bonds
+        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
+
+        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+        """
+
+        sol = fsolve(self.eqns_xy, np.array([x, p]))
+
+        return sol
+
+    def eqns_h(self, val):
+        """
+        Equations determining the fraction of hydrogen bonds
+        when :math:`(f_+, f_-)` is samll
+
+        :param val: ndarray containing :math:`(h_+, h_-)`
+        :return: equations (ndarray)
+        """
+
+        h_a, h_b = val
+
+        x, p = self.solv_eqns_xy(self.x, self.p)
+
+        eqn1 = np.exp(1 + self.df_a) * self.phi_w * (1 - p) ** 2
+        eqn2 = np.exp(1 + self.df_b) * self.phi_w * \
+               (1 - x * self.u_p * self.phi_p / self.phi_w - p) ** 2
+
+        eqn1_f = eqn1 * (self.m_a - h_a)
+        eqn2_f = eqn2 * (self.m_b - h_b)
+
+        return np.array([h_a - eqn1_f, h_b - eqn2_f])
+
+    def solv_eqns_h(self, h_a, h_b):
+        """
+        Solution to the equations defining the fraction of hydrogen bonds
+        when :math:`(f_+, f_-)` is samll
+
+        :param h_a: initial value for :math:`(h_+)`
+        :param h_b: initial value for :math:`(h_-)`
+        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
+
+        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+        """
+
+        sol = fsolve(self.eqns_h, np.array([h_a, h_b]))
+
+        return sol
+
+    def eqns_exact(self, val):
+        """
+         Exact equations determining the fraction of hydrogen bonds \
+         and number of water molecules forming the hydration shell
+
+        :param val: ndarray containing :math:`(x, p, h_+, h_-)`
+        :return: equations (ndarray)
+        """
+        x, p, h_a, h_b = val
+
+        f_a = h_a * self.nu_a * self.u_s * self.phi_s / self.phi_w
+        f_b = h_b * self.nu_b * self.u_s * self.phi_s / self.phi_w
+
+        fac = 2 * self.phi_w * \
+              (1 - p - x * self.u_p * self.phi_p / self.phi_w - f_b)
+
+        eqn1 = np.exp(self.df_p) * (1 - x) * fac
+        eqn2 = np.exp(self.df_w) * (1 - p - f_a) * fac
+
+        eqn3_1 = np.exp(1 + self.df_a) * self.phi_w * (1 - p - f_a) ** 2
+        eqn4_1 = np.exp(1 + self.df_b) * self.phi_w * \
+                 (1 - x * self.u_p * self.phi_p / self.phi_w - p - f_b) ** 2
+
+        eqn3 = eqn3_1 * (self.m_a - h_a) * (1 - f_a - f_b)
+        eqn4 = eqn4_1 * (self.m_b - h_b) * (1 - f_a - f_b)
+
+        return np.array([x - eqn1, p - eqn2,
+                         (1 - f_a) * h_a - eqn3, (1 - f_b) * h_b - eqn4])
+
+    def solv_eqns_exact(self, x, p, h_a, h_b):
+        """
+        Exact solution to the equations defining the fraction of hydrogen bonds \
+        and number of water molecules forming the hydration shell
+
+        :param x: initial value for fraction of polymer hydrogen bonds
+        :param p: initial value for fraction of water hydrogen bonds
+        :param h_a: initial value for :math:`(h_+)`
+        :param h_b: initial value for :math:`(h_-)`
+        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
+
+        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+        """
+
+        sol = fsolve(self.eqns_exact, np.array([x, p, h_a, h_b]))
+
+        return sol
+
+    def eqns_small_m(self, val):
+        """
+        Equations determining the fraction of hydrogen bonds
+        and number of water molecules forming the hydration shell
+        when :math:`(m_s)` is samll
+
+        :param val: ndarray containing :math:`(x, p, f_+, f_-)`
+        :return: equations (ndarray)
+        """
+        x, p, f_a, f_b = val
+
+        fac = 2 * (1 - self.phi_p) * \
+              (1 - p - x * self.u_p * self.phi_p / (1 - self.phi_p))
+
+        eqn1 = np.exp(self.df_p) * (1 - x) * fac
+        eqn2 = np.exp(self.df_w) * (1 - p) * fac
+
+        eqn3_1 = np.exp(1 + self.df_a) * (1 - self.phi_p) * \
+                 (1 - p) ** 2  #
+        eqn4_1 = np.exp(1 + self.df_b) * (1 - self.phi_p) * \
+                 (1 - x * self.u_p * self.phi_p / (1 - self.phi_p) - p) ** 2
+
+        eqn3 = self.m_a * self.nu_a * self.conc_l / self.D_w * eqn3_1
+        eqn4 = self.m_b * self.nu_b * self.conc_l / self.D_w * eqn4_1
+
+        return np.array([x - eqn1, p - eqn2, f_a *
+                         (1 + eqn3_1) - eqn3, f_b * (1 + eqn4_1) - eqn4])
+
+    def solv_eqns_small_m(self, x, p, f_a, f_b):
+        """
+        Solution to the equations defining the fraction of hydrogen bonds
+        and number of water molecules forming the hydration shell
+        when :math:`(m_s)` is samll
+
+        :param x: initial value for fraction of polymer hydrogen bonds
+        :param p: initial value for fraction of water hydrogen bonds
+        :param f_a: initial value for :math:`(f_+)`
+        :param f_b: initial value for :math:`(f_-)`
+        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
+
+        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
+        """
+
+        sol = fsolve(self.eqns_small_m, np.array([x, p, f_a, f_b]))
+
+        return sol
+
+
+    def f_plus_minus(self, val):
+        """
+        Calculates :math:`(f_+, f_-)` with given :math:`(h_+, h_-)`
+
+        :param val: ndarray containing :math:`(h_+, h_-)`
+        :return: equations (ndarray)
+        """
+        h_a, h_b = val
+
+        f_a = h_a * self.nu_a * self.u_s * self.phi_s / self.phi_w
+        f_b = h_b * self.nu_b * self.u_s * self.phi_s / self.phi_w
+
+        return np.array([f_a, f_b])
+
+    def h_plus_minus(self, val):
+        """
+        Calculates :math:`(h_+, h_-)` with given :math:`(f_+, f_-)`
+
+        :param val: ndarray containing :math:`(f_+, f_-)`
+        :return: equations (ndarray)
+        """
+        f_a, f_b = val
+
+        h_a = f_a / self.nu_a / self.u_s / self.phi_s * self.phi_w
+        h_b = f_b / self.nu_b / self.u_s / self.phi_s * self.phi_w
+
+        return np.array([h_a, h_b])
+        
+    def xy_firstorder(self,x,y):
+        """
+        First order perturbative solution of to the equations defining
+        the fraction of hydrogen bonds
+        when :math:`(m_s)` is samll
+
+        :param x: initial value for fraction of polymer hydrogen bonds
+        :param y: initial value for fraction of water hydrogen bonds
+
+        :return: ndarray containing :first order perturbative solution of math:`(x, p, f_+, f_-)`
+
+        """
+        L_a1 = np.exp(1 + self.df_a) * (1 - self.phi_p) * (1 - y) ** 2
+        L_a = self.m_a * L_a1 / (1 + L_a1) * self.nu_a / self.D_w
+
+        L_b1 = np.exp(1 + self.df_b) * (1 - self.phi_p) * \
+               (1 - y - x * self.u_p * self.phi_p / (1 - self.phi_p)) ** 2
+        L_b = self.m_b * L_b1 / (1 + L_b1) * self.nu_b / self.D_w
+
+        Z_val = 1 + 2 * (1 - y) ** 2 * (1 - self.phi_p) * \
+                np.exp(self.df_w) + 2 * (1 - x) ** 2 * \
+                np.exp(self.df_p) * self.phi_p * self.u_p
+
+        dx_1 = - 2 * (1 - x) ** 2 * np.exp(self.df_p) * (1 - self.phi_p)
+        dx_2 = self.D_w * (y * L_a - L_b) + (y - 1) / self.u_s
+
+        dy_1 = - 2 * (1 - x) ** 2 * y * L_a * \
+               np.exp(self.df_p) * self.u_p * self.phi_p
+        dy_2 = - y * L_a
+        dy_3 = - 2 * (1 - y) ** 2 * (self.phi_p - 1) * \
+               np.exp(self.df_w) * \
+               ((y - 1) / self.u_s - L_b * self.D_w) / self.D_w
+
+        A1 = 2 * np.exp(self.df_p) * (-1 + x) ** 2
+        A2 = 2 * np.exp(self.df_w) * (-1 + y) ** 2
+        F = (-1 + y - L_b * self.u_s * self.D_w + self.phi_p -
+             y * self.phi_p +
+             L_b * self.u_s * self.D_w * self.phi_p) / \
+            (self.u_s * self.D_w)
+        G1 = (- self.u_p * self.u_s * self.D_w * self.phi_p) / \
+             (self.u_s * self.D_w)
+        G2 = (- self.u_s * self.D_w +
+              self.u_s * self.D_w * self.phi_p) / (self.u_s * self.D_w)
+        H = L_a * y
+        dx = -((A1 * F - A1 * G2 * H) /
+               (-1 + A1 * G1 + A2 * G2)) * self.conc_l
+        dy = -((A2 * F - H + A1 * G1 * H) /
+               (-1 + A1 * G1 + A2 * G2)) * self.conc_l
+
+        return np.array([dx, dy, L_a * self.conc_l, L_b * self.conc_l])
+
+    def xy_secondorder(self,x_0,y_0):
+        """
+        Second order perturbative solution of to the equations defining
+        the fraction of hydrogen bonds
+        when :math:`(m_s)` is samll
+
+        :param x_0: initial value for fraction of polymer hydrogen bonds
+        :param y_0: initial value for fraction of water hydrogen bonds
+
+        :return: ndarray containing : second order perturbative solution of math:`(x, p, f_+, f_-)`
+
+        """
+
+        L_a1 = np.exp(1 + self.df_a) * \
+               (1 - self.phi_p) * (1 - y_0) ** 2
+        L_a = self.m_a * L_a1 / (1 + L_a1) * \
+              self.nu_a / self.D_w
+
+        L_b1 = np.exp(1 + self.df_b) * (1 - self.phi_p) * \
+               (1 - y_0 - x_0 * self.u_p * self.phi_p /
+                (1 - self.phi_p)) ** 2
+        L_b = self.m_b * L_b1 / (1 + L_b1) * self.nu_b / self.D_w
+
+        A1 = 2 * np.exp(self.df_p) * (-1 + x_0) ** 2
+        A2 = 2 * np.exp(self.df_w) * (-1 + y_0) ** 2
+        F = (-1 + y_0 - L_b * self.u_s * self.D_w + self.phi_p -
+             y_0 * self.phi_p +
+             L_b * self.u_s * self.D_w * self.phi_p) / \
+            (self.u_s * self.D_w)
+
+        G1 = (- self.u_p * self.u_s * self.D_w * self.phi_p) / \
+             (self.u_s * self.D_w)
+        G2 = (- self.u_s * self.D_w + self.u_s *
+              self.D_w * self.phi_p) / \
+             (self.u_s * self.D_w)
+        H = L_a * y_0
+        a_val = -((A1 * F - A1 * G2 * H) /
+                  (-1 + A1 * G1 + A2 * G2))  # first order x
+        b_val = -((A2 * F - H + A1 * G1 * H) /
+                  (-1 + A1 * G1 + A2 * G2))  # first order y
+
+        c_val_1 = np.exp(1 + self.df_a) * \
+                  self.nu_a * self.m_a * (y_0 - 1) * \
+                  (self.phi_p - 1) * \
+                  (-2 * (b_val + L_a) * self.u_s * self.D_w + y_0 - 1)
+        c_val_2 = (-np.exp(1 + self.df_a) * y_0 ** 2 * (self.phi_p - 1) +
+                   2 * np.exp(1 + self.df_a) * y_0 * (self.phi_p - 1) -
+                   np.exp(1 + self.df_a) * self.phi_p +
+                   np.exp(1 + self.df_a) + 1)
+        c_val = c_val_1 / (self.u_s * self.D_w ** 2) / \
+                c_val_2 ** 2  # first order f_a
+
+        d_val_11 = np.exp(1 + self.df_b) * \
+                   self.nu_b * self.m_b * (self.phi_p - 1) * (
+                -self.phi_p * (x_0 * self.u_p + 1) +
+                y_0 * (self.phi_p - 1) + 1)
+        d_val_12 = (2 * self.u_s * self.D_w *
+                    (L_b + b_val + self.phi_p *
+                     (a_val * self.u_p - b_val - L_b)) +
+                    x_0 * self.u_p * self.phi_p + y_0 * (
+                            self.phi_p - 1) - self.phi_p + 1)
+        d_val_1 = d_val_11 * d_val_12
+        d_val_21 = -2 * np.exp(1 + self.df_b) *\
+                   y_0 * (self.phi_p - 1) * \
+                   (self.phi_p * (x_0 * self.u_p + 1) - 1)
+        d_val_22 = np.exp(1 + self.df_b) * \
+                   self.phi_p ** 2 * (x_0 * self.u_p + 1) ** 2 \
+                   - self.phi_p * (
+                           2 * np.exp(1 + self.df_b) * x_0 *
+                           self.u_p + 2 * np.exp(1 + self.df_b) + 1) + \
+                   np.exp(1 + self.df_b) * y_0 ** 2 * (
+                           self.phi_p - 1) ** 2 + np.exp(1 + self.df_b) + 1
+        d_val_2 = self.u_s * self.D_w ** 2 * (d_val_21 + d_val_22) ** 2
+        d_val = d_val_1 / d_val_2
+
+        A_11 = A1 * (1 - self.phi_p) * (-1 + x_0)
+        A_22 = A2 * (1 - self.phi_p) * (-1 + y_0)
+
+        B0_1 = -((self.u_p * self.phi_p *
+                  (-a_val - (x_0) / (self.u_s * self.D_w))) /
+                 (1 - self.phi_p) - b_val - L_b) / (self.u_s * self.D_w)
+        B0_2 = -(a_val * self.u_p * self.phi_p) / \
+               ((1 - self.phi_p) * self.u_s * self.D_w)
+        B0_3 = -d_val + ((x_0 * self.u_p * self.phi_p) /
+                         (self.phi_p - 1) - y_0 + 1) / \
+               (self.u_s ** 2 * self.D_w ** 2)
+        B_0 = B0_1 + B0_2 + B0_3
+
+        B_1 = self.u_p * self.phi_p / (1 - self.phi_p)
+        C_0 = -b_val ** 2 - b_val * L_a * y_0 - b_val * L_a + \
+              c_val * y_0 ** 2 - c_val * y_0 - L_a ** 2 * y_0
+
+        a_sec_1 = A_11 * (-A_22 * B_0 + C_0) - \
+                  (-a_val ** 2 - A_11 * B_0) * (-1 + A_22 + y_0)
+        a_sec_2 = A_11 * A_22 * B_1 - \
+                  (-1 + A_11 * B_1 + x_0) * (-1 + A_22 + y_0)
+        a_sec = - a_sec_1 / a_sec_2
+
+        b_sec_1 = A_22 * B_0 + a_val ** 2 * A_22 * B_1 -\
+                  C_0 + A_11 * B_1 * C_0 - \
+                  A_22 * B_0 * x_0 + C_0 * x_0
+        b_sec_2 = 1 - A_22 - A_11 * B_1 - x_0 + \
+                  A_22 * x_0 - y_0 + A_11 * B_1 * y_0 + x_0 * y_0
+        b_sec = - b_sec_1 / b_sec_2
+
+        return np.array([a_sec, b_sec, c_val - L_a * L_b, 
+                         d_val - L_a * L_b]) * self.conc_l ** 2
+
+
+class PolymerSolutionSalts(object):
+    """
+    Defines a solution with polymers with hydrogen bonds generalizing the \
+    model
+    """
+
+    def __init__(
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p,
+                 param_s):
+
+        """
+        The constructor, with the following parameters
+
+        :param param_poly: polymer parameters :math:`(\\phi_p, \\frac{\\upsilon_w} \
+        {\\upsilon_p}, \\Delta F_p)`
+        :param param_salt: salt parameters (see definition below)
+        :param temp: temprature in Kelvin
+        :param df_w: free energy change upon formation of hydrogen bond \
+        in water (in :math:`k_BT` units)
+        :param x_ini: fraction of polymer hydrogen bonds
+        :param p_ini: fraction of water hydrogen bonds
+        :param n_k: number of Kuhn lengths for the polymer
+        :param chi_p: Flory Huggins parameter
+        :param param_s: microscopic salt parameters \
+        :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
+        (number of water molecules \
+        forming the hydration shell, diameter, maximum number of water \
+        molecules that maybe bound to each ion,  the number of ions per salt)
+
+        the parameter param_salt is given by
+        :math:`(m_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
+        \\frac{\\upsilon_w}{\\upsilon_-}, \\Delta F_a, \\Delta F_b)`
+
+        where :math:`m_s` is the concentration in mol/kg
         """
         #concentration of salt (NaCl)
 
         # concentration in mol/kg
-        self.conc_l = v_s[0]
+        self.conc_l = param_salt[0]
 
         # concentration in mol/L
 
@@ -65,33 +511,33 @@ class PolymerSolutionSalts(object):
         salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
         obj_water_bp = wbp.WaterPropertiesFineMillero(self.T)
 
-        v_solvent = obj_water_bp.molar_volume()
+        param_saltolvent = obj_water_bp.molar_volume()
         m_solvent = obj_water_bp.MolecularWeight
-        v_solute = salt_nacl.molar_vol(self.conc_l)
+        param_saltolute = salt_nacl.molar_vol(self.conc_l)
 
         self.conc = con.molality_2_molarity(self.conc_l,
-                                            v_solvent,
-                                            v_solute,
+                                            param_saltolvent,
+                                            param_saltolute,
                                             m_solvent)
 
 
 
         # molecular volumes
-        self.u_p = v_p[1]
-        self.u_a = v_s[1]
-        self.u_b = v_s[2]
-        self.u_s = 1/(1 / self.u_a + 1 /self.u_b)
+        self.u_p = param_poly[1]
+        self.u_a = param_salt[1]
+        self.u_b = param_salt[2]
+        self.u_s = 1 / (1 / self.u_a + 1 /self.u_b)
 
         self.D_w = 55.509 # mol/kg water
 
         # volume fractions
-        self.phi_p = v_p[0]
+        self.phi_p = param_poly[0]
 
-        self.V_s = self.conc_l / self.u_s / self.D_w
+        self.param_salt = self.conc_l / self.u_s / self.D_w
         self.V_w = 1
-        self.V_all = (self.V_s + self.V_w) / (1 - self.phi_p)
+        self.V_all = (self.param_salt + self.V_w) / (1 - self.phi_p)
 
-        self.phi_s = self.V_s / self.V_all
+        self.phi_s = self.param_salt / self.V_all
         self.phi_w = self.V_w / self.V_all
 
         # polymer and polymer interaction parameters
@@ -116,9 +562,9 @@ class PolymerSolutionSalts(object):
 
         # relative free energies of water association
         self.df_w = df_w
-        self.df_p = v_p[2]
-        self.df_a = v_s[3]
-        self.df_b = v_s[4]
+        self.df_p = param_poly[2]
+        self.df_a = param_salt[3]
+        self.df_b = param_salt[4]
 
         self.i_size_a = param_s[2]
         self.i_size_b = param_s[3]
@@ -266,8 +712,8 @@ class PolymerSolutionSalts(object):
 
     def chem_potential_w_full(self):
         """
-        Full chemical potential \
-        of water :math:`\\frac{\\mu_w}{k_B T}=\\frac{1}{k_B T}
+        Chemical potential of water without minimization of the free energy\
+        :math:`\\frac{\\mu_w}{k_B T}=\\frac{1}{k_B T}
         (f- \\phi_p \\frac{\\partial f}{\\partial \\phi_p}- \
         \\phi_s \\frac{\\partial f}{\\partial \\phi_s})`
 
@@ -356,7 +802,7 @@ class PolymerSolutionSalts(object):
 
     def chem_potential_s_full(self):
         """
-        Full chemical potential of salt\
+        Chemical potential of salt without minimization of the free energy\
         :math:`\\frac{\\mu_s}{k_B T} =
         \\frac{ \\upsilon_s}{ \\upsilon_w}\
         \\frac{ \\mu_w}{k_B T} + \
@@ -404,7 +850,7 @@ class PolymerSolutionSalts(object):
 
     def chem_potential_p(self):
         """
-        Reduced chemical potential of polymers\
+        Reduced chemical potential of polymer\
         :math:`\\frac{\\mu_p}{k_B T} =
         \\frac{N \\upsilon_p}{ \\upsilon_w}\
         \\frac{ \\mu_w}{k_B T} + \
@@ -440,7 +886,7 @@ class PolymerSolutionSalts(object):
 
     def chem_potential_p_full(self):
         """
-        Full chemical potential of polymers\
+        Chemical potential of polymer without minimization of the free energy\
         :math:`\\frac{\\mu_p}{k_B T} =
         \\frac{N \\upsilon_p}{ \\upsilon_w}\
         \\frac{ \\mu_w}{k_B T} + \
@@ -486,258 +932,6 @@ class PolymerSolutionSalts(object):
         return ( self.chem_potential_p() + mu_6 + mu_7
                 + mu_8 + mu_9)
 
-    def eqns(self, val):
-        """
-        Equations determining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
-        
-        :param val: ndarray containing x,p
-        :return: equations (ndarray)
-        """
 
-        x, p = val
-
-        fac = 2 * self.phi_w * (1 - p - x * self.u_p * self.phi_p / self.phi_w)
-
-        eqn1 = np.exp(self.df_p) * (1 - x) * fac
-        eqn2 = np.exp(self.df_w) * (1 - p) * fac
-
-        return np.array([x - eqn1, p - eqn2])
-
-    def solv_eqns(self, x, p):
-        """
-        Solution to the equations defining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
-        
-        :param x: initial value for fraction of polymer hydrogen bonds
-        :param p: initial value for fraction of water hydrogen bonds
-        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
-
-        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
-        """
-
-        sol = fsolve(self.eqns, np.array([x, p]))
-
-        return sol
-
-
-    def eqns_f(self, val):
-        """
-        Equations determining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
-        
-        :param val: ndarray containing :math:`(h_+, h_-)`
-        :return: equations (ndarray)
-        """
-
-        h_a, h_b = val
-
-        x, p = self.solv_eqns(self.x, self.p)
-
-        eqn1 = np.exp(1 + self.df_a) * self.phi_w * (1 - p) ** 2
-        eqn2 = np.exp(1 + self.df_b) * self.phi_w * \
-               (1 - x * self.u_p * self.phi_p / self.phi_w - p) ** 2
-
-        eqn1_f = eqn1 * (self.m_a - h_a)
-        eqn2_f = eqn2 * (self.m_b - h_b)
-
-        return np.array([h_a - eqn1_f, h_b - eqn2_f])
-
-    def solv_eqns_f(self, h_a, h_b):
-        """
-        Solution to the equations defining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
-        
-        :param h_a: initial value for :math:`(h_+)`
-        :param h_b: initial value for :math:`(h_-)`
-        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
-
-        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
-        """
-
-        sol = fsolve(self.eqns_f, np.array([h_a, h_b]))
-
-        return sol
-
-    def eqns_f2(self, val):
-        """
-        Equations determining the fraction of hydrogen bonds
-
-        :param val: ndarray containing :math:`(x, p, h_+, h_-)`
-        :return: equations (ndarray)
-        """
-        x, p, h_a, h_b = val
-
-        f_a = h_a * self.nu_a * self.u_s * self.phi_s / self.phi_w
-        f_b = h_b * self.nu_b * self.u_s * self.phi_s / self.phi_w
-
-        fac = 2 * self.phi_w * \
-              (1 - p  - x * self.u_p * self.phi_p / self.phi_w - f_b)
-
-        eqn1 = np.exp(self.df_p) * (1 - x) * fac
-        eqn2 = np.exp(self.df_w) * (1 - p - f_a) * fac
-
-        eqn3_1 = np.exp(1 + self.df_a) * self.phi_w * (1 - p - f_a) ** 2
-        eqn4_1 = np.exp(1 + self.df_b) * self.phi_w * \
-                 (1 - x * self.u_p * self.phi_p / self.phi_w - p - f_b) ** 2
-
-        eqn3 = eqn3_1 * (self.m_a - h_a) * (1 - f_a - f_b)
-        eqn4 = eqn4_1 * (self.m_b - h_b) * (1 - f_a - f_b)
-
-        return np.array([x - eqn1, p - eqn2,
-                         (1 - f_a) * h_a - eqn3, (1 - f_b) * h_b - eqn4])
-
-    def solv_eqns_f2(self, x, p, h_a, h_b):
-        """
-        Solution to the equations defining the fraction of hydrogen bonds
-
-        :param x: initial value for fraction of polymer hydrogen bonds
-        :param p: initial value for fraction of water hydrogen bonds
-        :param h_a: initial value for :math:`(h_+)`
-        :param h_b: initial value for :math:`(h_-)`
-        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
-
-        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
-        """
-
-        sol = fsolve(self.eqns_f2, np.array([x, p, h_a, h_b]))
-
-        return sol
-
-
-    def eqns_f3(self,val):
-        """
-        Equations determining the fraction of hydrogen bonds
-
-        :param val: ndarray containing :math:`(x, p, f_+, f_-)`
-        :return: equations (ndarray)
-        """
-        x, p, f_a, f_b = val
-
-        fac = 2 * (1-self.phi_p) * \
-              (1 - p  - x * self.u_p * self.phi_p / (1-self.phi_p) )
-
-        eqn1 = np.exp(self.df_p) * (1 - x) * fac
-        eqn2 = np.exp(self.df_w) * (1 - p) * fac
-
-        eqn3_1 = np.exp(1 + self.df_a) * (1-self.phi_p)  * \
-                 (1 - p )** 2  #
-        eqn4_1 = np.exp(1 + self.df_b) * (1-self.phi_p)  * \
-                 (1 - x * self.u_p *self.phi_p / (1-self.phi_p)  - p )** 2
-
-        eqn3 = self.m_a * self.nu_a * self.conc_l / self.D_w * eqn3_1
-        eqn4 = self.m_b * self.nu_b * self.conc_l / self.D_w * eqn4_1
-
-        return np.array([x - eqn1, p - eqn2, f_a *
-                         (1 + eqn3_1) - eqn3, f_b * (1 + eqn4_1) - eqn4])
-
-    def solv_eqns_f3(self,x, p, f_a, f_b):
-        """
-        Solution to the equations defining the fraction of hydrogen bonds
-        when :math:`(m_s)` is samll
-        
-        :param x: initial value for fraction of polymer hydrogen bonds
-        :param p: initial value for fraction of water hydrogen bonds
-        :param f_a: initial value for :math:`(f_+)`
-        :param f_b: initial value for :math:`(f_-)`
-        :return: number of hydrogen bonds ( OptimizeResultsObject_ )
-
-        .. _OptimizeResultsObject: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult
-        """
-
-        sol = fsolve(self.eqns_f3, np.array([x, p, f_a, f_b]))
-
-        return sol
-
-
-    def xy_secondorder(self,x_0,y_0):
-        """
-        Perturbative solution of to the equations defining the fraction of hydrogen bonds
-        when :math:`(m_s)` is samll
-        
-        :param x_0: initial value for fraction of polymer hydrogen bonds
-        :param y_0: initial value for fraction of water hydrogen bonds
-
-        :return: ndarray containing :first order perturbative solution of math:`(x, p, f_+, f_-)` \
-                                    second order perturbative solution of xmath:`(x, p, f_+, f_-)`
-
-        """
-
-        L_a1 =  np.exp(1 + self.df_a) * (1- self.phi_p) * (1 - y_0) ** 2
-        L_a = self.m_a * L_a1 / (1 + L_a1) * self.nu_a / self.D_w
-
-        L_b1 =  np.exp(1 + self.df_b) * (1- self.phi_p) * \
-                (1-y_0- x_0 * self.u_p * self.phi_p / (1- self.phi_p))**2
-        L_b = self.m_b * L_b1 / (1 + L_b1) * self.nu_b / self.D_w
-
-
-        A1 = 2 * np.exp(self.df_p) * (-1 + x_0) ** 2
-        A2 = 2 * np.exp(self.df_w) * (-1 + y_0) ** 2
-        F = (-1 + y_0 - L_b * self.u_s *self.D_w + self.phi_p -
-             y_0*self.phi_p + L_b * self.u_s * self.D_w * self.phi_p) / \
-            (self.u_s *self.D_w)
-
-        G1 = (- self.u_p * self.u_s * self.D_w*self.phi_p) / \
-             (self.u_s * self.D_w)
-        G2 = (- self.u_s * self.D_w + self.u_s *self.D_w *self.phi_p) / \
-             (self.u_s *self.D_w)
-        H = L_a * y_0
-        a_val = -((A1 * F - A1* G2* H)/(-1 + A1* G1 + A2 * G2))  # first order x
-        b_val = -((A2 * F - H + A1* G1* H)/(-1 + A1 *G1 + A2* G2)) # first order y
-
-        c_val_1 = np.exp(1+self.df_a) * self.nu_a * self.m_a * (y_0 - 1) * \
-                  (self.phi_p - 1) * (-2 * (b_val + L_a)* self.u_s * self.D_w + y_0 - 1)
-        c_val_2 = (-np.exp(1+self.df_a) * y_0 ** 2 * (self.phi_p - 1) +
-                   2 * np.exp(1+self.df_a) * y_0 * (self.phi_p - 1) -
-                   np.exp(1+self.df_a) * self.phi_p + np.exp(1+self.df_a) + 1)
-        c_val = c_val_1 / (self.u_s * self.D_w ** 2) / c_val_2 ** 2  # first order f_a
-
-        d_val_11 = np.exp(1+self.df_b) * self.nu_b * self.m_b * (self.phi_p - 1) * (
-                    -self.phi_p * (x_0 * self.u_p + 1) + y_0 * (self.phi_p - 1) + 1)
-        d_val_12 = (2 * self.u_s * self.D_w * (L_b + b_val +
-                    self.phi_p * (a_val * self.u_p - b_val- L_b) ) +
-                    x_0 * self.u_p * self.phi_p + y_0 * (
-                                self.phi_p - 1) - self.phi_p + 1)
-        d_val_1 = d_val_11 * d_val_12
-        d_val_21 = -2 * np.exp(1+self.df_b) * y_0 * (self.phi_p - 1) * \
-                   (self.phi_p * (x_0 * self.u_p + 1) - 1)
-        d_val_22 = np.exp(1+self.df_b) * self.phi_p ** 2 * (x_0 * self.u_p + 1) ** 2 \
-                   - self.phi_p * (
-                    2 * np.exp(1+self.df_b) * x_0 * self.u_p + 2 * np.exp(1+self.df_b) + 1) + \
-                   np.exp(1+self.df_b) * y_0 ** 2 * (
-                               self.phi_p - 1) ** 2 + np.exp(1+self.df_b) + 1
-        d_val_2 = self.u_s * self.D_w ** 2 * (d_val_21 + d_val_22) ** 2
-        d_val = d_val_1 / d_val_2 
-
-
-        A_11 = A1 * (1-self.phi_p) * (-1 + x_0)
-        A_22 = A2 * (1-self.phi_p) * (-1 + y_0)
-
-
-
-        B0_1 =  -((self.u_p * self.phi_p * (-a_val-(x_0) / (self.u_s *self.D_w))) /
-                  (1-self.phi_p)-b_val-L_b) / (self.u_s*self.D_w)
-        B0_2 =  -(a_val * self.u_p * self.phi_p)/((1-self.phi_p) *self.u_s*self.D_w)
-        B0_3 = -d_val + ((x_0 *self.u_p *self.phi_p) / (self.phi_p-1)-y_0+1) / \
-               (self.u_s ** 2*self.D_w ** 2)
-        B_0 = B0_1 + B0_2 + B0_3
-
-        B_1  = self.u_p * self.phi_p/(1-self.phi_p)
-        C_0 = -b_val ** 2 - b_val * L_a * y_0 - b_val * L_a + \
-              c_val * y_0 ** 2 - c_val * y_0 - L_a ** 2 * y_0
-
-        a_sec_1 = A_11*(-A_22*B_0+C_0)-(-a_val**2-A_11*B_0)*(-1+A_22+y_0)
-        a_sec_2 = A_11*A_22*B_1-(-1+A_11*B_1+x_0)*(-1+A_22+y_0)
-        a_sec = - a_sec_1 / a_sec_2
-
-        b_sec_1 = A_22*B_0+a_val**2*A_22*B_1-C_0+A_11*B_1*C_0-A_22*B_0*x_0+C_0*x_0
-        b_sec_2 = 1-A_22-A_11*B_1-x_0+A_22*x_0-y_0+A_11*B_1*y_0+x_0*y_0
-        b_sec = - b_sec_1 / b_sec_2
-
-
-        return np.array([a_val, b_val, c_val, d_val,
-                         a_sec * self.conc**2, b_sec * self.conc**2,
-                         (c_val-L_a*L_b) * self.conc**2,
-                         (d_val-L_a*L_b)* self.conc**2])
 
 
