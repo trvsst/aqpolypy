@@ -26,7 +26,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     """
 
     def __init__(
-                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p,
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_s,
                  param_s):
 
         """
@@ -39,9 +39,10 @@ class Polymer_hydrogen_bond_shell_solver(object):
         :param df_w: free energy change upon formation of hydrogen bond \
         in water (in :math:`k_BT` units)
         :param x_ini: fraction of polymer hydrogen bonds
-        :param p_ini: fraction of water hydrogen bonds
+        :param p_ini: fraction of water hydrogen bonds        
         :param n_k: number of Kuhn lengths for the polymer
         :param chi_p: Flory Huggins parameter
+        :param chi_s: Flory Huggins parameter between polymer and salt        
         :param param_s: microscopic salt parameters \
         :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
         (number of water molecules \
@@ -65,8 +66,14 @@ class Polymer_hydrogen_bond_shell_solver(object):
         self.u_a = param_salt[1]
         self.u_b = param_salt[2]
         self.u_s = 1 / (1 / self.u_a + 1 /self.u_b)
-
-        self.D_w = 55.509 # mol/kg water
+        
+        
+        self.T = temp
+        salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
+        obj_water_bp = wbp.WaterPropertiesFineMillero(self.T)
+        v_w = obj_water_bp.molar_volume() # molar volume of water 
+        den = obj_water_bp.density() # density of water in SI unit from Ref[4]
+        self.D_w = 1 / den / v_w #55.509 # mol/kg water  
 
         # volume fractions
         self.phi_p = param_poly[0]
@@ -112,7 +119,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     def eqns_xy(self, val):
         """
         Equations determining the fraction of hydrogen bonds x, y
-        when :math:`(f_+, f_-)` is samll
+        when :math:`(f_+, f_-)` is small
 
         :param val: ndarray containing x,p
         :return: equations (ndarray)
@@ -130,7 +137,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     def solv_eqns_xy(self, x, p):
         """
         Solution to the equations defining the fraction of hydrogen bonds x, y
-        when :math:`(f_+, f_-)` is samll
+        when :math:`(f_+, f_-)` is small
 
         :param x: initial value for fraction of polymer hydrogen bonds
         :param p: initial value for fraction of water hydrogen bonds
@@ -146,7 +153,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     def eqns_h(self, val):
         """
         Equations determining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
+        when :math:`(f_+, f_-)` is small
 
         :param val: ndarray containing :math:`(h_+, h_-)`
         :return: equations (ndarray)
@@ -168,7 +175,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     def solv_eqns_h(self, h_a, h_b):
         """
         Solution to the equations defining the fraction of hydrogen bonds
-        when :math:`(f_+, f_-)` is samll
+        when :math:`(f_+, f_-)` is small
 
         :param h_a: initial value for :math:`(h_+)`
         :param h_b: initial value for :math:`(h_-)`
@@ -232,7 +239,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
         """
         Equations determining the fraction of hydrogen bonds
         and number of water molecules forming the hydration shell
-        when :math:`(m_s)` is samll
+        when :math:`(m_s)` is small
 
         :param val: ndarray containing :math:`(x, p, f_+, f_-)`
         :return: equations (ndarray)
@@ -260,7 +267,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
         """
         Solution to the equations defining the fraction of hydrogen bonds
         and number of water molecules forming the hydration shell
-        when :math:`(m_s)` is samll
+        when :math:`(m_s)` is small
 
         :param x: initial value for fraction of polymer hydrogen bonds
         :param p: initial value for fraction of water hydrogen bonds
@@ -308,7 +315,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
         """
         First order perturbative solution of to the equations defining
         the fraction of hydrogen bonds
-        when :math:`(m_s)` is samll
+        when :math:`(m_s)` is small
 
         :param x: initial value for fraction of polymer hydrogen bonds
         :param y: initial value for fraction of water hydrogen bonds
@@ -359,7 +366,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
         """
         Second order perturbative solution of to the equations defining
         the fraction of hydrogen bonds
-        when :math:`(m_s)` is samll
+        when :math:`(m_s)` is small
 
         :param x_0: initial value for fraction of polymer hydrogen bonds
         :param y_0: initial value for fraction of water hydrogen bonds
@@ -471,7 +478,7 @@ class PolymerSolutionSalts(object):
     """
 
     def __init__(
-                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p,
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_s,
                  param_s):
 
         """
@@ -486,7 +493,8 @@ class PolymerSolutionSalts(object):
         :param x_ini: fraction of polymer hydrogen bonds
         :param p_ini: fraction of water hydrogen bonds
         :param n_k: number of Kuhn lengths for the polymer
-        :param chi_p: Flory Huggins parameter
+        :param chi_p: Flory Huggins parameter between water and polymer
+        :param chi_s: Flory Huggins parameter between polymer and salt
         :param param_s: microscopic salt parameters \
         :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
         (number of water molecules \
@@ -520,15 +528,15 @@ class PolymerSolutionSalts(object):
                                             param_saltolute,
                                             m_solvent)
 
-
-
         # molecular volumes
         self.u_p = param_poly[1]
         self.u_a = param_salt[1]
         self.u_b = param_salt[2]
         self.u_s = 1 / (1 / self.u_a + 1 /self.u_b)
-
-        self.D_w = 55.509 # mol/kg water
+        
+        v_w = obj_water_bp.molar_volume() # molar volume of water 
+        den = obj_water_bp.density() # density of water in SI unit from Ref[4]
+        self.D_w = 1 / den / v_w #55.509 # mol/kg water
 
         # volume fractions
         self.phi_p = param_poly[0]
@@ -543,6 +551,7 @@ class PolymerSolutionSalts(object):
         # polymer and polymer interaction parameters
         self.n = n_k
         self.chi_p = chi_p
+        self.chi_s = chi_s
 
         # hydration numbers
         self.h_a = param_s[0]
@@ -616,6 +625,8 @@ class PolymerSolutionSalts(object):
         f_ref_2 = lg(self.phi_w, self.phi_w / np.exp(1))
 
         f_int_1 = self.chi_p * self.phi_p * self.phi_w
+        
+        f_int_2 = self.chi_s * self.phi_p * self.phi_s
 
         f_as_1_1 = (lg(self.x, self.x) + lg(1 - self.x, 1 - self.x)
                     - self.x * self.df_p)
@@ -652,7 +663,7 @@ class PolymerSolutionSalts(object):
         f_as_0 = self.phi_w * (f_as_0_1 + f_as_0_2)
 
         f_ref_all = f_ref_11 + f_ref_12 + f_ref_2
-        f_int_all = f_int_1
+        f_int_all = f_int_1 + f_int_2 
         f_as_all = (f_as_1 + f_as_2 + f_as_3 + f_as_4 + f_as_5
                     + f_as_6 + f_as_7 + f_as_0)
 
@@ -661,7 +672,7 @@ class PolymerSolutionSalts(object):
         f_exc = f_exc_0 * f_exc_1
 
 
-        return f_ref_all + f_int_all + f_as_all + f_exc
+        return f_ref_all + f_int_all + f_as_all + f_exc # f_exc # 
 
     def chem_potential_w(self):
         """
@@ -706,9 +717,11 @@ class PolymerSolutionSalts(object):
         mu_11 = mu_11_1 + mu_11_2
 
         mu_12 = self.nu * self.conc_l / self.D_w * (1 - self.osm )
+        
+        mu_chi = - self.chi_s * self.phi_p * self.phi_s
 
-        return (mu_0 + mu_1 + mu_2 + mu_3  + mu_4
-                + mu_5 + mu_6 + mu_11 + mu_12)
+        return (mu_0 + mu_1 + mu_2 + mu_3  + mu_4 
+                + mu_5 + mu_6 + mu_11 + mu_12 + mu_chi)
 
     def chem_potential_w_full(self):
         """
@@ -797,8 +810,9 @@ class PolymerSolutionSalts(object):
 
         mu_9 = self.nu * self.gamma
 
-
-        return (mu_0 + mu_1 + mu_2 + mu_3 + mu_8 + mu_9)
+        mu_chi = self.chi_s * self.phi_p * (1 - self.phi_s) / self.u_s
+        
+        return (mu_0 + mu_1 + mu_2 + mu_3 + mu_8 + mu_9 +mu_chi)
 
     def chem_potential_s_full(self):
         """
@@ -881,8 +895,10 @@ class PolymerSolutionSalts(object):
         mu_5_0 = self.u_p * (np.log(2 * self.phi_w / np.exp(1)) - self.phi_p)
 
         mu_5 = -2 * self.n / self.u_p * (self.x * mu_5_0 - self.p * self.phi_w)
+        
+        mu_chi = self.chi_s * (1 - self.phi_p) * self.phi_s * self.n / self.u_p      
 
-        return (mu_1 + mu_2 + mu_3 + mu_4 + mu_5)
+        return (mu_1 + mu_2 + mu_3 + mu_4 + mu_5 + mu_chi)
 
     def chem_potential_p_full(self):
         """
