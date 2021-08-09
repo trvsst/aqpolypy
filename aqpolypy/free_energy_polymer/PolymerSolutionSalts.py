@@ -26,7 +26,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
     """
 
     def __init__(
-                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_s,
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e,
                  param_s):
 
         """
@@ -42,7 +42,7 @@ class Polymer_hydrogen_bond_shell_solver(object):
         :param p_ini: fraction of water hydrogen bonds        
         :param n_k: number of Kuhn lengths for the polymer
         :param chi_p: Flory Huggins parameter
-        :param chi_s: Flory Huggins parameter between polymer and salt        
+        :param chi_e: Flory Huggins parameter between polymer and salt        
         :param param_s: microscopic salt parameters \
         :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
         (number of water molecules \
@@ -478,7 +478,7 @@ class PolymerSolutionSalts(object):
     """
 
     def __init__(
-                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_s,
+                 self, param_poly, param_salt, temp, df_w, x_ini, p_ini, n_k, chi_p, chi_e,
                  param_s):
 
         """
@@ -494,7 +494,7 @@ class PolymerSolutionSalts(object):
         :param p_ini: fraction of water hydrogen bonds
         :param n_k: number of Kuhn lengths for the polymer
         :param chi_p: Flory Huggins parameter between water and polymer
-        :param chi_s: Flory Huggins parameter between polymer and salt
+        :param chi_e: Flory Huggins parameter between polymer and salt
         :param param_s: microscopic salt parameters \
         :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
         (number of water molecules \
@@ -859,7 +859,7 @@ class PolymerSolutionSalts(object):
         mu_7_2 = mu_7_2_1 * mu_7_2_0 * mu_7_0 / z_val ** 2 / self.phi_w
         mu_7 = - self.phi_w / self.u_s * (mu_7_1 * np.log(mu_7_2))
 
-        return ( self.chem_potential_s() + mu_4
+        return (self.chem_potential_s() + mu_4
                 + mu_5 + mu_6 + mu_7)
 
     def chem_potential_p(self):
@@ -945,7 +945,7 @@ class PolymerSolutionSalts(object):
         mu_9 = - self.n / self.u_p * self.phi_w * (mu_9_1) * np.log(mu_9_2)
 
 
-        return ( self.chem_potential_p() + mu_6 + mu_7
+        return (self.chem_potential_p() + mu_6 + mu_7
                 + mu_8 + mu_9)
 
 
