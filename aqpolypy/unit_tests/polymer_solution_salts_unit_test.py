@@ -16,6 +16,8 @@ import aqpolypy.units.units as un
 
 import aqpolypy.water.WaterMilleroBP as wbp
 
+import aqpolypy.salt.SaltNaClRP as nacl  
+
 class TestPolymerwithSalts(unittest.TestCase):
 ###### self.D_w need to be fixed at 55.509  to pass this test
     def test_free_c(self):
@@ -35,13 +37,17 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
-
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])
 
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
+        
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])        
+        
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -73,14 +79,19 @@ class TestPolymerwithSalts(unittest.TestCase):
         chi_p = 0.5
         chi_s = 0.4
 
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
-
+        #param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1, 0., 0.])
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])
 
 
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
+        
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])
+
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -110,12 +121,17 @@ class TestPolymerwithSalts(unittest.TestCase):
         chi_p = 0.5
         chi_s = 0.4
 
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
+        #param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1, 0., 0.])
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])        
 
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
         free = np.zeros_like(phi_val)
 
         for ind, phi_p in enumerate(phi_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])
+                    
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -166,11 +182,15 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
-
+        #param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1, 0., 0.])
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])
 
 
         for ind, phi_p in enumerate(phi_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])        
+        
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -178,13 +198,7 @@ class TestPolymerwithSalts(unittest.TestCase):
             potential_s[ind] = polymer_sol.chem_potential_s_full()
             potential_p[ind] = polymer_sol.chem_potential_p_full()
    
-        #dw = np.array([0.00113843, 0.00113843, 0.00113843, 0.00113843, 0.00113843,
-        #             0.00113843, 0.00113843, 0.00113843, 0.00113843, 0.00113843])
-        #ds = np.array([-0.80911723, -0.80911723, -0.80911723, -0.80911723, -0.80911723,
-        #               -0.80911723, -0.80911723, -0.80911723, -0.80911723, -0.80911723])
-        #dp = np.array([ 9.09494702e-13,  0.00000000e+00, -1.13686838e-13, -5.68434189e-14,
-         #              0.00000000e+00,  5.68434189e-13,  4.26325641e-13,  3.69482223e-13,
-         #              -3.69482223e-13,  1.42108547e-14])
+
         dw = np.array([0.00113844, 0.00113844, 0.00113844, 0.00113844, 0.00113844,
                        0.00113844, 0.00113844, 0.00113844, 0.00113844, 0.00113844])
         ds = np.array([-0.80911723, -0.80911723, -0.80911723, -0.80911723, -0.80911723,
@@ -241,12 +255,16 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
-
+        #param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1, 0., 0.])
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])
 
         c_val = np.linspace(0.1, 0.8, num_pnts)
 
         for ind, c_s in enumerate(c_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(c_s)
+            param_s[9] = S_para.osmotic_coeff(c_s)        
+        
             polymer_sol = Pss.PolymerSolutionSalts(v_p, 
                                                    np.array([c_s, 1, 1, -100/3, -100/3]), 
                                                    temp, df_w, x_ini, p_ini, 
@@ -281,7 +299,8 @@ class TestPolymerwithSalts(unittest.TestCase):
         chi_p = 0.5
         chi_s = 0.4
 
-        param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1])
+        #param_s = np.array([7, 7, 1, 1, 8, 8, 1, 1, 0., 0.])
+        param_s = np.array([7., 7., 1., 1., 8., 8., 1., 1., 0., 0.])        
         
         obj_water_bp = wbp.WaterPropertiesFineMillero(temp )
         v_w = obj_water_bp.molar_volume() # molar volume of water 
@@ -289,6 +308,10 @@ class TestPolymerwithSalts(unittest.TestCase):
         D_w = 1 / den / v_w #55.509 # mol/kg water        
 
         for ind, phi_p in enumerate(phi_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])  
+        
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -339,7 +362,7 @@ class TestPolymerwithSalts(unittest.TestCase):
         chi_p = 0.5
         chi_s = 0.4
 
-        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])  
+        param_s = np.array([5., 5., 1., 1., 8., 8., 1., 1., 0., 0.])          
         num_pnts = 10
 
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
@@ -364,6 +387,10 @@ class TestPolymerwithSalts(unittest.TestCase):
         y_comp_2 = np.zeros_like(phi_val)    
         
         for ind, phi_p in enumerate(phi_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0])         
+        
             Polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s)
@@ -376,7 +403,8 @@ class TestPolymerwithSalts(unittest.TestCase):
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_comp[ind], y_comp[ind], 
                                                    n_k, chi_p, chi_s, 
-                                                   np.array([ha_comp[ind], hb_comp[ind], 1, 1, 8, 8, 1, 1]))
+                                                   np.array([ha_comp[ind], hb_comp[ind], \
+                                                   1, 1, 8, 8, 1, 1, param_s[8], param_s[9]]))
             
             x_comp_2[ind] = polymer_sol_2.solv_eqns(x_ini,p_ini)[0]
             y_comp_2[ind] = polymer_sol_2.solv_eqns(x_ini,p_ini)[1]
@@ -412,7 +440,9 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])  
+        #param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1, 0., 0.]) 
+        param_s = np.array([5., 5., 1., 1., 8., 8., 1., 1., 0., 0.])  
+                 
         num_pnts = 10
 
         phi_val = np.linspace(1e-1, 0.8, num_pnts)
@@ -432,6 +462,10 @@ class TestPolymerwithSalts(unittest.TestCase):
         hb_comp = np.zeros_like(phi_val)         
         
         for ind, phi_p in enumerate(phi_val):
+            S_para = nacl.NaClPropertiesRogersPitzer(tk=temp, pa=1)
+            param_s[8] = S_para.log_gamma(v_s[0])
+            param_s[9] = S_para.osmotic_coeff(v_s[0]) 
+        
             Polymer_sol = Pss.Polymer_hydrogen_bond_shell_solver(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_ini, p_ini, 
                                                    n_k, chi_p, chi_s, param_s) 
@@ -442,7 +476,8 @@ class TestPolymerwithSalts(unittest.TestCase):
             polymer_sol = Pss.PolymerSolutionSalts(np.array([phi_p, 1/3, 10/3]), 
                                                    v_s, temp, df_w, x_comp[ind], y_comp[ind], 
                                                    n_k, chi_p, chi_s, 
-                                                   np.array([ha_comp[ind], hb_comp[ind], 1, 1, 8, 8, 1, 1]))           
+                                                   np.array([ha_comp[ind], hb_comp[ind], \
+                                                   1, 1, 8, 8, 1, 1, param_s[8], param_s[9]]))        
             
             w_comp[ind] = polymer_sol.chem_potential_w_full()
             s_comp[ind] = polymer_sol.chem_potential_s_full()
@@ -470,7 +505,8 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4 
-        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        #param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        param_s = np.array([5., 5., 1., 1., 8., 8., 1., 1., 0., 0.])          
         
         num_puts = 10
 
@@ -560,7 +596,8 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        #param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        param_s = np.array([5., 5., 1., 1., 8., 8., 1., 1., 0., 0.])          
 
 
         x_sol = np.zeros_like(con) # exact
@@ -633,7 +670,8 @@ class TestPolymerwithSalts(unittest.TestCase):
         n_k = 100
         chi_p = 0.5
         chi_s = 0.4
-        param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        #param_s = np.array([5, 5, 1, 1, 8, 8, 1, 1])
+        param_s = np.array([5., 5., 1., 1., 8., 8., 1., 1., 0., 0.])          
         
         num_puts = 10
 

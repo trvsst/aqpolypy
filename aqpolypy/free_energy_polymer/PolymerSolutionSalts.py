@@ -16,7 +16,6 @@ from scipy.optimize import fsolve
 
 import aqpolypy.units.concentration as con
 import aqpolypy.water.WaterMilleroBP as wbp
-import aqpolypy.salt.SaltNaClRP as nacl
 
 
 class Polymer_hydrogen_bond_shell_solver(object):
@@ -44,10 +43,11 @@ class Polymer_hydrogen_bond_shell_solver(object):
         :param chi_p: Flory Huggins parameter
         :param chi_e: Flory Huggins parameter between polymer and salt        
         :param param_s: microscopic salt parameters \
-        :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
+        :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-, log(gamma), osm)` \
         (number of water molecules \
         forming the hydration shell, diameter, maximum number of water \
-        molecules that maybe bound to each ion,  the number of ions per salt)
+        molecules that maybe bound to each ion,  the number of ions per salt,\
+        activity coefficient, osmotic coefficient) 
 
         the parameter param_salt is given by
         :math:`(m_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
@@ -69,7 +69,6 @@ class Polymer_hydrogen_bond_shell_solver(object):
         
         
         self.T = temp
-        salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
         obj_water_bp = wbp.WaterPropertiesFineMillero(self.T)
         v_w = obj_water_bp.molar_volume() # molar volume of water 
         den = obj_water_bp.density() # density of water in SI unit from Ref[4]
@@ -496,10 +495,11 @@ class PolymerSolutionSalts(object):
         :param chi_p: Flory Huggins parameter between water and polymer
         :param chi_e: Flory Huggins parameter between polymer and salt
         :param param_s: microscopic salt parameters \
-        :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-)` \
+        :math:`(h_+, h_-, d_+, d_-, m_+, m_-, \\nu_+, \\nu_-, log(gamma), osm)` \
         (number of water molecules \
         forming the hydration shell, diameter, maximum number of water \
-        molecules that maybe bound to each ion,  the number of ions per salt)
+        molecules that maybe bound to each ion,  the number of ions per salt,\
+        activity coefficient, osmotic coefficient) 
 
         the parameter param_salt is given by
         :math:`(m_s, \\frac{\\upsilon_w}{\\upsilon_+}, \
@@ -516,17 +516,17 @@ class PolymerSolutionSalts(object):
 
         self.T = temp
 
-        salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
+        #salt_nacl = nacl.NaClPropertiesRogersPitzer(self.T)
+        #param_saltolvent = obj_water_bp.molar_volume()
+        #m_solvent = obj_water_bp.MolecularWeight
+        #param_saltolute = salt_nacl.molar_vol(self.conc_l)
+
+        #self.conc = con.molality_2_molarity(self.conc_l,
+                                            #param_saltolvent,
+                                            #param_saltolute,
+                                            #m_solvent)
+
         obj_water_bp = wbp.WaterPropertiesFineMillero(self.T)
-
-        param_saltolvent = obj_water_bp.molar_volume()
-        m_solvent = obj_water_bp.MolecularWeight
-        param_saltolute = salt_nacl.molar_vol(self.conc_l)
-
-        self.conc = con.molality_2_molarity(self.conc_l,
-                                            param_saltolvent,
-                                            param_saltolute,
-                                            m_solvent)
 
         # molecular volumes
         self.u_p = param_poly[1]
@@ -546,12 +546,13 @@ class PolymerSolutionSalts(object):
         self.V_all = (self.param_salt + self.V_w) / (1 - self.phi_p)
 
         self.phi_s = self.param_salt / self.V_all
+
         self.phi_w = self.V_w / self.V_all
 
         # polymer and polymer interaction parameters
         self.n = n_k
         self.chi_p = chi_p
-        self.chi_s = chi_s
+        self.chi_e = chi_e
 
         # hydration numbers
         self.h_a = param_s[0]
@@ -597,11 +598,14 @@ class PolymerSolutionSalts(object):
 
         self.dydp = self.p / self.phi_w
         self.dyds = self.p / self.phi_w
-
-        S_para = nacl.NaClPropertiesRogersPitzer(tk=self.T, pa=1)
-
-        self.gamma = S_para.log_gamma(self.conc_l)
-        self.osm = S_para.osmotic_coeff(self.conc_l)
+        
+        
+        self.gamma = param_s[8]
+        self.osm = param_s[9]
+        
+        #S_para = nacl.NaClPropertiesRogersPitzer(tk=self.T, pa=1)
+        #self.gamma = S_para.log_gamma(self.conc_l)
+        #self.osm = S_para.osmotic_coeff(self.conc_l)
 
         self.A_a = self.nu_a * self.m_a * self.conc_l / self.D_w
         self.B_b = self.nu_b * self.m_b * self.conc_l / self.D_w
@@ -626,7 +630,7 @@ class PolymerSolutionSalts(object):
 
         f_int_1 = self.chi_p * self.phi_p * self.phi_w
         
-        f_int_2 = self.chi_s * self.phi_p * self.phi_s
+        f_int_2 = self.chi_e * self.phi_p * self.phi_s
 
         f_as_1_1 = (lg(self.x, self.x) + lg(1 - self.x, 1 - self.x)
                     - self.x * self.df_p)
@@ -718,7 +722,7 @@ class PolymerSolutionSalts(object):
 
         mu_12 = self.nu * self.conc_l / self.D_w * (1 - self.osm )
         
-        mu_chi = - self.chi_s * self.phi_p * self.phi_s
+        mu_chi = - self.chi_e * self.phi_p * self.phi_s
 
         return (mu_0 + mu_1 + mu_2 + mu_3  + mu_4 
                 + mu_5 + mu_6 + mu_11 + mu_12 + mu_chi)
@@ -810,7 +814,7 @@ class PolymerSolutionSalts(object):
 
         mu_9 = self.nu * self.gamma
 
-        mu_chi = self.chi_s * self.phi_p * (1 - self.phi_s) / self.u_s
+        mu_chi = self.chi_e * self.phi_p * (1 - self.phi_s) / self.u_s
         
         return (mu_0 + mu_1 + mu_2 + mu_3 + mu_8 + mu_9 +mu_chi)
 
@@ -896,7 +900,7 @@ class PolymerSolutionSalts(object):
 
         mu_5 = -2 * self.n / self.u_p * (self.x * mu_5_0 - self.p * self.phi_w)
         
-        mu_chi = self.chi_s * (1 - self.phi_p) * self.phi_s * self.n / self.u_p      
+        mu_chi = self.chi_e * (1 - self.phi_p) * self.phi_s * self.n / self.u_p      
 
         return (mu_1 + mu_2 + mu_3 + mu_4 + mu_5 + mu_chi)
 
