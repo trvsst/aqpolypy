@@ -6,7 +6,7 @@ setup(
     author='A. Travesset',
     author_email='trvsst@ameslab.gov',
     packages=['aqpolypy'],
-    scripts=['bin/units_example.py'],
+    # scripts=['bin/units_example.py'],
     url='http://pypi.python.org/pypi/TowelStuff/',
     license='LICENSE.txt',
     description='Polymers, hydrogen bonds and electrolytes.',

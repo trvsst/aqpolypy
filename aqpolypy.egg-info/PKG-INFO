@@ -1,4 +1,4 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: aqpolypy
 Version: 0.5.0
 Summary: Polymers, hydrogen bonds and electrolytes.
@@ -6,40 +6,41 @@ Home-page: http://pypi.python.org/pypi/TowelStuff/
 Author: A. Travesset
 Author-email: trvsst@ameslab.gov
 License: LICENSE.txt
-Description: aqpolypy
-        ===========
-        
-        aqpolypy: Povides a set of tools to analyze phase diagrams of polymers in aqueous systems, incuding electrolutes
-        it most useful for tasks involving hydrogen bonding polymers and electrolytes at arbitrary concentrations. Typical usage
-        often looks like this::
-        
-            #!/usr/bin/env python
-        
-            aqpolypy.water.WaterMilleroBP as wp
-        
-            wp.waterPropertiesFineMillero(300)
-        
-        
-        Paragraphs are separated by blank lines. *Italics*, **bold**,
-        and ``monospace``
-        
-        
-        A Section
-        =========
-        
-        Lists look like this:
-        
-        * First
-        
-        * Second. Can be multiple lines
-          but must be indented properly.
-        
-        A Sub-Section
-        -------------
-        
-        Numbered lists look like you'd expect:
-        
-        1. hi there
-        
-        2. must be going
-Platform: UNKNOWN
+License-File: LICENSE.txt
+
+aqpolypy
+===========
+
+aqpolypy: Povides a set of tools to analyze phase diagrams of polymers in aqueous systems, incuding electrolutes
+it most useful for tasks involving hydrogen bonding polymers and electrolytes at arbitrary concentrations. Typical usage
+often looks like this::
+
+    #!/usr/bin/env python
+
+    aqpolypy.water.WaterMilleroBP as wp
+
+    wp.waterPropertiesFineMillero(300)
+
+
+Paragraphs are separated by blank lines. *Italics*, **bold**,
+and ``monospace``
+
+
+A Section
+=========
+
+Lists look like this:
+
+* First
+
+* Second. Can be multiple lines
+  but must be indented properly.
+
+A Sub-Section
+-------------
+
+Numbered lists look like you'd expect:
+
+1. hi there
+
+2. must be going
