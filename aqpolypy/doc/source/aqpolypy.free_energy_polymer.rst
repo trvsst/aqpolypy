@@ -27,7 +27,15 @@ BinaryBrushSuperLattice
     :members:
     :undoc-members:
     :show-inheritance:
-    
+
+ElectrolyteSolution
+-------------------
+
+.. automodule:: aqpolypy.free_energy_polymer.ElectrolyteSolution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 PolymerSolution
 ---------------
 
