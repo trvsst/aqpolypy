@@ -14,7 +14,6 @@ from scipy.special import xlogy as lg
 from scipy.optimize import fsolve
 import aqpolypy.units.units as un
 import aqpolypy.water.WaterMilleroBP as fm
-import aqpolypy.salts_theory.Bjerrum as Bj
 
 class ElectrolyteSolution(object):
     """
@@ -59,7 +58,7 @@ class ElectrolyteSolution(object):
         # water model at the given temperature
         self.press = press
         wfm = fm.WaterPropertiesFineMillero(self.tp, self.press)
-        self.a_gamma = Bj.Bjerrum(wfm).a_gamma
+        self.a_gamma = 3*wfm.a_phi()
 
         # molecular volume
         self.u_w = param_w['v_w']
@@ -270,3 +269,24 @@ class ElectrolyteSolution(object):
         val = np.sqrt(i_str)
 
         return -2*self.a_gamma*val/(1+b_g*val)
+
+    def f_assoc(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=0):
+        """
+        Defines the total free energy
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        :param k_ref: reference compressibility for the compressibility free energy
+        :param b_g: parameter defining the extension for the electrostatic free energy
+        """
+
+        f_i = self.f_ideal(nw_i, ns_i)
+        f_a = self.f_assoc(nw_i, ns_i, y, za, zd, fb)
+        f_c = self.f_comp(nw_i, ns_i, fb, k_ref)
+        f_d = self.f_debye(nw_i, ns_i, fb, b_g)
+
+        return f_i + f_a + f_c + f_d
