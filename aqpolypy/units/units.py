@@ -51,7 +51,7 @@ def delta_w():
     :rtype: float
     """
 
-    m_h20 = 18.01528
+    m_h20 = 18.015268
 
     return 1000/m_h20
 
