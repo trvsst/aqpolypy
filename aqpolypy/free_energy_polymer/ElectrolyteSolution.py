@@ -13,13 +13,15 @@ from scipy.special import xlogy as lg
 
 from scipy.optimize import fsolve
 import aqpolypy.units.units as un
+import aqpolypy.water.WaterMilleroBP as fm
+import aqpolypy.salts_theory.Bjerrum as Bj
 
 class ElectrolyteSolution(object):
     """
     Class defining an electrolyte solution
     """
 
-    def __init__(self, temp, param_w, param_salt, param_h):
+    def __init__(self, temp, param_w, param_salt, param_h, press=1.01325):
 
         """
         The constructor, with the following parameters
@@ -28,6 +30,7 @@ class ElectrolyteSolution(object):
         :param param_w: water parameters (see definition below)
         :param param_salt: salt parameters (see definition below)
         :param param_h: hydration layer parameters, see below
+        :param press: pressure in bars, default is 1 atm
 
         the parameters param_w is a dictionary with
         :math:`v\_w = \\upsilon_w, de\\_w = \\Delta E_w, ds\\_w = \\Delta S_w, de\\_2d=\\Delta E_{2d}, \
@@ -52,6 +55,11 @@ class ElectrolyteSolution(object):
 
         # temperature
         self.tp = temp
+
+        # water model at the given temperature
+        self.press = press
+        wfm = fm.WaterPropertiesFineMillero(self.tp, self.press)
+        self.a_gamma = Bj.Bjerrum(wfm).a_gamma
 
         # molecular volume
         self.u_w = param_w['v_w']
@@ -253,7 +261,7 @@ class ElectrolyteSolution(object):
         :param nw_i: water number density
         :param ns_i: salt number density
         :param fb: fraction of Bjerrum pairs
-        :param b_g: parameter defining the free energy
+        :param b_g: parameter defining the extension for the free energy
         """
 
         molal = self.delta_w*ns_i/nw_i
@@ -261,6 +269,4 @@ class ElectrolyteSolution(object):
         i_str = (1-fb)*molal
         val = np.sqrt(i_str)
 
-        a_gamma = 1.0
-
-        return -2*a_gamma*val/(1+b_g*val)
+        return -2*self.a_gamma*val/(1+b_g*val)
