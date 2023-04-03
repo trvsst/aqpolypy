@@ -43,6 +43,19 @@ def r_gas():
     return avogadro() * k_boltzmann()
 
 
+def delta_w():
+    """
+    The quantity :math:`\\\Delta_w=\\frac{10^3}{M_{H20}}`
+
+    :return: :math:`\\\Delta_w=`
+    :rtype: float
+    """
+
+    m_h20 = 18.01528
+
+    return 1000/m_h20
+
+
 def joule_2_cal(e):
     """
     Conversion of joule to calories

@@ -25,6 +25,10 @@ class TestUnits(unittest.TestCase):
         # avogadro = 6.0221365e23
         self.assertEqual(un.avogadro(), 6.0221365e23)
 
+    def test_deltaw(self):
+        # delta_w = 55.508435061791985
+        self.assertEqual(un.delta_w(), 55.508435061791985)
+
     # Testing r gas
     def test_r_gas(self):
         # r gas constant = boltzmann * avogadro

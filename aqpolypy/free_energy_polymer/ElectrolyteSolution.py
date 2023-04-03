@@ -12,7 +12,7 @@ import numpy as np
 from scipy.special import xlogy as lg
 
 from scipy.optimize import fsolve
-import aqpolypy.units.concentration as con
+import aqpolypy.units.units as un
 
 class ElectrolyteSolution(object):
     """
@@ -46,6 +46,9 @@ class ElectrolyteSolution(object):
         hb\\_p0 = h^B_{(+,0)}, hb\\_p1 = h^B_{(+,1)}, h^B\\_p2 = h^B_{(+,2)}, \
         hb\\_m0 = h^B_{(-,0)}, hb\\_m1 = h^B_{(-,1)}, h^B\\_m2 = h^B_{(-,2)}`
         """
+
+        # constants
+        self.delta_w = un.delta_w()
 
         # temperature
         self.tp = temp
@@ -239,7 +242,7 @@ class ElectrolyteSolution(object):
         """
 
         k_param = self.u_w/(self.tp*k_ref)
-        v0 = nw_i * self.u_w +  ((1-fb)*self.u_s+fb*self.u_bs)*ns_i
+        v0 = nw_i * self.u_w+((1-fb)*self.u_s+fb*self.u_bs)*ns_i
 
         return 0.5*k_param*(1-v0)**2/v0
 
@@ -253,7 +256,7 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the free energy
         """
 
-        molal = ns_i/nw_i
+        molal = self.delta_w*ns_i/nw_i
 
         i_str = (1-fb)*molal
         val = np.sqrt(i_str)
