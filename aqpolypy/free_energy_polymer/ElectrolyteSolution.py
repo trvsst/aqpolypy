@@ -242,3 +242,22 @@ class ElectrolyteSolution(object):
         v0 = nw_i * self.u_w +  ((1-fb)*self.u_s+fb*self.u_bs)*ns_i
 
         return 0.5*k_param*(1-v0)**2/v0
+
+    def f_debye(self, nw_i, ns_i, fb, b_g=0):
+        """
+        Defines the Debye-Huckel contribution
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param fb: fraction of Bjerrum pairs
+        :param b_g: parameter defining the free energy
+        """
+
+        molal = ns_i/nw_i
+
+        i_str = (1-fb)*molal
+        val = np.sqrt(i_str)
+
+        a_gamma = 1.0
+
+        return -2*a_gamma*val/(1+b_g*val)
