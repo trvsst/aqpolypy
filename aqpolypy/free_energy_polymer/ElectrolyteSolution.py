@@ -66,8 +66,8 @@ class ElectrolyteSolution(object):
         # energies and entropies
         self.e_w = param_w['de_w']
         self.s_w = param_w['se_w']
-        self.e_2d = param_w['de_2w']
-        self.s_2d = param_w['ds_2w']
+        self.e_2d = param_w['de_2d']
+        self.s_2d = param_w['ds_2d']
         self.e_2a = param_w['de_2a']
         self.s_2a = param_w['ds_2a']
 
