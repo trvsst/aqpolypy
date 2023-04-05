@@ -58,5 +58,13 @@ class TestFreeEnergy(unittest.TestCase):
         test_c = np.allclose(comp_comp, vals_comp, 0, 1e-6)
         self.assertTrue(test_c)
 
+    def test_free_debye_huckel(self):
+
+        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.0, 0.5, 1.0, 1.0])
+        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
+        test_bpar = np.array([0.0, 0.0, 0.5, 1.0])
+
 if __name__ == '__main__':
     unittest.main()
