@@ -217,7 +217,7 @@ class ElectrolyteSolution(object):
         t_15_2 = 2*n_s*(lg(1-fb, 1-fb)+lg(fb, fb))-lg(n_s*fb, n_s*fb)
         t_15 = t_15_1+t_15_2
 
-        t_16 = -2*lg(n_w, n_w)-2*y*n_w*(np.log(2)-1)+n_s*(fb(1+self.h_bp+self.h_bm)+(1-fb)*(self.h_p+self.h_m))
+        t_16 = -2*lg(n_w, n_w)-2*y*n_w*(np.log(2)-1)+n_s*(fb*(1+self.h_bp+self.h_bm)+(1-fb)*(self.h_p+self.h_m))
 
         t_s = t_0+t_1+t_2+t_3+t_4+t_5+t_6+t_7+t_8+t_9+t_10+t_11+t_12+t_13+t_14+t_15+t_16
 
@@ -270,7 +270,7 @@ class ElectrolyteSolution(object):
 
         return -4*self.a_gamma*i_str**3*self.tau_debye(val)*nw_i/(3*self.delta_w)
 
-    def f_total(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=0):
+    def f_total(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
         """
         Defines the total free energy
 
@@ -290,6 +290,22 @@ class ElectrolyteSolution(object):
         f_d = self.f_debye(nw_i, ns_i, fb, b_g)
 
         return f_i + f_a + f_c + f_d
+
+    def mu_w(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
+        """
+        Defines the total free energy
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        :param k_ref: reference compressibility for the compressibility free energy
+        :param b_g: parameter defining the extension for the electrostatic free energy
+        """
+
+        return 1.0
 
     @staticmethod
     def tau_debye(x):

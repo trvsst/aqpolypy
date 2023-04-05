@@ -71,5 +71,18 @@ class TestFreeEnergy(unittest.TestCase):
         test_d = np.allclose(comp_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_d)
 
+    def test_free_assoc(self):
+
+        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
+        test_y = np.array([0.6, 0.55, 0.7, 0.72])
+        test_za = np.array([0.35, 0.3, 0.6, 0.55])
+        test_zd = np.array([0.25, 0.2, 0.55, 0.6])
+
+        comp_assoc = el_sol.f_assoc(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+
+
 if __name__ == '__main__':
     unittest.main()
