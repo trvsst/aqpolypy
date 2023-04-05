@@ -42,12 +42,21 @@ class TestFreeEnergy(unittest.TestCase):
         vals_ideal = np.array([10694.17289883, 10625.31694141, 11800.63110599])
 
         # testing params up to a precision of 10^-6
-        test_1 = np.allclose(comp_ideal, vals_ideal, 0, 1e-6)
-        self.assertTrue(test_1)
+        test_i = np.allclose(comp_ideal, vals_ideal, 0, 1e-6)
+        self.assertTrue(test_i)
 
     def test_free_compressibilty(self):
 
         el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+        test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
+        test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
+        test_f_b = np.array([0.0, 0.0, 0.5, 1])
+
+        k_ref = 5e-3
+        comp_comp = el_sol.f_comp(test_n_w, test_n_s, test_f_b, k_ref)
+        vals_comp = np.array([16642.00600168, 16630.00600601, 15630.00638978, 16305.00612557])
+        test_c = np.allclose(comp_comp, vals_comp, 0, 1e-6)
+        self.assertTrue(test_c)
 
 if __name__ == '__main__':
     unittest.main()

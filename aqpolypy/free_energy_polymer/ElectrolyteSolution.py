@@ -249,7 +249,7 @@ class ElectrolyteSolution(object):
         """
 
         k_param = self.u_w/(self.tp*k_ref)
-        v0 = nw_i * self.u_w+((1-fb)*self.u_s+fb*self.u_bs)*ns_i
+        v0 = nw_i * self.u_w+((1-fb)*self.u_s+fb*self.u_b)*ns_i
 
         return 0.5*k_param*(1-v0)**2/v0
 
