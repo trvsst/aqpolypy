@@ -253,7 +253,7 @@ class ElectrolyteSolution(object):
 
         return 0.5*k_param*(1-v0)**2/v0
 
-    def f_debye(self, nw_i, ns_i, fb, b_g=0):
+    def f_debye(self, nw_i, ns_i, fb, b_g=1e-2):
         """
         Defines the Debye-Huckel contribution
 
@@ -265,10 +265,10 @@ class ElectrolyteSolution(object):
 
         molal = self.delta_w*ns_i/nw_i
 
-        i_str = (1-fb)*molal
-        val = np.sqrt(i_str)
+        i_str = np.sqrt((1-fb)*molal)
+        val = b_g*i_str
 
-        return -2*self.a_gamma*val/(1+b_g*val)
+        return -4*self.a_gamma*i_str**3*self.tau_debye(val)*nw_i/(3*self.delta_w)
 
     def f_total(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=0):
         """
@@ -290,3 +290,15 @@ class ElectrolyteSolution(object):
         f_d = self.f_debye(nw_i, ns_i, fb, b_g)
 
         return f_i + f_a + f_c + f_d
+
+    @staticmethod
+    def tau_debye(x):
+        """
+        Function
+
+        :math:`\\tau(x)=\\frac{3}{x^3}\\left(\\log(x)-x+\\frac{x^2}{2}\\right)
+
+        necessary to compute the debye-huckel contribution
+        """
+
+        return 3.0*(np.log(1+x)-x+x**2/2)/x**3
