@@ -270,7 +270,7 @@ class ElectrolyteSolution(object):
 
         return -2*self.a_gamma*val/(1+b_g*val)
 
-    def f_assoc(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=0):
+    def f_total(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=0):
         """
         Defines the total free energy
 
