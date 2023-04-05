@@ -62,6 +62,8 @@ class ElectrolyteSolution(object):
 
         # molecular volume
         self.u_w = param_w['v_w']
+        self.u_s = param_salt['v_s']
+        self.u_b = param_salt['v_b']
 
         # energies and entropies
         self.e_w = param_w['de_w']
@@ -98,13 +100,11 @@ class ElectrolyteSolution(object):
         self.e_b = param_salt['de_b']
         self.s_b = param_salt['ds_b']
 
-        # maximum hydration
-        self.m_p = param_salt['m_p']
-        self.m_m = param_salt['m_m']
-        self.m_bp = param_salt['mb_p']
-        self.m_bm = param_salt['mb_m']
-
-        # hydration parameters
+        # # hydration parameters
+        self.m_p = param_h['m_p']
+        self.m_m = param_h['m_m']
+        self.m_bp = param_h['mb_p']
+        self.m_bm = param_h['mb_m']
         self.h_p0 = param_h['h_p0']
         self.h_p1 = param_h['h_p1']
         self.h_p2 = param_h['h_p2']
