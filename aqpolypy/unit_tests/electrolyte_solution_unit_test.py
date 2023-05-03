@@ -82,6 +82,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
         comp_assoc = el_sol.f_assoc(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        vals_comp = [-17928.98280199, -17246.08272997, -22121.72593814, -23873.49131049]
+        test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
+        self.assertTrue(test_a)
 
 
 if __name__ == '__main__':

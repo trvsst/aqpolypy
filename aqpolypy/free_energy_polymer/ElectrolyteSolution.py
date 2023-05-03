@@ -178,11 +178,11 @@ class ElectrolyteSolution(object):
         va2 = za * n_w - ((1 - fb) * self.h_p2 + fb * self.h_bp2)*n_s
         t_5 = lg(va2, va2)
 
-        vah = lg(self.h_p0, self.h_p0)+lg(self.h_p1, self.h_p1)+lg(self.h_p1, self.h_p1)
+        vah = lg(self.h_p0, self.h_p0)+lg(self.h_p1, self.h_p1)+lg(self.h_p2, self.h_p2)
         t_6 = (1-fb)*n_s*(vah-lg(self.h_p, self.h_p))
 
         vabh1 = lg(self.h_bp0, self.h_bp0) + lg(self.h_bp1, self.h_bp1)
-        vabh2 = lg(self.h_bp1, self.h_bp1)
+        vabh2 = lg(self.h_bp2, self.h_bp2)
         t_7 = fb * n_s * (vabh1+vabh2-lg(self.h_bp, self.h_bp))
 
         vd0 = (1-2*y+zd)*n_w-((1-fb)*self.h_m0+fb*self.h_bm0)*n_s
@@ -194,11 +194,11 @@ class ElectrolyteSolution(object):
         vd2 = za * n_w - ((1 - fb) * self.h_m2 + fb * self.h_bm2) * n_s
         t_10 = lg(vd2, vd2)
 
-        vdh = lg(self.h_m0, self.h_m0) + lg(self.h_m1, self.h_m1) + lg(self.h_m1, self.h_m1)
+        vdh = lg(self.h_m0, self.h_m0) + lg(self.h_m1, self.h_m1) + lg(self.h_m2, self.h_m2)
         t_11 = (1 - fb) * n_s * (vdh - lg(self.h_m, self.h_m))
 
         vdbh1 = lg(self.h_bm0, self.h_bm0) + lg(self.h_bm1, self.h_bm1)
-        vdbh2 = lg(self.h_bm1, self.h_bm1)
+        vdbh2 = lg(self.h_bm2, self.h_bm2)
         t_12 = fb * n_s * (vdbh1 + vdbh2 - lg(self.h_bm, self.h_bm))
 
         t_13_1 = n_s*self.m_p*(1-fb)*lg(1-self.h_p/self.m_p, 1-self.h_p/self.m_p)
