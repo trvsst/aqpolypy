@@ -263,7 +263,7 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the free energy
         """
 
-        molal = self.delta_w*ns_i/nw_i
+        molal = self.concentration_molal(nw_i, ns_i)
 
         i_str = np.sqrt((1-fb)*molal)
         val = b_g*i_str
@@ -291,9 +291,43 @@ class ElectrolyteSolution(object):
 
         return f_i + f_a + f_c + f_d
 
+    def mu_w_1(self, nw_i, ns_i, y, za, zd, fb):
+        """
+        Defines partial contribution to the water chemical potential
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        """
+
+        r_h = ns_i/nw_i
+        n_w = nw_i * self.u_w
+        n_s = ns_i * self.u_w
+
+        t_11 = (1-2*y)*np.log(n_w)
+        t_12 = (1-2*y+za)*np.log(1-2*y+za-((1-fb)*self.h_p0+fb*self.h_bp0)*r_h)
+        t_1 = t_11+t_12
+
+        t_2 = 2*(y-za)*np.log(2*(y-za)-((1-fb)*self.h_p1+fb*self.h_bp1)*r_h)
+
+        t_3 = z_a*np.log(z_a-((1-fb)*self.h_p2+fb*self.h_bp2)*r_h)
+
+        t_4 = (1-2*y+zd)*np.log(1-2*y+zd-((1-fb)*self.h_m0+fb*self.h_bm0)*r_h)
+
+        t_5 = 2*(y-zd)*np.log(2*(y-zd)-((1-fb)*self.h_m1+fb*self.h_bm1)*r_h)
+
+        t_6 = z_d*np.log(z_d-((1-fb)*self.h_m2+fb*self.h_bm2)*r_h)
+
+        t_7 = -2*y*self.f_w-zd*self.f_2d-za*self.f_2a-2*(3*y-za-zd)*np.log(2)-2*lg(y, y)
+
+        return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
+
     def mu_w(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
         """
-        Defines the total free energy
+        Defines the water chemical potential
 
         :param nw_i: water number density
         :param ns_i: salt number density
@@ -305,7 +339,18 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        return 1.0
+        m_1 = self.mu_w_1(self, nw_i, ns_i, y, za, zd, fb)
+
+        return m_1
+
+    def concentration_molal(self, nw_i, ns_i):
+        """
+        returns the concentration in molal units
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        """
+        return self.delta_w * ns_i / nw_i
 
     @staticmethod
     def tau_debye(x):
