@@ -353,7 +353,7 @@ class ElectrolyteSolution(object):
 
         return t_1
 
-    def mu_w(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
+    def mu_w(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
         """
         Defines the water chemical potential
 
@@ -363,7 +363,6 @@ class ElectrolyteSolution(object):
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
         :param fb: fraction of Bjerrum pairs
-        :param k_ref: reference compressibility for the compressibility free energy
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
