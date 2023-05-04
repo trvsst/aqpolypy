@@ -86,6 +86,33 @@ class TestFreeEnergy(unittest.TestCase):
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
+    def test_mu_water_1(self):
+        el_mu = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
+        test_y = np.array([0.6, 0.55, 0.7, 0.72])
+        test_za = np.array([0.35, 0.3, 0.6, 0.55])
+        test_zd = np.array([0.25, 0.2, 0.55, 0.6])
+
+        comp_mu_w_1=el_mu.mu_w_1(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        vals_comp = [-5.25727997, -4.55696617, -7.17320148, -7.61640162]
+        test_mu_1 = np.allclose(comp_mu_w_1, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_1)
+
+    def test_mu_debye(self):
+        el_mu_d = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
+        test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
+
+        test_m = el_mu_d.concentration_molal(test_n_w, test_n_s)
+        comp_mu_debye = el_mu_d.mu_w_debye(test_m, test_f_b, test_bpar)
+        vals_comp = [1.41161015e-05, 5.01848558e-03, 5.43015396e-03, 3.57547593e-03]
+        test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_debye)
 
 if __name__ == '__main__':
     unittest.main()

@@ -313,17 +313,45 @@ class ElectrolyteSolution(object):
 
         t_2 = 2*(y-za)*np.log(2*(y-za)-((1-fb)*self.h_p1+fb*self.h_bp1)*r_h)
 
-        t_3 = z_a*np.log(z_a-((1-fb)*self.h_p2+fb*self.h_bp2)*r_h)
+        t_3 = za*np.log(za-((1-fb)*self.h_p2+fb*self.h_bp2)*r_h)
 
         t_4 = (1-2*y+zd)*np.log(1-2*y+zd-((1-fb)*self.h_m0+fb*self.h_bm0)*r_h)
 
         t_5 = 2*(y-zd)*np.log(2*(y-zd)-((1-fb)*self.h_m1+fb*self.h_bm1)*r_h)
 
-        t_6 = z_d*np.log(z_d-((1-fb)*self.h_m2+fb*self.h_bm2)*r_h)
+        t_6 = zd*np.log(zd-((1-fb)*self.h_m2+fb*self.h_bm2)*r_h)
 
         t_7 = -2*y*self.f_w-zd*self.f_2d-za*self.f_2a-2*(3*y-za-zd)*np.log(2)-2*lg(y, y)
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
+
+    def mu_w_debye(self, i_str, fb, b_g):
+        """
+        Defines the Electrostatic chemical potential
+
+        :param i_str: ionic strength (molal scale)
+        :param b_g: chemical potential constant
+        :param fb: fraction of Bjerrum pairs
+        """
+
+        x_val = np.sqrt((1-fb)*i_str)
+        return 2*self.a_gamma*x_val**3*self.r_debye(b_g*x_val)/(3*self.delta_w)
+
+    def mu_w_comp(self, nw_i, ns_i, y, fb):
+        """
+        Defines the compressibility chemical potential
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        """
+        n_w = nw_i * self.u_w
+        n_s = ns_i * self.u_w
+
+        t_1 = -(1-2*y)*n_w +((1-fb)*(self.h_p+self.h_m)+fb*(self.h_bp+self.h_bm))*n_s-(2-fb)*n_s\
+
+        return t_1
 
     def mu_w(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
         """
@@ -339,9 +367,16 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        m_1 = self.mu_w_1(self, nw_i, ns_i, y, za, zd, fb)
+        m_1 = self.mu_w_1(nw_i, ns_i, y, za, zd, fb)
 
-        return m_1
+        i_str = self.concentration_molal(nw_i, ns_i)
+        m_2 = self.mu_w_debye(i_str, fb, b_g)
+
+        m_3 = self.mu_w_comp(nw_i, ns_i, y, fb)
+
+        m_total = m_1+m_2+m_3
+
+        return m_total
 
     def concentration_molal(self, nw_i, ns_i):
         """
@@ -357,9 +392,21 @@ class ElectrolyteSolution(object):
         """
         Function
 
-        :math:`\\tau(x)=\\frac{3}{x^3}\\left(\\log(x)-x+\\frac{x^2}{2}\\right)
+        :math:`\\tau(x)=\\frac{3}{x^3}\\left(\\log(x)-x+\\frac{x^2}{2}\\right)`
 
         necessary to compute the debye-huckel contribution
         """
 
         return 3.0*(np.log(1+x)-x+x**2/2)/x**3
+
+    @staticmethod
+    def r_debye(x):
+        """
+        Function
+
+        :math:`\\frac{3}{x^3}\\left(1+x-\\frac{1}{1+x}-2\\log(1+x)\\right)`
+
+        necessary to compute the water chemical potential
+        """
+
+        return 3*(1+x-1/(1+x)-2*np.log(1+x))/x**3
