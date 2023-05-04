@@ -355,7 +355,7 @@ class ElectrolyteSolution(object):
 
     def mu_sf_1(self, nw_i, ns_i, y, za, zd, fb):
         """
-        Defines partial contribution to the water chemical potential
+        Defines partial contribution to the free salt chemical potential
 
         :param nw_i: water number density
         :param ns_i: salt number density
@@ -407,6 +407,52 @@ class ElectrolyteSolution(object):
         x_val = np.sqrt((1-fb)*i_str)
 
         return -2*self.a_gamma*x_val/(1+b_g*x_val)
+
+    def mu_sb_1(self, nw_i, ns_i, y, za, zd, fb):
+        """
+        Defines partial contribution to the bjerrum salt chemical potential
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        """
+
+        r_h = ns_i / nw_i
+        n_w = nw_i * self.u_w
+        n_s = ns_i * self.u_w
+
+        t_11 = np.log(fb*n_s)-self.h_bm*self.f_bm-self.h_bp*self.f_bp + self.f_bj
+        t_12 = self.h_bm1*self.f_bm1+self.h_bm2*self.f_bm2+self.h_bp1*self.f_bp1+self.h_bp2*self.f_bp2
+        t_1 = t_11 + t_12
+
+        t_2 = -self.h_bp0*np.log(1-2*y+za-((1-fb)*self.h_p0+fb*self.h_bp0)*r_h)
+
+        t_3 = -self.h_bp1*np.log(2*(y-za)-((1-fb)*self.h_p1+fb*self.h_bp1)*r_h)
+
+        t_4 = -self.h_bp2*np.log(za-((1-fb)*self.h_p2+fb*self.h_bp2)*r_h)
+
+        t_5 = lg(self.h_bp0, self.h_bp0)+lg(self.h_bp1, self.h_bp1)+lg(self.h_bp2, self.h_bp2)-lg(self.h_bp, self.h_bp)
+
+        t_6 = -self.h_bm0*np.log(1-2*y+zd-((1-fb)*self.h_m0+fb*self.h_bm0)*r_h)
+
+        t_7 = -self.h_bm1*np.log(2*(y-zd)-((1-fb)*self.h_m1+fb*self.h_bm1)*r_h)
+
+        t_8 = -self.h_bm2*np.log(zd-((1-fb)*self.h_m2 + fb * self.h_bm2) * r_h)
+
+        t_9_1 = lg(self.h_bm0, self.h_bm0) + lg(self.h_bm1, self.h_bm1)
+        t_9_2 = lg(self.h_bm2, self.h_bm2) - lg(self.h_bm, self.h_bm)
+        t_9 = t_9_1 + t_9_2
+
+        t_10_1 = self.m_bp*(lg(1-self.h_bp/self.m_bp,1-self.h_bp/self.m_bp)+ lg(self.h_bp/self.m_bp,self.h_bp/self.m_bp))
+        t_10_2 = self.m_bp*(lg(1-self.h_bm/self.m_bm,1-self.h_bm/self.m_bm)+ lg(self.h_bm/self.m_bm,self.h_bm/self.m_bm))
+        t_10 = t_10_1 + t_10_2
+
+        t_11 = np.log(self.m_m*self.m_p)
+
+        return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
     def mu_w(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
         """
