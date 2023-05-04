@@ -142,5 +142,18 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
+    def test_mu_salt_debye(self):
+        el_mu_d = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
+        test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
+
+        test_m = el_mu_d.concentration_molal(test_n_w, test_n_s)
+        comp_mu_debye = el_mu_d.mu_w_debye(test_m, test_f_b, test_bpar)
+        vals_comp = [1.41161015e-05, 5.01848558e-03, 5.43015396e-03, 3.57547593e-03]
+        test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_debye)
+
 if __name__ == '__main__':
     unittest.main()
