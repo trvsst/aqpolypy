@@ -353,6 +353,61 @@ class ElectrolyteSolution(object):
 
         return t_1
 
+    def mu_sf_1(self, nw_i, ns_i, y, za, zd, fb):
+        """
+        Defines partial contribution to the water chemical potential
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        """
+
+        r_h = ns_i / nw_i
+        n_w = nw_i * self.u_w
+        n_s = ns_i * self.u_w
+
+        t_11 = 2*np.log((1-fb)*n_s)-self.h_m*self.f_m-self.h_p*self.f_p
+        t_12 = self.h_m1*self.f_m1+self.h_m2*self.f_m2+self.h_p1*self.f_p1+self.h_p2*self.f_p2
+        t_1 = t_11 + t_12
+
+        t_2 = -self.h_p0*np.log(1-2*y+za-((1-fb)*self.h_p0+fb*self.h_bp0)*r_h)
+
+        t_3 = -self.h_p1*np.log(2*(y-za)-((1-fb)*self.h_p1+fb*self.h_bp1)*r_h)
+
+        t_4 = -self.h_p2*np.log(za-((1-fb)*self.h_p2+fb*self.h_bp2)*r_h)
+
+        t_5 = lg(self.h_p0, self.h_p0)+lg(self.h_p1, self.h_p1)+lg(self.h_p2, self.h_p2)-lg(self.h_p, self.h_p)
+
+        t_6 = -self.h_m0*np.log(1-2*y+zd-((1-fb)*self.h_m0+fb*self.h_bm0)*r_h)
+
+        t_7 = -self.h_m1*np.log(2*(y-zd)-((1-fb)*self.h_m1+fb*self.h_bm1)*r_h)
+
+        t_8 = -self.h_m2*np.log(zd-((1-fb)*self.h_m2 + fb * self.h_bm2) * r_h)
+
+        t_9 = lg(self.h_m0, self.h_m0) + lg(self.h_m1, self.h_m1) + lg(self.h_m2, self.h_m2) - lg(self.h_m, self.h_m)
+
+        t_10_1 = self.m_p*(lg(1-self.h_p/self.m_p,1-self.h_p/self.m_p)+ lg(self.h_p/self.m_p,self.h_p/self.m_p))
+        t_10_2 = self.m_p*(lg(1-self.h_m/self.m_m,1-self.h_m/self.m_m)+ lg(self.h_m/self.m_m,self.h_m/self.m_m))
+        t_10 = t_10_1 + t_10_2
+
+        return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10
+
+    def mu_sf_debye(self, i_str, fb, b_g):
+        """
+        Defines the salt Electrostatic chemical potential
+
+        :param i_str: ionic strength (molal scale)
+        :param b_g: chemical potential constant
+        :param fb: fraction of Bjerrum pairs
+        """
+
+        x_val = np.sqrt((1-fb)*i_str)
+
+        return -2*self.a_gamma*x_val/(1+b_g*x_val)
+
     def mu_w(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
         """
         Defines the water chemical potential
@@ -374,6 +429,30 @@ class ElectrolyteSolution(object):
         m_3 = self.mu_w_comp(nw_i, ns_i, y, fb)
 
         m_total = m_1+m_2+m_3
+
+        return m_total
+
+    def mu_sf(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
+        """
+        Defines the free salt chemical potential
+
+        :param nw_i: water number density
+        :param ns_i: salt number density
+        :param y: fraction of water hydrogen bonds
+        :param za: fraction of double acceptor hydrogen bonds
+        :param zd: fraction of double donor hydrogen bonds
+        :param fb: fraction of Bjerrum pairs
+        :param b_g: parameter defining the extension for the electrostatic free energy
+        """
+
+        m_1 = self.mu_w_sf(nw_i, ns_i, y, za, zd, fb)
+
+        i_str = self.concentration_molal(nw_i, ns_i)
+        m_2 = self.mu_sf_debye(i_str, fb, b_g)
+
+        m_3 = self.mu_w_comp(nw_i, ns_i, y, fb)*self.u_w/self.u_s
+
+        m_total = m_1 + m_2 + m_3
 
         return m_total
 
