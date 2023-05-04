@@ -349,7 +349,7 @@ class ElectrolyteSolution(object):
         n_w = nw_i * self.u_w
         n_s = ns_i * self.u_w
 
-        t_1 = -(1-2*y)*n_w +((1-fb)*(self.h_p+self.h_m)+fb*(self.h_bp+self.h_bm))*n_s-(2-fb)*n_s\
+        t_1 = -(1-2*y)*n_w +((1-fb)*(self.h_p+self.h_m)+fb*(self.h_bp+self.h_bm))*n_s-(2-fb)*n_s
 
         return t_1
 

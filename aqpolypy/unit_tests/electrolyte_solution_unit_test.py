@@ -114,5 +114,18 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_debye)
 
+    def test_mu_comp(self):
+        el_mu_c = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+
+        test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
+        test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
+        test_y = np.array([0.6, 0.55, 0.7, 0.72])
+        test_f_b = np.array([0.0, 0.0, 0.5, 1])
+
+        comp_mu_c = el_mu_c.mu_w_comp(test_n_w, test_n_s, test_y, test_f_b)
+        vals_comp = [ 333.24,  337.5,  6516.0,  5937.6 ]
+        test_mu_comp = np.allclose(comp_mu_c, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_comp)
+
 if __name__ == '__main__':
     unittest.main()
