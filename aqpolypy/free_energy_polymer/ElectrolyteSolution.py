@@ -424,7 +424,7 @@ class ElectrolyteSolution(object):
         n_w = nw_i * self.u_w
         n_s = ns_i * self.u_w
 
-        t_11 = np.log(fb*n_s)-self.h_bm*self.f_bm-self.h_bp*self.f_bp + self.f_bj
+        t_11 = np.log(fb*n_s)-self.h_bm*self.f_bm-self.h_bp*self.f_bp - self.f_bj
         t_12 = self.h_bm1*self.f_bm1+self.h_bm2*self.f_bm2+self.h_bp1*self.f_bp1+self.h_bp2*self.f_bp2
         t_1 = t_11 + t_12
 

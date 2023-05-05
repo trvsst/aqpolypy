@@ -155,5 +155,21 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_debye)
 
+    def test_mu_salt_bjerrum_1(self):
+        el_mu = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
+
+        test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
+        test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        test_f_b = np.array([1e-4, 1e-4, 0.25, 0.25])
+        test_y = np.array([0.6, 0.55, 0.7, 0.72])
+        test_za = np.array([0.35, 0.3, 0.6, 0.55])
+        test_zd = np.array([0.25, 0.2, 0.55, 0.6])
+
+        comp_mu_b_salt_1 = el_mu.mu_sb_1(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        vals_comp = [-26.49673298, -22.36947333, -11.31812004,  -5.83708178]
+        test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_b_salt_1)
+
+
 if __name__ == '__main__':
     unittest.main()
