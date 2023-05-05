@@ -519,7 +519,7 @@ class ElectrolyteSolution(object):
 
         m_2 = self.mu_w_comp(nw_i, ns_i, y, fb) * self.u_w / self.u_s
 
-        m_total = m_1 + m_2 
+        m_total = m_1 + m_2
 
         return m_total
 
