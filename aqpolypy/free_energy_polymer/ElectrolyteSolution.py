@@ -523,6 +523,235 @@ class ElectrolyteSolution(object):
 
         return m_total
 
+    def eqn_y(self, in_p):
+        """
+        Equation determining the number of water hydrogen bonds
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        fm=1
+
+        t_0 = 8*in_p['y']*np.exp(self.f_w)
+        t_1_u = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
+        t_2_u = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
+        t_2_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
+
+        return t_0 - t_1_u*t_2_u/(t_1_d*t_2_d)
+
+    def eqn_za(self, in_p):
+        """
+        Equation determining the number of water molecules with 2 acceptor hydrogen bonds
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = 0.25*np.exp(self.f_2a)
+        t_1_u = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
+        t_2_u = in_p['za']- ((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*fm
+        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+
+        return t_0 - t_1_u*t_2_u/t_1_d**2
+
+    def eqn_zd(self, in_p):
+        """
+        Equation determining the number of water molecules with 2 donor hydrogen bonds
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = 0.25 * np.exp(self.f_2d)
+        t_1_u = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
+        t_2_u = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*fm
+        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
+
+        return t_0-t_1_u*t_2_u/t_1_d**2
+
+    def eqn_h_p0(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_p0
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_p)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
+        t_1_u = in_p['h_p0']
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_p0(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_p0
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bp) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
+        t_1_u = in_p['h_p0']
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['hb_p0']+in_p['fb']*in_p['hb_p0'])*fm
+
+        return t_0 - t_1_u / t_1_d
+
+    def eqn_h_p1(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_p1
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_p+self.f_p1)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
+        t_1_u = in_p['h_p1']
+        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_p1(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_p1
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bp + self.f_bp1) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
+        t_1_u = in_p['hb_p1']
+        t_1_d = 2 * (in_p['y'] - in_p['za']) - ((1 - in_p['fb']) * in_p['h_p1'] + in_p['fb'] * in_p['hb_p1']) * fm
+
+        return t_0 - t_1_u / t_1_d
+
+    def eqn_h_p2(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_p2
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_p+self.f_p2)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
+        t_1_u = in_p['h_p2']
+        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_p2(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_p2
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_p-in_p['hb_p0']-in_p['hb_p1']-in_p['hb_p2'])
+        t_1_u = in_p['h_p2']
+        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_h_m0(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_m0
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_m)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
+        t_1_u = in_p['h_m0']
+        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_m0(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_m0
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bm) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
+        t_1_u = in_p['h_p0']
+        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['hb_m0']+in_p['fb']*in_p['hb_m0'])*fm
+
+        return t_0 - t_1_u / t_1_d
+
+    def eqn_h_m1(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_m1
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_m+self.f_m1)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
+        t_1_u = in_p['h_m1']
+        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_m1(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_m1
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bm + self.f_bm1) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
+        t_1_u = in_p['hb_m1']
+        t_1_d = 2 * (in_p['y'] - in_p['zd']) - ((1 - in_p['fb']) * in_p['h_m1'] + in_p['fb'] * in_p['hb_m1']) * fm
+
+        return t_0 - t_1_u / t_1_d
+
+    def eqn_h_m2(self, in_p):
+        """
+        Equation determining the hydration shell parameter h_m2
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_m+self.f_m2)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
+        t_1_u = in_p['h_m2']
+        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
+    def eqn_hb_m2(self, in_p):
+        """
+        Equation determining the hydration shell parameter hb_m2
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        f_m = 1
+
+        t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_m-in_p['hb_m0']-in_p['hb_m1']-in_p['hb_m2'])
+        t_1_u = in_p['h_m2']
+        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*fm
+
+        return t_0 -  t_1_u/t_1_d
+
     def concentration_molal(self, nw_i, ns_i):
         """
         returns the concentration in molal units
