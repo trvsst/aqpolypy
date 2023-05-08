@@ -752,6 +752,15 @@ class ElectrolyteSolution(object):
 
         return t_0 -  t_1_u/t_1_d
 
+    def eqn_bjerrum(self, in_p):
+        """
+        Equation determining the bjerrum equations
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        return 1.0
+    
     def concentration_molal(self, nw_i, ns_i):
         """
         returns the concentration in molal units
