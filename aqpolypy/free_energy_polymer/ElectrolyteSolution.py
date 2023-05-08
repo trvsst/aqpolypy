@@ -17,14 +17,16 @@ import aqpolypy.water.WaterMilleroBP as fm
 
 class ElectrolyteSolution(object):
     """
-    Class defining an electrolyte solution
+    Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, temp, param_w, param_salt, param_h, press=1.01325):
+    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325):
 
         """
         The constructor, with the following parameters
 
+        :param nw_i: water number density
+        :param ns_i: salt number density
         :param temp: temperature in Kelvin
         :param param_w: water parameters (see definition below)
         :param param_salt: salt parameters (see definition below)
@@ -55,7 +57,7 @@ class ElectrolyteSolution(object):
         # temperature
         self.tp = temp
 
-        # water model at the given temperature
+        # water model at the given temperature and pressure
         self.press = press
         wfm = fm.WaterPropertiesFineMillero(self.tp, self.press)
         self.a_gamma = 3*wfm.a_phi()
@@ -64,6 +66,14 @@ class ElectrolyteSolution(object):
         self.u_w = param_w['v_w']
         self.u_s = param_salt['v_s']
         self.u_b = param_salt['v_b']
+
+        # concentration in dimensionless units
+        self.n_w = nw_i * self.u_w
+        self.n_s = ns_i * self.u_w
+        self.r_h = self.ns / self.nw
+        # concentration in the molal scale and ionic strength
+        self.ml = self.concentration_molal(self.nw, self.ns)
+        self.ionic_strength = np.sqrt(self.ml)
 
         # energies and entropies
         self.e_w = param_w['de_w']
@@ -142,20 +152,18 @@ class ElectrolyteSolution(object):
         self.h_bp = self.h_bp0 + self.h_bp1 + self.h_bp2
         self.h_bm = self.h_bm0 + self.h_bm1 + self.h_bm2
 
-    def f_assoc(self, nw_i, ns_i, y, za, zd, fb):
+    def f_assoc(self, y, za, zd, fb):
         """
         Defines the association free energy
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
         :param fb: fraction of Bjerrum pairs
         """
 
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        n_w = self.n_w
+        n_s = self.n_s
 
         t_0 = - n_w*(2*y*self.f_w+zd*self.f_2d+za*self.f_2a)-n_s*fb*self.f_bj
 
@@ -223,59 +231,49 @@ class ElectrolyteSolution(object):
 
         return t_s
 
-    def f_ideal(self, nw_i, ns_i):
+    def f_ideal(self):
         """
         Defines the ideal free energy
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         """
 
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        n_w = self.nw
+        n_s = self.n_s
 
         t_s = lg(n_w, n_w) + 2*lg(n_s, n_s) - (n_w+2*n_s)
 
         return t_s
 
-    def f_comp(self, nw_i, ns_i, fb, k_ref):
+    def f_comp(self, fb, k_ref):
         """
         Defines the compressible free energy
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param fb: fraction of Bjerrum pairs
         :param k_ref: reference compressibility
         """
 
         k_param = self.u_w/(self.tp*k_ref)
-        v0 = nw_i * self.u_w+((1-fb)*self.u_s+fb*self.u_b)*ns_i
+        v0 = self.n_w+((1-fb)*self.u_s+fb*self.u_b)*self.n_s/self.u_w
 
         return 0.5*k_param*(1-v0)**2/v0
 
-    def f_debye(self, nw_i, ns_i, fb, b_g=1e-2):
+    def f_debye(self, fb, b_g=1e-2):
         """
         Defines the Debye-Huckel contribution
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param fb: fraction of Bjerrum pairs
         :param b_g: parameter defining the extension for the free energy
         """
 
-        molal = self.concentration_molal(nw_i, ns_i)
-
-        i_str = np.sqrt((1-fb)*molal)
+        i_str = np.sqrt(1-fb)*self.ionic_strength
         val = b_g*i_str
 
-        return -4*self.a_gamma*i_str**3*self.tau_debye(val)*nw_i/(3*self.delta_w)
+        return -4*self.a_gamma*i_str**3*self.tau_debye(val)*self.n_w/(3*self.delta_w)
 
-    def f_total(self, nw_i, ns_i, y, za, zd, fb, k_ref, b_g=1e-4):
+    def f_total(self, y, za, zd, fb, k_ref, b_g=1e-4):
         """
         Defines the total free energy
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
@@ -284,28 +282,26 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        f_i = self.f_ideal(nw_i, ns_i)
-        f_a = self.f_assoc(nw_i, ns_i, y, za, zd, fb)
-        f_c = self.f_comp(nw_i, ns_i, fb, k_ref)
-        f_d = self.f_debye(nw_i, ns_i, fb, b_g)
+        f_i = self.f_ideal()
+        f_a = self.f_assoc(y, za, zd, fb)
+        f_c = self.f_comp(fb, k_ref)
+        f_d = self.f_debye(fb, b_g)
 
         return f_i + f_a + f_c + f_d
 
-    def mu_w_1(self, nw_i, ns_i, y, za, zd, fb):
+    def mu_w_1(self, y, za, zd, fb):
         """
         Defines partial contribution to the water chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
         :param fb: fraction of Bjerrum pairs
         """
 
-        r_h = ns_i/nw_i
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        r_h = self.r_h
+        n_w = self.n_w
+        n_s = self.n_s
 
         t_11 = (1-2*y)*np.log(n_w)
         t_12 = (1-2*y+za)*np.log(1-2*y+za-((1-fb)*self.h_p0+fb*self.h_bp0)*r_h)
@@ -325,49 +321,44 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
 
-    def mu_w_debye(self, i_str, fb, b_g):
+    def mu_w_debye(self, fb, b_g):
         """
         Defines the Electrostatic chemical potential
 
-        :param i_str: ionic strength (molal scale)
         :param b_g: chemical potential constant
         :param fb: fraction of Bjerrum pairs
         """
 
-        x_val = np.sqrt((1-fb)*i_str)
+        x_val = np.sqrt((1-fb))*self.ionic_strength
         return 2*self.a_gamma*x_val**3*self.r_debye(b_g*x_val)/(3*self.delta_w)
 
-    def mu_w_comp(self, nw_i, ns_i, y, fb):
+    def mu_w_comp(self, y, fb):
         """
         Defines the compressibility chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param fb: fraction of Bjerrum pairs
         """
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        n_w = self.n_w
+        n_s = self.n_s
 
         t_1 = -(1-2*y)*n_w +((1-fb)*(self.h_p+self.h_m)+fb*(self.h_bp+self.h_bm))*n_s-(2-fb)*n_s
 
         return t_1
 
-    def mu_sf_1(self, nw_i, ns_i, y, za, zd, fb):
+    def mu_sf_1(self, y, za, zd, fb):
         """
         Defines partial contribution to the free salt chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
         :param fb: fraction of Bjerrum pairs
         """
 
-        r_h = ns_i / nw_i
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        r_h = self.r_h
+        n_w = self.n_w
+        n_s = self.n_s
 
         t_11 = 2*np.log((1-fb)*n_s)-self.h_m*self.f_m-self.h_p*self.f_p
         t_12 = self.h_m1*self.f_m1+self.h_m2*self.f_m2+self.h_p1*self.f_p1+self.h_p2*self.f_p2
@@ -395,7 +386,7 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10
 
-    def mu_sf_debye(self, i_str, fb, b_g):
+    def mu_sf_debye(self, fb, b_g):
         """
         Defines the salt Electrostatic chemical potential
 
@@ -404,25 +395,23 @@ class ElectrolyteSolution(object):
         :param fb: fraction of Bjerrum pairs
         """
 
-        x_val = np.sqrt((1-fb)*i_str)
+        x_val = np.sqrt(1-fb)*self.ionic_strength
 
         return -2*self.a_gamma*x_val/(1+b_g*x_val)
 
-    def mu_sb_1(self, nw_i, ns_i, y, za, zd, fb):
+    def mu_sb_1(self, y, za, zd, fb):
         """
         Defines partial contribution to the bjerrum salt chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
         :param fb: fraction of Bjerrum pairs
         """
 
-        r_h = ns_i / nw_i
-        n_w = nw_i * self.u_w
-        n_s = ns_i * self.u_w
+        r_h = self.r_h
+        n_w = self.n_w
+        n_s = self.n_s
 
         t_11 = np.log(fb*n_s)-self.h_bm*self.f_bm-self.h_bp*self.f_bp - self.f_bj
         t_12 = self.h_bm1*self.f_bm1+self.h_bm2*self.f_bm2+self.h_bp1*self.f_bp1+self.h_bp2*self.f_bp2
@@ -454,12 +443,10 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
-    def mu_w(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
+    def mu_w(self, y, za, zd, fb, b_g=1e-4):
         """
         Defines the water chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
@@ -467,23 +454,18 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        m_1 = self.mu_w_1(nw_i, ns_i, y, za, zd, fb)
-
-        i_str = self.concentration_molal(nw_i, ns_i)
-        m_2 = self.mu_w_debye(i_str, fb, b_g)
-
-        m_3 = self.mu_w_comp(nw_i, ns_i, y, fb)
+        m_1 = self.mu_w_1(y, za, zd, fb)
+        m_2 = self.mu_w_debye(fb, b_g)
+        m_3 = self.mu_w_comp(y, fb)
 
         m_total = m_1+m_2+m_3
 
         return m_total
 
-    def mu_sf(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
+    def mu_sf(self, y, za, zd, fb, b_g=1e-4):
         """
         Defines the free salt chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
@@ -491,23 +473,18 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        m_1 = self.mu_sf_1(nw_i, ns_i, y, za, zd, fb)
-
-        i_str = self.concentration_molal(nw_i, ns_i)
-        m_2 = self.mu_sf_debye(i_str, fb, b_g)
-
-        m_3 = self.mu_w_comp(nw_i, ns_i, y, fb)*self.u_w/self.u_s
+        m_1 = self.mu_sf_1(y, za, zd, fb)
+        m_2 = self.mu_sf_debye(fb, b_g)
+        m_3 = self.mu_w_comp(y, fb)*self.u_w/self.u_s
 
         m_total = m_1 + m_2 + m_3
 
         return m_total
 
-    def mu_bf(self, nw_i, ns_i, y, za, zd, fb, b_g=1e-4):
+    def mu_bf(self, y, za, zd, fb, b_g=1e-4):
         """
         Defines the bjerrum salt chemical potential
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
         :param y: fraction of water hydrogen bonds
         :param za: fraction of double acceptor hydrogen bonds
         :param zd: fraction of double donor hydrogen bonds
@@ -515,9 +492,8 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the electrostatic free energy
         """
 
-        m_1 = self.mu_sb_1(nw_i, ns_i, y, za, zd, fb)
-
-        m_2 = self.mu_w_comp(nw_i, ns_i, y, fb) * self.u_w / self.u_s
+        m_1 = self.mu_sb_1(y, za, zd, fb)
+        m_2 = self.mu_w_comp(y, fb) * self.u_w / self.u_s
 
         m_total = m_1 + m_2
 
@@ -530,13 +506,11 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        fm=1
-
         t_0 = 8*in_p['y']*np.exp(self.f_w)
-        t_1_u = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
-        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
-        t_2_u = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
-        t_2_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
+        t_1_u = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
+        t_2_u = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
+        t_2_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
 
         return t_0 - t_1_u*t_2_u/(t_1_d*t_2_d)
 
@@ -547,12 +521,10 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = 0.25*np.exp(self.f_2a)
-        t_1_u = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
-        t_2_u = in_p['za']- ((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*fm
-        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+        t_1_u = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
+        t_2_u = in_p['za']- ((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*self.r_h
+        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
 
         return t_0 - t_1_u*t_2_u/t_1_d**2
 
@@ -566,9 +538,9 @@ class ElectrolyteSolution(object):
         f_m = 1
 
         t_0 = 0.25 * np.exp(self.f_2d)
-        t_1_u = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
-        t_2_u = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*fm
-        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
+        t_1_u = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
+        t_2_u = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*self.r_h
+        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
 
         return t_0-t_1_u*t_2_u/t_1_d**2
 
@@ -579,11 +551,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_p)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
         t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*fm
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -594,11 +564,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bp) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
         t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['hb_p0']+in_p['fb']*in_p['hb_p0'])*fm
+        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['hb_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -609,11 +577,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_p+self.f_p1)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
         t_1_u = in_p['h_p1']
-        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -624,11 +590,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bp + self.f_bp1) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
         t_1_u = in_p['hb_p1']
-        t_1_d = 2 * (in_p['y'] - in_p['za']) - ((1 - in_p['fb']) * in_p['h_p1'] + in_p['fb'] * in_p['hb_p1']) * fm
+        t_1_d = 2 * (in_p['y'] - in_p['za']) - ((1 - in_p['fb']) * in_p['h_p1'] + in_p['fb'] * in_p['hb_p1'])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -639,11 +603,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_p+self.f_p2)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
         t_1_u = in_p['h_p2']
-        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -654,11 +616,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_p-in_p['hb_p0']-in_p['hb_p1']-in_p['hb_p2'])
         t_1_u = in_p['h_p2']
-        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*fm
+        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -669,11 +629,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_m)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
         t_1_u = in_p['h_m0']
-        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*fm
+        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -684,11 +642,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bm) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
         t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['hb_m0']+in_p['fb']*in_p['hb_m0'])*fm
+        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['hb_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -699,11 +655,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_m+self.f_m1)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
         t_1_u = in_p['h_m1']
-        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*fm
+        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -714,11 +668,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bm + self.f_bm1) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
         t_1_u = in_p['hb_m1']
-        t_1_d = 2 * (in_p['y'] - in_p['zd']) - ((1 - in_p['fb']) * in_p['h_m1'] + in_p['fb'] * in_p['hb_m1']) * fm
+        t_1_d = 2 *(in_p['y']-in_p['zd'])-((1 - in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -729,11 +681,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_m+self.f_m2)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
         t_1_u = in_p['h_m2']
-        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*fm
+        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -744,11 +694,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        f_m = 1
-
         t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_m-in_p['hb_m0']-in_p['hb_m1']-in_p['hb_m2'])
         t_1_u = in_p['h_m2']
-        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*fm
+        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -760,15 +708,15 @@ class ElectrolyteSolution(object):
         """
 
         return 1.0
-    
-    def concentration_molal(self, nw_i, ns_i):
+
+    def concentration_molal(self):
         """
         returns the concentration in molal units
 
         :param nw_i: water number density
         :param ns_i: salt number density
         """
-        return self.delta_w * ns_i / nw_i
+        return self.delta_w * self.r_h
 
     @staticmethod
     def tau_debye(x):
