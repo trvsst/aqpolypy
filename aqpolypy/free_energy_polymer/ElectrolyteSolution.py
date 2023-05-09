@@ -544,9 +544,9 @@ class ElectrolyteSolution(object):
         f_m = 1
 
         t_0 = 0.25 * np.exp(self.f_2d)
-        t_1_u = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
-        t_2_u = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*self.r_h
-        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
+        t_1_u = 1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h
+        t_2_u = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
+        t_1_d = 2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
 
         return t_0-t_1_u*t_2_u/t_1_d**2
 
@@ -557,9 +557,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_p)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
-        t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['h_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
+        t_0 = np.exp(self.f_p)*(self.m_p-in_p[3]-in_p[4]-in_p[5])
+        t_1_u = in_p[3]
+        t_1_d = 1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -570,9 +570,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bp) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
-        t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['za']-((1-in_p['fb'])*in_p['hb_p0']+in_p['fb']*in_p['hb_p0'])*self.r_h
+        t_0 = np.exp(self.f_bp) * (self.m_bp - in_p[9] - in_p[10] - in_p[11])
+        t_1_u = in_p[9]
+        t_1_d = 1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -583,9 +583,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_p+self.f_p1)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
-        t_1_u = in_p['h_p1']
-        t_1_d = 2*(in_p['y']-in_p['za'])-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
+        t_0 = np.exp(self.f_p+self.f_p1)*(self.m_p-in_p[3]-in_p[4]-in_p[5])
+        t_1_u = in_p[4]
+        t_1_d = 2*(in_p[0]-in_p[1])-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -596,9 +596,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bp + self.f_bp1) * (self.m_bp - in_p['hb_p0'] - in_p['hb_p1'] - in_p['hb_p2'])
-        t_1_u = in_p['hb_p1']
-        t_1_d = 2 * (in_p['y'] - in_p['za']) - ((1 - in_p['fb']) * in_p['h_p1'] + in_p['fb'] * in_p['hb_p1'])*self.r_h
+        t_0 = np.exp(self.f_bp + self.f_bp1) * (self.m_bp - in_p[9] - in_p[10] - in_p[11])
+        t_1_u = in_p[10]
+        t_1_d = 2 * (in_p[0] - in_p[1]) - ((1 - in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -609,9 +609,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_p+self.f_p2)*(self.m_p-in_p['h_p0']-in_p['h_p1']-in_p['h_p2'])
-        t_1_u = in_p['h_p2']
-        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
+        t_0 = np.exp(self.f_p+self.f_p2)*(self.m_p-in_p[3]-in_p[4]-in_p[5])
+        t_1_u = in_p[5]
+        t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p['fb']*in_p[11])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -622,9 +622,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_p-in_p['hb_p0']-in_p['hb_p1']-in_p['hb_p2'])
-        t_1_u = in_p['h_p2']
-        t_1_d = in_p['za']-((1-in_p['fb'])*in_p['h_p2']+in_p['fb']*in_p['hb_p2'])*self.r_h
+        t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_p-in_p[9]-in_p[10]-in_p[11])
+        t_1_u = in_p[11]
+        t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -635,9 +635,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_m)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
-        t_1_u = in_p['h_m0']
-        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['h_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
+        t_0 = np.exp(self.f_m)*(self.m_m-in_p[6]-in_p[7]-in_p[8])
+        t_1_u = in_p[6]
+        t_1_d = 1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -648,9 +648,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bm) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
-        t_1_u = in_p['h_p0']
-        t_1_d = 1-2*in_p['y']+in_p['zd']-((1-in_p['fb'])*in_p['hb_m0']+in_p['fb']*in_p['hb_m0'])*self.r_h
+        t_0 = np.exp(self.f_bm) * (self.m_bm - in_p[12] - in_p[13] - in_p[14])
+        t_1_u = in_p[12]
+        t_1_d = 1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -661,9 +661,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_m+self.f_m1)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
-        t_1_u = in_p['h_m1']
-        t_1_d = 2*(in_p['y']-in_p['zd'])-((1-in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
+        t_0 = np.exp(self.f_m+self.f_m1)*(self.m_m-in_p[6]-in_p[7]-in_p[8])
+        t_1_u = in_p[7]
+        t_1_d = 2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -674,9 +674,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bm + self.f_bm1) * (self.m_bm - in_p['hb_m0'] - in_p['hb_m1'] - in_p['hb_m2'])
-        t_1_u = in_p['hb_m1']
-        t_1_d = 2 *(in_p['y']-in_p['zd'])-((1 - in_p['fb'])*in_p['h_m1']+in_p['fb']*in_p['hb_m1'])*self.r_h
+        t_0 = np.exp(self.f_bm + self.f_bm1)*(self.m_bm-in_p[12]-in_p[13]-in_p[14])
+        t_1_u = in_p[13]
+        t_1_d = 2 *(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
 
         return t_0 - t_1_u / t_1_d
 
@@ -687,9 +687,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_m+self.f_m2)*(self.m_m-in_p['h_m0']-in_p['h_m1']-in_p['h_m2'])
-        t_1_u = in_p['h_m2']
-        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_p1']+in_p['fb']*in_p['hb_p1'])*self.r_h
+        t_0 = np.exp(self.f_m+self.f_m2)*(self.m_m-in_p[6]-in_p[7]-in_p[8])
+        t_1_u = in_p[8]
+        t_1_d = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -700,9 +700,9 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_m-in_p['hb_m0']-in_p['hb_m1']-in_p['hb_m2'])
-        t_1_u = in_p['h_m2']
-        t_1_d = in_p['zd']-((1-in_p['fb'])*in_p['h_m2']+in_p['fb']*in_p['hb_m2'])*self.r_h
+        t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_m-in_p[12]-in_p[13]-in_p[14])
+        t_1_u = in_p[8]
+        t_1_d = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
