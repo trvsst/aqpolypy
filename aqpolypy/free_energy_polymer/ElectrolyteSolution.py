@@ -33,6 +33,9 @@ class ElectrolyteSolution(object):
         :param param_h: hydration layer parameters, see below
         :param press: pressure in bars, default is 1 atm
 
+        number density must be given in the same units as the molar volume
+        Energy is given in units of temperature, entropies in units of :math:`k_{B}`
+
         the parameters param_w is a dictionary with
         :math:`v\_w = \\upsilon_w, de\\_w = \\Delta E_w, ds\\_w = \\Delta S_w, de\\_2d=\\Delta E_{2d}, \
         ds\\_2d = \\Delta S_{2d}, de\\_2a=\\Delta E_{2a}, ds\\_2a = \\Delta S_{2a}`
