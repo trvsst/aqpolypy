@@ -78,6 +78,9 @@ class ElectrolyteSolution(object):
         self.ml = self.concentration_molal()
         self.sqrt_i_str = np.sqrt(self.ml)
 
+        # pressure
+        self.pvt = self.press*self.u_w/self.tp
+
         # energies and entropies
         self.e_w = param_w['de_w']
         self.s_w = param_w['se_w']
@@ -345,7 +348,7 @@ class ElectrolyteSolution(object):
         n_w = self.n_w
         n_s = self.n_s
 
-        t_1 = -(1-2*y) * n_w + ((1-fb) * (self.h_p+self.h_m) + fb * (self.hb_p + self.hb_m)) * n_s - (2 - fb) * n_s
+        t_1 = self.pvt-(1-2*y)*n_w+((1-fb)*(self.h_p+self.h_m)+fb*(self.hb_p+self.hb_m))*n_s-(2-fb)*n_s
 
         return t_1
 
