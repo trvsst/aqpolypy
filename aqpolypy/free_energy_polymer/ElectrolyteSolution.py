@@ -70,10 +70,10 @@ class ElectrolyteSolution(object):
         # concentration in dimensionless units
         self.n_w = nw_i * self.u_w
         self.n_s = ns_i * self.u_w
-        self.r_h = self.ns / self.nw
+        self.r_h = self.n_s / self.n_w
         # concentration in the molal scale and ionic strength
-        self.ml = self.concentration_molal(self.nw, self.ns)
-        self.ionic_strength = np.sqrt(self.ml)
+        self.ml = self.concentration_molal()
+        self.sqrt_i_str = np.sqrt(self.ml)
 
         # energies and entropies
         self.e_w = param_w['de_w']
@@ -237,7 +237,7 @@ class ElectrolyteSolution(object):
 
         """
 
-        n_w = self.nw
+        n_w = self.n_w
         n_s = self.n_s
 
         t_s = lg(n_w, n_w) + 2*lg(n_s, n_s) - (n_w+2*n_s)
@@ -265,7 +265,7 @@ class ElectrolyteSolution(object):
         :param b_g: parameter defining the extension for the free energy
         """
 
-        i_str = np.sqrt(1-fb)*self.ionic_strength
+        i_str = np.sqrt(1-fb)*self.sqrt_i_str
         val = b_g*i_str
 
         return -4*self.a_gamma*i_str**3*self.tau_debye(val)*self.n_w/(3*self.delta_w)
@@ -329,7 +329,7 @@ class ElectrolyteSolution(object):
         :param fb: fraction of Bjerrum pairs
         """
 
-        x_val = np.sqrt((1-fb))*self.ionic_strength
+        x_val = np.sqrt((1-fb))*self.sqrt_i_str
         return 2*self.a_gamma*x_val**3*self.r_debye(b_g*x_val)/(3*self.delta_w)
 
     def mu_w_comp(self, y, fb):
@@ -395,7 +395,7 @@ class ElectrolyteSolution(object):
         :param fb: fraction of Bjerrum pairs
         """
 
-        x_val = np.sqrt(1-fb)*self.ionic_strength
+        x_val = np.sqrt(1-fb)*self.sqrt_i_str
 
         return -2*self.a_gamma*x_val/(1+b_g*x_val)
 

@@ -33,12 +33,12 @@ class TestFreeEnergy(unittest.TestCase):
         self.param_h = {**dict_max, **dict_hp, **dict_h_m, **dict_h_bp, **dict_h_bm}
 
     def test_free_ideal(self):
-
-        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
-
         test_n_w = np.array([55.54, 55.0, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0])
-        comp_ideal = el_sol.f_ideal(test_n_w, test_n_s)
+
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
+        comp_ideal = el_sol.f_ideal()
         vals_ideal = np.array([10694.17289883, 10625.31694141, 11800.63110599])
 
         # testing params up to a precision of 10^-6
@@ -47,125 +47,141 @@ class TestFreeEnergy(unittest.TestCase):
 
     def test_free_compressibilty(self):
 
-        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
         test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
+
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.5, 1])
 
         k_ref = 5e-3
-        comp_comp = el_sol.f_comp(test_n_w, test_n_s, test_f_b, k_ref)
+        comp_comp = el_sol.f_comp(test_f_b, k_ref)
         vals_comp = np.array([16642.00600168, 16630.00600601, 15630.00638978, 16305.00612557])
         test_c = np.allclose(comp_comp, vals_comp, 0, 1e-6)
         self.assertTrue(test_c)
 
     def test_free_debye_huckel(self):
 
-        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        comp_debye = el_sol.f_debye(test_n_w, test_n_s, test_f_b, test_bpar)
-        vals_comp = [-0.00156919, -0.55497243, -0.77886876, -0.62931197]
+        comp_debye = el_sol.f_debye(test_f_b, test_bpar)
+        vals_comp = [-0.04707576, -16.64917299, -23.36606274, -18.8793592]
         test_d = np.allclose(comp_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_d)
 
     def test_free_assoc(self):
 
-        el_sol = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_assoc = el_sol.f_assoc(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        comp_assoc = el_sol.f_assoc(test_y, test_za, test_zd, test_f_b)
         vals_comp = [-17928.98280199, -17246.08272997, -22121.72593814, -23873.49131049]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
     def test_mu_water_1(self):
-        el_mu = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_mu_w_1=el_mu.mu_w_1(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        comp_mu_w_1=el_mu.mu_w_1(test_y, test_za, test_zd, test_f_b)
         vals_comp = [-5.25727997, -4.55696617, -7.17320148, -7.61640162]
         test_mu_1 = np.allclose(comp_mu_w_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_1)
 
     def test_mu_water_debye(self):
-        el_mu_d = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_mu_d = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        test_m = el_mu_d.concentration_molal(test_n_w, test_n_s)
-        comp_mu_debye = el_mu_d.mu_w_debye(test_m, test_f_b, test_bpar)
+        comp_mu_debye = el_mu_d.mu_w_debye(test_f_b, test_bpar)
         vals_comp = [1.41161015e-05, 5.01848558e-03, 5.43015396e-03, 3.57547593e-03]
         test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_debye)
 
     def test_mu_comp(self):
-        el_mu_c = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
+
+        el_mu_c = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_f_b = np.array([0.0, 0.0, 0.5, 1])
 
-        comp_mu_c = el_mu_c.mu_w_comp(test_n_w, test_n_s, test_y, test_f_b)
+        comp_mu_c = el_mu_c.mu_w_comp(test_y, test_f_b)
         vals_comp = [ 333.24,  337.5,  6516.0,  5937.6 ]
         test_mu_comp = np.allclose(comp_mu_c, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_comp)
 
     def test_mu_salt_1(self):
-        el_mu = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_mu_salt_1 = el_mu.mu_sf_1(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        comp_mu_salt_1 = el_mu.mu_sf_1(test_y, test_za, test_zd, test_f_b)
         vals_comp = [45.40514735, 53.53755282, 58.10210904, 64.73013653]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
     def test_mu_salt_debye(self):
-        el_mu_d = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_mu_d = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        test_m = el_mu_d.concentration_molal(test_n_w, test_n_s)
-        comp_mu_debye = el_mu_d.mu_w_debye(test_m, test_f_b, test_bpar)
+        comp_mu_debye = el_mu_d.mu_w_debye(test_f_b, test_bpar)
         vals_comp = [1.41161015e-05, 5.01848558e-03, 5.43015396e-03, 3.57547593e-03]
         test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_debye)
 
     def test_mu_salt_bjerrum_1(self):
-        el_mu = El.ElectrolyteSolution(self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+
         test_f_b = np.array([1e-4, 1e-4, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_mu_b_salt_1 = el_mu.mu_sb_1(test_n_w, test_n_s, test_y, test_za, test_zd, test_f_b)
+        comp_mu_b_salt_1 = el_mu.mu_sb_1(test_y, test_za, test_zd, test_f_b)
         vals_comp = [-26.49673298, -22.36947333, -11.31812004,  -5.83708178]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
