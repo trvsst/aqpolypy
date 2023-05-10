@@ -333,17 +333,19 @@ class ElectrolyteSolution(object):
         x_val = np.sqrt((1-fb))*self.sqrt_i_str
         return 2*self.a_gamma*x_val**3*self.r_debye(b_g*x_val)/(3*self.delta_w)
 
-    def mu_w_comp(self, y, fb):
+    def mu_w_comp(self, in_p):
         """
         Defines the compressibility chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
-        n_w = self.n_w
-        n_s = self.n_s
 
-        t_1 = self.pvt-(1-2*y)*n_w+((1-fb)*(self.h_p+self.h_m)+fb*(self.hb_p+self.hb_m))*n_s-(2-fb)*n_s
+        s_hp = np.sum(in_p[3:9], axis=0)
+        s_bp = np.sum(in_p[9:15], axis=0)
+        t_1_1 = self.pvt-(1-2*in_p[0])*self.n_w-(2-in_p[15])*self.n_s
+        t_1_2 = ((1-in_p[15])*s_hp+in_p[15]*s_bp)*self.n_s
+
+        t_1 = t_1_1 + t_1_2
 
         return t_1
 

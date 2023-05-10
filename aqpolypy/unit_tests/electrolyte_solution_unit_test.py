@@ -150,7 +150,10 @@ class TestFreeEnergy(unittest.TestCase):
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_f_b = np.array([0.0, 0.0, 0.5, 1])
 
-        comp_mu_c = el.mu_w_comp(test_y, test_f_b)
+        self.in_p[0] = test_y
+        self.in_p[15] = test_f_b
+
+        comp_mu_c = el.mu_w_comp(self.in_p)
         vals_comp = [ 333.24,  337.5,  6516.0,  5937.6 ]
         test_mu_comp = np.allclose(comp_mu_c, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_comp)
