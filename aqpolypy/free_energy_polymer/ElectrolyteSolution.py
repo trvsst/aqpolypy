@@ -450,20 +450,16 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
-    def mu_w(self, y, za, zd, fb, b_g=1e-4):
+    def mu_w(self, in_p):
         """
         Defines the water chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
-        :param b_g: parameter defining the extension for the electrostatic free energy
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        m_1 = self.mu_w_1(y, za, zd, fb)
-        m_2 = self.mu_w_debye(fb, b_g)
-        m_3 = self.mu_w_comp(y, fb)
+        m_1 = self.mu_w_1(in_p)
+        m_2 = self.mu_w_debye(in_p)
+        m_3 = self.mu_w_comp(in_p)
 
         m_total = m_1+m_2+m_3
 
