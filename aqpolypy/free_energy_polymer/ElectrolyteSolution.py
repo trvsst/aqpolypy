@@ -452,38 +452,30 @@ class ElectrolyteSolution(object):
 
         return m_total
 
-    def mu_sf(self, y, za, zd, fb, b_g=1e-4):
+    def mu_sf(self, in_p):
         """
         Defines the free salt chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
-        :param b_g: parameter defining the extension for the electrostatic free energy
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        m_1 = self.mu_sf_1(y, za, zd, fb)
-        m_2 = self.mu_sf_debye(fb, b_g)
-        m_3 = self.mu_w_comp(y, fb)*self.u_w/self.u_s
+        m_1 = self.mu_sf_1(in_p)
+        m_2 = self.mu_sf_debye(in_p)
+        m_3 = self.mu_w_comp(in_p)*self.u_w/self.u_s
 
         m_total = m_1 + m_2 + m_3
 
         return m_total
 
-    def mu_bf(self, y, za, zd, fb, b_g=1e-4):
+    def mu_bf(self, in_p):
         """
         Defines the bjerrum salt chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
-        :param b_g: parameter defining the extension for the electrostatic free energy
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        m_1 = self.mu_sb_1(y, za, zd, fb)
-        m_2 = self.mu_w_comp(y, fb) * self.u_w / self.u_s
+        m_1 = self.mu_sb_1(in_p)
+        m_2 = self.mu_w_comp(in_p)*self.u_w/self.u_b
 
         m_total = m_1 + m_2
 
@@ -697,7 +689,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        return 1.0
+        return self.mu_sf(in_p)-self.mu_bf(in_p)
 
     def concentration_molal(self):
         """
