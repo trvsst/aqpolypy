@@ -171,8 +171,13 @@ class TestFreeEnergy(unittest.TestCase):
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_mu_salt_1 = el_mu.mu_sf_1(test_y, test_za, test_zd, test_f_b)
-        vals_comp = [45.40514735, 53.53755282, 58.10210904, 64.73013653]
+        self.in_p[0] = test_y
+        self.in_p[1] = test_za
+        self.in_p[2] = test_zd
+        self.in_p[15] = test_f_b
+
+        comp_mu_salt_1 = el_mu.mu_sf_1(self.in_p)
+        vals_comp = [45.86428195, 53.99668742, 58.56124364, 65.18927112]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
