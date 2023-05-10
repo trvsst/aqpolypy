@@ -400,44 +400,37 @@ class ElectrolyteSolution(object):
 
         return -2*self.a_gamma*x_val/(1+self.b_param*x_val)
 
-    def mu_sb_1(self, y, za, zd, fb):
+    def mu_sb_1(self, in_p):
         """
         Defines partial contribution to the bjerrum salt chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
+        s_bp = np.sum(in_p[9:12], axis=0)
+        s_bm = np.sum(in_p[12:15], axis=0)
 
-        r_h = self.r_h
-        n_w = self.n_w
-        n_s = self.n_s
-
-        t_11 = np.log(fb*n_s) - self.hb_m * self.f_bm - self.hb_p * self.f_bp - self.f_bj
-        t_12 = self.hb_m1 * self.f_bm1 + self.hb_m2 * self.f_bm2 + self.hb_p1 * self.f_bp1 + self.hb_p2 * self.f_bp2
+        t_11 = np.log(in_p[15]*self.n_s)-s_bp*self.f_bp-s_bm*self.f_bm-self.f_bj
+        t_12 = in_p[10]*self.f_bp1+in_p[11]*self.f_bp2+in_p[13]*self.f_bm1+in_p[14]*self.f_bm2
         t_1 = t_11 + t_12
 
-        t_2 = -self.hb_p0 * np.log(1 - 2 * y + za - ((1 - fb) * self.h_p0 + fb * self.hb_p0) * r_h)
+        t_2 = -in_p[9]*np.log(1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h)
 
-        t_3 = -self.hb_p1 * np.log(2 * (y - za) - ((1 - fb) * self.h_p1 + fb * self.hb_p1) * r_h)
+        t_3 = -in_p[10]*np.log(2*(in_p[0]-in_p[1])-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h)
 
-        t_4 = -self.hb_p2 * np.log(za - ((1 - fb) * self.h_p2 + fb * self.hb_p2) * r_h)
+        t_4 = -in_p[11]*np.log(in_p[1]-((1-in_p[15])*in_p[5]+ in_p[15]*in_p[11])*self.r_h)
 
-        t_5 = lg(self.hb_p0, self.hb_p0) + lg(self.hb_p1, self.hb_p1) + lg(self.hb_p2, self.hb_p2) - lg(self.hb_p, self.hb_p)
+        t_5 = lg(in_p[9], in_p[9])+lg(in_p[10], in_p[10])+lg(in_p[11], in_p[11]) - lg(s_bp, s_bp)
 
-        t_6 = -self.hb_m0 * np.log(1 - 2 * y + zd - ((1 - fb) * self.h_m0 + fb * self.hb_m0) * r_h)
+        t_6 = -in_p[12]*np.log(1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h)
 
-        t_7 = -self.hb_m1 * np.log(2 * (y - zd) - ((1 - fb) * self.h_m1 + fb * self.hb_m1) * r_h)
+        t_7 = -in_p[13]*np.log(2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h)
 
-        t_8 = -self.hb_m2 * np.log(zd - ((1 - fb) * self.h_m2 + fb * self.hb_m2) * r_h)
+        t_8 = -in_p[14]*np.log(in_p[2]-((1-in_p[15])*in_p[8]+ in_p[15]*in_p[14])*self.r_h)
 
-        t_9_1 = lg(self.hb_m0, self.hb_m0) + lg(self.hb_m1, self.hb_m1)
-        t_9_2 = lg(self.hb_m2, self.hb_m2) - lg(self.hb_m, self.hb_m)
-        t_9 = t_9_1 + t_9_2
+        t_9 = lg(in_p[12], in_p[12])+lg(in_p[13], in_p[13])+lg(in_p[14], in_p[14])-lg(s_bm, s_bm)
 
-        t_10_1 = self.m_bp*(lg(1 - self.hb_p / self.m_bp, 1 - self.hb_p / self.m_bp) + lg(self.hb_p / self.m_bp, self.hb_p / self.m_bp))
-        t_10_2 = self.m_bp*(lg(1 - self.hb_m / self.m_bm, 1 - self.hb_m / self.m_bm) + lg(self.hb_m / self.m_bm, self.hb_m / self.m_bm))
+        t_10_1 = self.m_bp*(lg(1-s_bp/self.m_bp, 1-s_bp/self.m_bp)+lg(s_bp/self.m_bp, s_bp/self.m_bp))
+        t_10_2 = self.m_bm*(lg(1-s_bm/self.m_bm, 1-s_bm/self.m_bm)+lg(s_bm/self.m_bm, s_bm/ self.m_bm))
         t_10 = t_10_1 + t_10_2
 
         t_11 = np.log(self.m_m*self.m_p)
