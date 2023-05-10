@@ -184,16 +184,16 @@ class TestFreeEnergy(unittest.TestCase):
     def test_mu_salt_debye(self):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+        t_b = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        el_mu_d = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        el = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, b_param=t_b)
 
-        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
-        test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
+        self.in_p[15] = np.array([0.0, 0.0, 0.25, 0.25])
 
-        #comp_mu_debye = el_mu_d.mu_w_debye(test_f_b, test_bpar)
-        #vals_comp = [1.41161015e-05, 5.01848558e-03, 5.43015396e-03, 3.57547593e-03]
-        #test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
-        #self.assertTrue(test_mu_debye)
+        comp_mu_debye = el.mu_sf_debye(self.in_p)
+        vals_comp = [-0.23532007, -1.66197828, -1.43308287, -1.09890055]
+        test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
+        self.assertTrue(test_mu_debye)
 
     def test_mu_salt_bjerrum_1(self):
 

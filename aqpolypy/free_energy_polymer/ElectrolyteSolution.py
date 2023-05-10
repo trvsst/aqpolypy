@@ -389,18 +389,16 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10
 
-    def mu_sf_debye(self, fb, b_g):
+    def mu_sf_debye(self, in_p):
         """
         Defines the salt Electrostatic chemical potential
 
-        :param i_str: ionic strength (molal scale)
-        :param b_g: chemical potential constant
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        x_val = np.sqrt(1-fb)*self.sqrt_i_str
+        x_val = np.sqrt(1-in_p[15])*self.sqrt_i_str
 
-        return -2*self.a_gamma*x_val/(1+b_g*x_val)
+        return -2*self.a_gamma*x_val/(1+self.b_param*x_val)
 
     def mu_sb_1(self, y, za, zd, fb):
         """
