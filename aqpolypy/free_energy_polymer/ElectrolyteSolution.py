@@ -295,35 +295,30 @@ class ElectrolyteSolution(object):
 
         return f_i + f_a + f_c + f_d
 
-    def mu_w_1(self, y, za, zd, fb):
+    def mu_w_1(self, in_p):
         """
         Defines partial contribution to the water chemical potential
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        r_h = self.r_h
-        n_w = self.n_w
-        n_s = self.n_s
-
-        t_11 = (1-2*y)*np.log(n_w)
-        t_12 = (1-2*y+za)*np.log(1 - 2 * y + za - ((1-fb) * self.h_p0 + fb * self.hb_p0) * r_h)
+        t_11 = (1-2*in_p[0])*np.log(self.n_w)
+        t_12 = (1-2*in_p[0]+in_p[1])*np.log(1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h)
         t_1 = t_11+t_12
 
-        t_2 = 2*(y-za)*np.log(2 * (y-za) - ((1-fb) * self.h_p1 + fb * self.hb_p1) * r_h)
+        t_2 = 2*(in_p[0]-in_p[1])*np.log(2*(in_p[0]-in_p[1])-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h)
 
-        t_3 = za*np.log(za - ((1-fb) * self.h_p2 + fb * self.hb_p2) * r_h)
+        t_3 = in_p[1]*np.log(in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h)
 
-        t_4 = (1-2*y+zd)*np.log(1 - 2 * y + zd - ((1-fb) * self.h_m0 + fb * self.hb_m0) * r_h)
+        t_4 = (1-2*in_p[0]+in_p[2])*np.log(1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h)
 
-        t_5 = 2*(y-zd)*np.log(2 * (y-zd) - ((1-fb) * self.h_m1 + fb * self.hb_m1) * r_h)
+        t_5 = 2*(in_p[0]-in_p[2])*np.log(2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h)
 
-        t_6 = zd*np.log(zd - ((1-fb) * self.h_m2 + fb * self.hb_m2) * r_h)
+        t_6 = in_p[2]*np.log(in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h)
 
-        t_7 = -2*y*self.f_w-zd*self.f_2d-za*self.f_2a-2*(3*y-za-zd)*np.log(2)-2*lg(y, y)
+        t_7_1 = -2*in_p[0]*self.f_w-in_p[2]*self.f_2d-in_p[1]*self.f_2a
+        t_7_2 = -2*(3*in_p[0]-in_p[1]-in_p[2])*np.log(2)-2*lg(in_p[0], in_p[0])
+        t_7 = t_7_1 + t_7_2
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
 

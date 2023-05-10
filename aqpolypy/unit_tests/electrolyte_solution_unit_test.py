@@ -31,6 +31,19 @@ class TestFreeEnergy(unittest.TestCase):
         dict_h_bp = {'hb_p0': 4.0, 'hb_p1': 0.5, 'hb_p2': 0.0}
         dict_h_bm = {'hb_m0': 4.5, 'hb_m1': 1.0, 'hb_m2': 0.0}
         self.param_h = {**dict_max, **dict_hp, **dict_h_m, **dict_h_bp, **dict_h_bm}
+        self.in_p = np.zeros([16, 4])
+        self.in_p[3, :] = dict_hp['h_p0']
+        self.in_p[4, :] = dict_hp['h_p1']
+        self.in_p[5, :] = dict_hp['h_p2']
+        self.in_p[6, :] = dict_h_m['h_m0']
+        self.in_p[7, :] = dict_h_m['h_m1']
+        self.in_p[8, :] = dict_h_m['h_m2']
+        self.in_p[9, :] = dict_h_bp['hb_p0']
+        self.in_p[10, :] = dict_h_bp['hb_p1']
+        self.in_p[11, :] = dict_h_bp['hb_p2']
+        self.in_p[12, :] = dict_h_bm['hb_m0']
+        self.in_p[13, :] = dict_h_bm['hb_m1']
+        self.in_p[14, :] = dict_h_bm['hb_m2']
 
     def test_free_ideal(self):
         test_n_w = np.array([55.54, 55.0, 30.5])
@@ -104,7 +117,11 @@ class TestFreeEnergy(unittest.TestCase):
         test_za = np.array([0.35, 0.3, 0.6, 0.55])
         test_zd = np.array([0.25, 0.2, 0.55, 0.6])
 
-        comp_mu_w_1=el_mu.mu_w_1(test_y, test_za, test_zd, test_f_b)
+        self.in_p[0] = test_y
+        self.in_p[1] = test_za
+        self.in_p[2] = test_zd
+        self.in_p[15] = test_f_b
+        comp_mu_w_1=el_mu.mu_w_1(self.in_p)
         vals_comp = [-5.25727997, -4.55696617, -7.17320148, -7.61640162]
         test_mu_1 = np.allclose(comp_mu_w_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_1)
