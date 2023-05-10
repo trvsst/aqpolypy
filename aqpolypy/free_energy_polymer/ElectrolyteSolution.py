@@ -166,51 +166,49 @@ class ElectrolyteSolution(object):
         self.hb_p = self.hb_p0 + self.hb_p1 + self.hb_p2
         self.hb_m = self.hb_m0 + self.hb_m1 + self.hb_m2
 
-    def f_assoc(self, y, za, zd, fb):
+    def f_assoc(self, in_p):
         """
         Defines the association free energy
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        n_w = self.n_w
-        n_s = self.n_s
+        s_hp = np.sum(in_p[3:6], axis=0)
+        s_hm = np.sum(in_p[6:9], axis=0)
+        s_bp = np.sum(in_p[9:12], axis=0)
+        s_bm = np.sum(in_p[12:15], axis=0)
 
-        t_0 = - n_w*(2*y*self.f_w+zd*self.f_2d+za*self.f_2a)-n_s*fb*self.f_bj
+        t_0 = - self.n_w*(2*in_p[0]*self.f_w+in_p[2]*self.f_2d+in_p[1]*self.f_2a)-self.n_s*fb*self.f_bj
 
-        t_1_0 = - n_s*(self.h_m*self.f_m+self.h_p*self.f_p)*(1-fb)
-        t_1_1 = - n_s * (self.hb_m * self.f_bm + self.hb_p * self.f_bp) * fb
+        t_1_0 = - self.n_s*(s_hm*self.f_m+s_hp*self.f_p)*(1-in_p[15])
+        t_1_1 = - self.n_s*(s_bm*self.f_bm+s_bp*self.f_bp)*in_p[15]
         t_1 = t_1_0 + t_1_1
 
-        t_2_0 = - n_s*(self.h_m1*self.f_m1+self.h_p1*self.f_p1)*(1-fb)
-        t_2_1 = - n_s*(self.h_m2*self.f_m2+self.h_p2*self.f_p2)*(1-fb)
-        t_2_2 = - n_s * (self.hb_m1 * self.f_bm1 + self.hb_p1 * self.f_bp1) * fb
-        t_2_3 = - n_s * (self.hb_m2 * self.f_bm2 + self.hb_p2 * self.f_bp2) * fb
+        t_2_0 = - self.n_s*(in_p[7]*self.f_m1+in_p[4]*self.f_p1)*(1-in_p[15])
+        t_2_1 = - self.n_s*(in_p[8]*self.f_m2+in_p[5]*self.f_p2)*(1-in_p[15])
+        t_2_2 = - self.n_s*(in_p[13]*self.f_bm1+in_p[10]*self.f_bp1)*in_p[15]
+        t_2_3 = - self.n_s*(in_p[14]*self.f_bm2+in_p[11]*self.f_bp2)*in_p[15]
         t_2 = t_2_0+t_2_1+t_2_2+t_2_3
 
-        va0 = (1-2*y+za) * n_w - ((1-fb) * self.h_p0 + fb * self.hb_p0) * n_s
+        va0 = (1-2*in_p[0]+in_p[1])*self.n_w-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.n_s
         t_3 = lg(va0, va0)
 
-        va1 = 2 * (y-za) * n_w - ((1-fb) * self.h_p1 + fb * self.hb_p1) * n_s
-        t_4 = lg(va1, va1)-2*(y-za)*n_w*np.log(2)
+        va1 = 2*(in_p[0]-in_p[1])*self.n_w-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.n_s
+        t_4 = lg(va1, va1)-2*(in_p[0]-in_p[1])*self.n_w*np.log(2)
 
-        va2 = za * n_w - ((1 - fb) * self.h_p2 + fb * self.hb_p2) * n_s
+        va2 = in_p[1]*self.n_w-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.n_s
         t_5 = lg(va2, va2)
 
-        vah = lg(self.h_p0, self.h_p0)+lg(self.h_p1, self.h_p1)+lg(self.h_p2, self.h_p2)
-        t_6 = (1-fb)*n_s*(vah-lg(self.h_p, self.h_p))
+        vah = lg(in_p[3], in_p[3])+lg(in_p[4], in_p[4])+lg(in_p[5], in_p[5])
+        t_6 = (1-in_p[15])*self.n_s*(vah-lg(s_hp, s_hp))
 
-        vabh1 = lg(self.hb_p0, self.hb_p0) + lg(self.hb_p1, self.hb_p1)
-        vabh2 = lg(self.hb_p2, self.hb_p2)
-        t_7 = fb * n_s * (vabh1 + vabh2 - lg(self.hb_p, self.hb_p))
+        vabh = lg(in_p[9], in_p[9]) + lg(in_p[10], in_p[10])+ lg(in_p[11], in_p[11])
+        t_7 = in_p[15]*self.n_s*(vabh-lg(s_bp, s_bp))
 
-        vd0 = (1-2*y+zd) * n_w - ((1-fb) * self.h_m0 + fb * self.hb_m0) * n_s
+        vd0 = (1-2*in_p[0]+in_p[2])*self.n_w-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.n_s
         t_8 = lg(vd0, vd0)
 
-        vd1 = 2 * (y - zd) * n_w - ((1 - fb) * self.h_m1 + fb * self.hb_m1) * n_s
+        vd1 = 2*(in_p[0]-in_p[2])*self.n_w-((1 - fb) * self.h_m1 + fb * self.hb_m1) * n_s
         t_9 = lg(vd1, vd1) - 2 * (y - zd) * n_w * np.log(2)
 
         vd2 = za * n_w - ((1 - fb) * self.h_m2 + fb * self.hb_m2) * n_s
