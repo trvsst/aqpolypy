@@ -20,7 +20,7 @@ class ElectrolyteSolution(object):
     Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325):
+    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325, b_param=0):
 
         """
         The constructor, with the following parameters
@@ -32,6 +32,7 @@ class ElectrolyteSolution(object):
         :param param_salt: salt parameters (see definition below)
         :param param_h: hydration layer parameters, see below
         :param press: pressure in bars, default is 1 atm
+        :param b_param: b-parameter for debye huckel contribution
 
         number density must be given in the same units as the molar volume
         Energy is given in units of temperature, entropies in units of :math:`k_{B}`
@@ -59,6 +60,9 @@ class ElectrolyteSolution(object):
 
         # temperature
         self.tp = temp
+
+        # electrostatic contribution
+        self.b_param = b_param
 
         # water model at the given temperature and pressure
         self.press = press
@@ -322,16 +326,16 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
 
-    def mu_w_debye(self, fb, b_g):
+    def mu_w_debye(self, in_p):
         """
         Defines the Electrostatic chemical potential
 
         :param b_g: chemical potential constant
-        :param fb: fraction of Bjerrum pairs
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        x_val = np.sqrt((1-fb))*self.sqrt_i_str
-        return 2*self.a_gamma*x_val**3*self.r_debye(b_g*x_val)/(3*self.delta_w)
+        x_val = np.sqrt((1-in_p[15]))*self.sqrt_i_str
+        return 2*self.a_gamma*x_val**3*self.r_debye(self.b_param*x_val)/(3*self.delta_w)
 
     def mu_w_comp(self, in_p):
         """
