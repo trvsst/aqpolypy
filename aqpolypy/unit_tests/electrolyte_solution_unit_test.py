@@ -59,16 +59,16 @@ class TestFreeEnergy(unittest.TestCase):
         self.assertTrue(test_i)
 
     def test_free_compressibilty(self):
-
+        k_ref = 5e-3
         test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
 
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, k_r= k_ref)
 
-        test_f_b = np.array([0.0, 0.0, 0.5, 1])
+        self.in_p[15] = np.array([0.0, 0.0, 0.5, 1])
 
-        k_ref = 5e-3
-        comp_comp = el_sol.f_comp(test_f_b, k_ref)
+
+        comp_comp = el_sol.f_comp(self.in_p)
         vals_comp = np.array([16642.00600168, 16630.00600601, 15630.00638978, 16305.00612557])
         test_c = np.allclose(comp_comp, vals_comp, 0, 1e-6)
         self.assertTrue(test_c)
@@ -77,13 +77,13 @@ class TestFreeEnergy(unittest.TestCase):
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
-
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
-
-        test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        comp_debye = el_sol.f_debye(test_f_b, test_bpar)
+        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, b_param=test_bpar)
+
+        self.in_p[15] = np.array([0.0, 0.0, 0.25, 0.25])
+
+        comp_debye = el_sol.f_debye(self.in_p)
         vals_comp = [-0.04707576, -16.64917299, -23.36606274, -18.8793592]
         test_d = np.allclose(comp_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_d)

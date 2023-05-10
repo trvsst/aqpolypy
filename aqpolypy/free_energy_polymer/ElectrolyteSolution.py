@@ -20,7 +20,7 @@ class ElectrolyteSolution(object):
     Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325, b_param=0):
+    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-5):
 
         """
         The constructor, with the following parameters
@@ -33,6 +33,7 @@ class ElectrolyteSolution(object):
         :param param_h: hydration layer parameters, see below
         :param press: pressure in bars, default is 1 atm
         :param b_param: b-parameter for debye huckel contribution
+        :param k_r: reference compressibility
 
         number density must be given in the same units as the molar volume
         Energy is given in units of temperature, entropies in units of :math:`k_{B}`
@@ -63,6 +64,9 @@ class ElectrolyteSolution(object):
 
         # electrostatic contribution
         self.b_param = b_param
+
+        # reference compressibility
+        self.k_ref = k_r
 
         # water model at the given temperature and pressure
         self.press = press
@@ -254,48 +258,41 @@ class ElectrolyteSolution(object):
 
         return t_s
 
-    def f_comp(self, fb, k_ref):
+    def f_comp(self, in_p):
         """
         Defines the compressible free energy
 
-        :param fb: fraction of Bjerrum pairs
-        :param k_ref: reference compressibility
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        k_param = self.u_w/(self.tp*k_ref)
-        v0 = self.n_w+((1-fb)*self.u_s+fb*self.u_b)*self.n_s/self.u_w
+        k_param = self.u_w/(self.tp*self.k_ref)
+        v0 = self.n_w+((1-in_p[15])*self.u_s+in_p[15]*self.u_b)*self.n_s/self.u_w
 
         return 0.5*k_param*(1-v0)**2/v0
 
-    def f_debye(self, fb, b_g=1e-2):
+    def f_debye(self, in_p):
         """
         Defines the Debye-Huckel contribution
 
-        :param fb: fraction of Bjerrum pairs
-        :param b_g: parameter defining the extension for the free energy
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        i_str = np.sqrt(1-fb)*self.sqrt_i_str
-        val = b_g*i_str
+        i_qstr = np.sqrt(1-in_p[15])*self.sqrt_i_str
+        val = self.b_param*i_qstr
 
-        return -4*self.a_gamma*i_str**3*self.tau_debye(val)*self.n_w/(3*self.delta_w)
+        return -4*self.a_gamma*i_qstr**3*self.tau_debye(val)*self.n_w/(3*self.delta_w)
 
-    def f_total(self, y, za, zd, fb, k_ref, b_g=1e-4):
+    def f_total(self, in_p):
         """
         Defines the total free energy
 
-        :param y: fraction of water hydrogen bonds
-        :param za: fraction of double acceptor hydrogen bonds
-        :param zd: fraction of double donor hydrogen bonds
-        :param fb: fraction of Bjerrum pairs
-        :param k_ref: reference compressibility for the compressibility free energy
-        :param b_g: parameter defining the extension for the electrostatic free energy
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
         f_i = self.f_ideal()
-        f_a = self.f_assoc(y, za, zd, fb)
-        f_c = self.f_comp(fb, k_ref)
-        f_d = self.f_debye(fb, b_g)
+        f_a = self.f_assoc(in_p)
+        f_c = self.f_comp(in_p)
+        f_d = self.f_debye(in_p)
 
         return f_i + f_a + f_c + f_d
 
