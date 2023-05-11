@@ -222,7 +222,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
-    def test_sols(self):
+    def test_sol_water(self):
 
         def sol_water(df):
             y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
@@ -245,6 +245,35 @@ class TestFreeEnergy(unittest.TestCase):
             test_cond = np.allclose(sol, sol_water(el.f_w), 0, 1e-8)
             self.assertTrue(test_cond)
 
+    def test_sol_water_salt(self):
+        def sol_salt(y, m, h):
+            r = m/55.50847203605298
+            t_0 = (y**2-((h[1]+2*h[2])*y-h[2])*r+(0.25*h[1]**2-h[0]*h[2])*r**2)/(1-np.sum(h)*r)
+            return t_0
+
+        nw = 55.5
+        ns_mat = np.array([0.5, 1.0, 1.5, 2.0, 2.5, 3.0])
+
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.63
+        ini_p[1] = 0.4
+        ini_p[2] = 0.4
+        for ns in ns_mat:
+            el = El.ElectrolyteSolution(nw, ns, self.temp, self.param_w, self.param_salt, self.param_h)
+            ini_p[3] = 5.0
+            ini_p[4] = 2.0
+            ini_p[5] = 0.0
+            ini_p[6] = 7.0
+            ini_p[7] = 3.0
+            ini_p[8] = 0.5
+            ini_p[15] = 1e-14
+            sol = el.solve_eqns(ini_p, np.array([0, 1, 2]))
+            ini_p[:3] = sol[:]
+            da = el.delta_w
+            test_cond1 = np.allclose(sol[1], sol_salt(sol[0], da*ns/nw, ini_p[3:6]))
+            test_cond2 = np.allclose(sol[2], sol_salt(sol[0], da*ns/nw, ini_p[6:9]))
+            self.assertTrue(test_cond1)
+            self.assertTrue(test_cond2)
 
 if __name__ == '__main__':
     unittest.main()
