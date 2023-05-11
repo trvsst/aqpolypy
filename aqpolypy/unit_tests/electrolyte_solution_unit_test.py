@@ -222,6 +222,29 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
+    def test_sols(self):
+
+        def sol_water(df):
+            y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
+            return np.array([y_val, y_val**2, y_val**2])
+
+        nw = 55.5
+        ns = 1e-14
+
+        ini_p = np.zeros(16)
+
+        tp = np.array([300, 320, 340, 360, 380])
+
+        for temp in tp:
+            el = El.ElectrolyteSolution(nw, ns, temp, self.param_w, self.param_salt, self.param_h)
+            ini_p[0] = 0.63
+            ini_p[1] = 0.4
+            ini_p[2] = 0.4
+            ini_p[15] = 1e-14
+            sol = el.solve_eqns(ini_p, np.array([0,1,2]))
+            test_cond = np.allclose(sol, sol_water(el.f_w), 0, 1e-8)
+            self.assertTrue(test_cond)
+
 
 if __name__ == '__main__':
     unittest.main()

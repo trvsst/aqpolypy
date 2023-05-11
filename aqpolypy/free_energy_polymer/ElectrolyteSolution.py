@@ -583,7 +583,7 @@ class ElectrolyteSolution(object):
 
         t_0 = np.exp(self.f_p+self.f_p2)*(self.m_p-in_p[3]-in_p[4]-in_p[5])
         t_1_u = in_p[5]
-        t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p['fb']*in_p[11])*self.r_h
+        t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
 
@@ -686,6 +686,40 @@ class ElectrolyteSolution(object):
         """
 
         return self.mu_sf(in_p)-self.mu_bf(in_p)
+
+    def eqns(self, in_p):
+        """
+         mean field equations
+
+        :param ini_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        eqns=np.array([self.eqn_y(in_p), self.eqn_za(in_p), self.eqn_zd(in_p),
+                       self.eqn_h_p0(in_p), self.eqn_h_p1(in_p), self.eqn_h_p2(in_p),
+                       self.eqn_h_m0(in_p), self.eqn_h_m1(in_p), self.eqn_h_m2(in_p),
+                       self.eqn_hb_p0(in_p), self.eqn_hb_p1(in_p), self.eqn_hb_p2(in_p),
+                       self.eqn_hb_m0(in_p), self.eqn_hb_m1(in_p), self.eqn_hb_m2(in_p),
+                       self.eqn_bjerrum(in_p)])
+
+        return eqns
+
+    def solve_eqns(self, ini_condition_p, num_eqns=np.arange(16, dtype='int')):
+        """
+        Solve the mean field equations
+
+        :param ini_condition_p: initial 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        :param num_eqns: indexes of the equations to solve
+        """
+
+        ini_c = ini_condition_p[num_eqns]
+        def fun(ini_p):
+            ini_val = ini_condition_p
+            ini_val[num_eqns] = ini_p
+            return self.eqns(ini_val)[num_eqns]
+
+        sol = fsolve(fun, ini_c)
+
+        return sol
 
     def concentration_molal(self):
         """
