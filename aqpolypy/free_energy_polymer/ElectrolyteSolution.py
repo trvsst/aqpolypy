@@ -178,7 +178,7 @@ class ElectrolyteSolution(object):
         s_bp = np.sum(in_p[9:12], axis=0)
         s_bm = np.sum(in_p[12:15], axis=0)
 
-        t_0 = - self.n_w*(2*in_p[0]*self.f_w+in_p[2]*self.f_2d+in_p[1]*self.f_2a)-self.n_s*fb*self.f_bj
+        t_0 = - self.n_w*(2*in_p[0]*self.f_w+in_p[2]*self.f_2d+in_p[1]*self.f_2a)-self.n_s*in_p[15]*self.f_bj
 
         t_1_0 = - self.n_s*(s_hm*self.f_m+s_hp*self.f_p)*(1-in_p[15])
         t_1_1 = - self.n_s*(s_bm*self.f_bm+s_bp*self.f_bp)*in_p[15]
@@ -208,36 +208,37 @@ class ElectrolyteSolution(object):
         vd0 = (1-2*in_p[0]+in_p[2])*self.n_w-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.n_s
         t_8 = lg(vd0, vd0)
 
-        vd1 = 2*(in_p[0]-in_p[2])*self.n_w-((1 - fb) * self.h_m1 + fb * self.hb_m1) * n_s
-        t_9 = lg(vd1, vd1) - 2 * (y - zd) * n_w * np.log(2)
+        vd1 = 2*(in_p[0]-in_p[2])*self.n_w-((1-in_p[15])*in_p[7]+ in_p[15]*in_p[13])*self.n_s
+        t_9 = lg(vd1, vd1)-2*(in_p[0]-in_p[2])*self.n_w * np.log(2)
 
-        vd2 = za * n_w - ((1 - fb) * self.h_m2 + fb * self.hb_m2) * n_s
+        vd2 = in_p[1]*self.n_w-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.n_s
         t_10 = lg(vd2, vd2)
 
-        vdh = lg(self.h_m0, self.h_m0) + lg(self.h_m1, self.h_m1) + lg(self.h_m2, self.h_m2)
-        t_11 = (1 - fb) * n_s * (vdh - lg(self.h_m, self.h_m))
+        vdh = lg(in_p[6], in_p[6])+lg(in_p[7], in_p[7])+lg(in_p[8], in_p[8])
+        t_11 = (1-in_p[15])*self.n_s*(vdh - lg(s_hm, s_hm))
 
-        vdbh1 = lg(self.hb_m0, self.hb_m0) + lg(self.hb_m1, self.hb_m1)
-        vdbh2 = lg(self.hb_m2, self.hb_m2)
-        t_12 = fb * n_s * (vdbh1 + vdbh2 - lg(self.hb_m, self.hb_m))
+        vdbh = lg(in_p[12], in_p[12]) + lg(in_p[13], in_p[13]) + lg(in_p[14], in_p[14])
+        t_12 = in_p[15]*self.n_s*(vdbh - lg(s_bm, s_bm))
 
-        t_13_1 = n_s*self.m_p*(1-fb)*lg(1-self.h_p/self.m_p, 1-self.h_p/self.m_p)
-        t_13_2 = n_s*self.m_p*(1-fb)*lg(self.h_p/self.m_p, self.h_p/self.m_p)
-        t_13_3 = n_s*self.m_bp*fb*lg(1 - self.hb_p / self.m_bp, 1 - self.hb_p / self.m_bp)
-        t_13_4 = n_s*self.m_bp*fb*lg(self.hb_p / self.m_bp, self.hb_p / self.m_bp)
+        t_13_1 = self.n_s*self.m_p*(1-in_p[15])*lg(1-s_hp/self.m_p, 1-s_hp/self.m_p)
+        t_13_2 = self.n_s*self.m_p*(1-in_p[15])*lg(s_hp/self.m_p, s_hp/self.m_p)
+        t_13_3 = self.n_s*self.m_bp*in_p[15]*lg(1-s_bp/self.m_bp, 1-s_bp/self.m_bp)
+        t_13_4 = self.n_s*self.m_bp*in_p[15]*lg(s_bp/self.m_bp, s_bp/self.m_bp)
         t_13 = t_13_1+t_13_2+t_13_3+t_13_4
 
-        t_14_1 = n_s*self.m_m*(1-fb)*lg(1-self.h_m/self.m_m, 1-self.h_m/self.m_m)
-        t_14_2 = n_s*self.m_m*(1-fb)*lg(self.h_m/self.m_m, self.h_m/self.m_m)
-        t_14_3 = n_s*self.m_bm*fb*lg(1 - self.hb_m / self.m_bm, 1 - self.hb_m / self.m_bm)
-        t_14_4 = n_s*self.m_bp*fb*lg(self.hb_m / self.m_bm, self.hb_m / self.m_bm)
+        t_14_1 = self.n_s*self.m_m*(1-in_p[15])*lg(1-s_hm/self.m_m, 1-s_hm/self.m_m)
+        t_14_2 = self.n_s*self.m_m*(1-in_p[15])*lg(s_hm/self.m_m, s_hm/self.m_m)
+        t_14_3 = self.n_s*self.m_bm*in_p[15]*lg(1-s_bm /self.m_bm,1-s_bm/self.m_bm)
+        t_14_4 = self.n_s*self.m_bp*in_p[15]*lg(s_bm/self.m_bm, s_bm/self.m_bm)
         t_14 = t_14_1 + t_14_2 + t_14_3 + t_14_4
 
-        t_15_1 = n_s*fb*np.log(self.m_bm*self.m_bp)-2*lg(y*n_w, y*n_w)
-        t_15_2 = 2*n_s*(lg(1-fb, 1-fb)+lg(fb, fb))-lg(n_s*fb, n_s*fb)
+        t_15_1 = self.n_s*in_p[15]*np.log(self.m_bm*self.m_bp)-2*lg(in_p[0]*self.n_w, in_p[0]*self.n_w)
+        t_15_2 = 2*self.n_s*(lg(1-in_p[15], 1-in_p[15])+lg(in_p[15], in_p[15]))-lg(self.n_s*in_p[15], self.n_s*in_p[15])
         t_15 = t_15_1+t_15_2
 
-        t_16 = -2*lg(n_w, n_w)-2*y*n_w*(np.log(2)-1)+n_s*(fb * (1 + self.hb_p + self.hb_m) + (1 - fb) * (self.h_p + self.h_m))
+        t_16_1 = -2*lg(self.n_w, self.n_w)-2*in_p[0]*self.n_w*(np.log(2)-1)
+        t_16_2 = self.n_s*(in_p[15]*(1+s_bp+s_bm)+(1-in_p[15])*(s_hp+s_hm))
+        t_16 = t_16_1 + t_16_2
 
         t_s = t_0+t_1+t_2+t_3+t_4+t_5+t_6+t_7+t_8+t_9+t_10+t_11+t_12+t_13+t_14+t_15+t_16
 
