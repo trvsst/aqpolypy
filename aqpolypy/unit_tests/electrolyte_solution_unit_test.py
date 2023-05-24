@@ -10,13 +10,14 @@
 import numpy as np
 import unittest
 import aqpolypy.free_energy_polymer.ElectrolyteSolution as El
-
+import aqpolypy.units.units as un
 
 class TestFreeEnergy(unittest.TestCase):
 
     def setUp(self):
         # define dict
         self.temp = 300
+        self.delta_w = un.delta_w()
         self.param_w = {'v_w': 30, 'de_w': 1330, 'se_w': 3.62, 'de_2d': 0.0, 'ds_2d': 0.0, 'de_2a': 0.0, 'ds_2a': 0.0}
         dict_vol = {'v_s': 30, 'v_b': 35}
         dict_p = {'de_p0': 665, 'ds_p0': 0.0, 'de_p1': -540, 'ds_p1': 0.0, 'de_p2': -10000, 'ds_p2': 0.0}
@@ -49,11 +50,12 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0])
 
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_sol = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h)
 
         comp_ideal = el_sol.f_ideal()
-        vals_ideal = np.array([10694.17289883, 10625.31694141, 11800.63110599])
-
+        vals_ideal = np.array([[-1.0,-1.10283371,-2.4342409]])
         # testing params up to a precision of 10^-6
         test_i = np.allclose(comp_ideal, vals_ideal, 0, 1e-6)
         self.assertTrue(test_i)
@@ -63,13 +65,14 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
 
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, k_r= k_ref)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_sol = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, k_r= k_ref)
 
         self.in_p[15] = np.array([0.0, 0.0, 0.5, 1])
 
-
         comp_comp = el_sol.f_comp(self.in_p)
-        vals_comp = np.array([16642.00600168, 16630.00600601, 15630.00638978, 16305.00612557])
+        vals_comp = np.array([[0.0, 0.0, 0.01054419, 0.04206328]])
         test_c = np.allclose(comp_comp, vals_comp, 0, 1e-6)
         self.assertTrue(test_c)
 
@@ -77,14 +80,17 @@ class TestFreeEnergy(unittest.TestCase):
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        test_m = self.delta_w*test_n_s/test_n_w
+
         test_bpar = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, b_param=test_bpar)
+        el_sol = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=test_bpar)
 
         self.in_p[15] = np.array([0.0, 0.0, 0.25, 0.25])
 
         comp_debye = el_sol.f_debye(self.in_p)
-        vals_comp = [-0.04707576, -16.64917299, -23.36606274, -18.8793592]
+        vals_comp = [-2.82482823e-05, -9.99950330e-03, -1.40336713e-02, -1.13389545e-02]
         test_d = np.allclose(comp_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_d)
 
@@ -93,7 +99,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
 
-        el_sol = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_sol = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
@@ -106,7 +114,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_assoc = el_sol.f_assoc(self.in_p)
-        vals_comp = [-17928.98280199, -17246.08272997, -22121.72593814, -23873.49131049]
+        vals_comp = [-2.58157683, -2.10511413, -1.73227097, -1.76463206]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
@@ -115,7 +123,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
 
-        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_mu = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
@@ -127,16 +137,19 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[2] = test_zd
         self.in_p[15] = test_f_b
         comp_mu_w_1=el_mu.mu_w_1(self.in_p)
-        vals_comp = [-5.25727997, -4.55696617, -7.17320148, -7.61640162]
+        vals_comp = [-3.77358379, -3.81520813, -4.20616932, -4.35266624]
         test_mu_1 = np.allclose(comp_mu_w_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_1)
 
     def test_mu_water_debye(self):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        test_m = self.delta_w*test_n_s/test_n_w
+
         t_b = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        el = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, b_param=t_b)
+        el = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=t_b)
 
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         self.in_p[15] = test_f_b
@@ -151,7 +164,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 30.5, 30.5])
         test_n_s = np.array([0.0, 0.5, 20.0, 20.5])
 
-        el = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, press=0)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, press=0)
 
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
         test_f_b = np.array([0.0, 0.0, 0.5, 1])
@@ -160,7 +175,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_mu_c = el.mu_w_comp(self.in_p)
-        vals_comp = [ 333.24,  337.5,  6516.0,  5937.6 ]
+        vals_comp = [0.2, 0.2027027, 4.3009901, 3.88078431]
         test_mu_comp = np.allclose(comp_mu_c, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_comp)
 
@@ -169,7 +184,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
 
-        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_mu = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_f_b = np.array([0.0, 0.0, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
@@ -182,16 +199,19 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_mu_salt_1 = el_mu.mu_sf_1(self.in_p)
-        vals_comp = [45.86428195, 53.99668742, 58.56124364, 65.18927112]
+        vals_comp = [31.02732015, 39.16152661, 43.72608283, 50.35411032]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
     def test_mu_salt_debye(self):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
+
+        test_m = self.delta_w*test_n_s/test_n_w
+
         t_b = np.array([1e-2, 1e-2, 0.5, 1.0])
 
-        el = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h, b_param=t_b)
+        el = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=t_b)
 
         self.in_p[15] = np.array([0.0, 0.0, 0.25, 0.25])
 
@@ -205,7 +225,9 @@ class TestFreeEnergy(unittest.TestCase):
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
 
-        el_mu = El.ElectrolyteSolution(test_n_w, test_n_s, self.temp, self.param_w, self.param_salt, self.param_h)
+        test_m = self.delta_w*test_n_s/test_n_w
+
+        el_mu = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h)
 
         test_f_b = np.array([1e-4, 1e-4, 0.25, 0.25])
         test_y = np.array([0.6, 0.55, 0.7, 0.72])
@@ -218,7 +240,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_mu_b_salt_1 = el_mu.mu_sb_1(self.in_p)
-        vals_comp = [-26.5958937, -22.46863405, -11.41728076, -5.9362425]
+        vals_comp = [-34.0143746,  -29.88621445, -18.83486116, -13.3538229]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
@@ -231,12 +253,14 @@ class TestFreeEnergy(unittest.TestCase):
         nw = 55.5
         ns = 1e-14
 
+        ml = self.delta_w*ns/nw
+
         ini_p = np.zeros(16)
 
         tp = np.array([300, 320, 340, 360, 380])
 
         for temp in tp:
-            el = El.ElectrolyteSolution(nw, ns, temp, self.param_w, self.param_salt, self.param_h)
+            el = El.ElectrolyteSolution(ml, temp, self.param_w, self.param_salt, self.param_h)
             ini_p[0] = 0.63
             ini_p[1] = 0.4
             ini_p[2] = 0.4
@@ -259,7 +283,8 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[1] = 0.4
         ini_p[2] = 0.4
         for ns in ns_mat:
-            el = El.ElectrolyteSolution(nw, ns, self.temp, self.param_w, self.param_salt, self.param_h)
+            ml = self.delta_w*ns/nw
+            el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
             ini_p[3] = 5.0
             ini_p[4] = 2.0
             ini_p[5] = 0.0

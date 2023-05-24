@@ -20,13 +20,12 @@ class ElectrolyteSolution(object):
     Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, nw_i, ns_i, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-5):
+    def __init__(self, ml, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-5):
 
         """
         The constructor, with the following parameters
 
-        :param nw_i: water number density
-        :param ns_i: salt number density
+        :param ml: salt molality
         :param temp: temperature in Kelvin
         :param param_w: water parameters (see definition below)
         :param param_salt: salt parameters (see definition below)
@@ -56,6 +55,9 @@ class ElectrolyteSolution(object):
         hb\\_m0 = h^B_{(-,0)}, hb\\_m1 = h^B_{(-,1)}, h^B\\_m2 = h^B_{(-,2)}`
         """
 
+        # molality
+        self.ml = ml
+
         # constants
         self.delta_w = un.delta_w()
 
@@ -79,11 +81,11 @@ class ElectrolyteSolution(object):
         self.u_b = param_salt['v_b']
 
         # concentration in dimensionless units
-        self.n_w = nw_i * self.u_w
-        self.n_s = ns_i * self.u_w
-        self.r_h = self.n_s / self.n_w
-        # concentration in the molal scale and ionic strength
-        self.ml = self.concentration_molal()
+        self.r_h = self.ml / self.delta_w
+        self.n_w = 1/(1+self.u_s*self.r_h/self.u_w)
+        self.n_s = self.u_w*self.r_h/(self.r_h*self.u_s+self.u_w)
+
+        # square ionic strength
         self.sqrt_i_str = np.sqrt(self.ml)
 
         # pressure
@@ -720,15 +722,6 @@ class ElectrolyteSolution(object):
         sol = fsolve(fun, ini_c)
 
         return sol
-
-    def concentration_molal(self):
-        """
-        returns the concentration in molal units
-
-        :param nw_i: water number density
-        :param ns_i: salt number density
-        """
-        return self.delta_w * self.r_h
 
     @staticmethod
     def tau_debye(x):
