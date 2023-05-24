@@ -535,7 +535,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[3]
         t_1_d = 1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_p0(self, in_p):
         """
@@ -548,7 +548,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[9]
         t_1_d = 1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h
 
-        return t_0 - t_1_u / t_1_d
+        return self.n_w*t_0 - t_1_u / t_1_d
 
     def eqn_h_p1(self, in_p):
         """
@@ -561,7 +561,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[4]
         t_1_d = 2*(in_p[0]-in_p[1])-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_p1(self, in_p):
         """
@@ -574,7 +574,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[10]
         t_1_d = 2 * (in_p[0] - in_p[1]) - ((1 - in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h
 
-        return t_0 - t_1_u / t_1_d
+        return self.n_w*t_0 - t_1_u / t_1_d
 
     def eqn_h_p2(self, in_p):
         """
@@ -587,7 +587,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[5]
         t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_p2(self, in_p):
         """
@@ -600,7 +600,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[11]
         t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_h_m0(self, in_p):
         """
@@ -613,7 +613,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[6]
         t_1_d = 1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_m0(self, in_p):
         """
@@ -626,7 +626,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[12]
         t_1_d = 1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h
 
-        return t_0 - t_1_u / t_1_d
+        return self.n_w*t_0 - t_1_u / t_1_d
 
     def eqn_h_m1(self, in_p):
         """
@@ -639,7 +639,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[7]
         t_1_d = 2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_m1(self, in_p):
         """
@@ -652,7 +652,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[13]
         t_1_d = 2 *(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
 
-        return t_0 - t_1_u / t_1_d
+        return self.n_w*t_0 - t_1_u / t_1_d
 
     def eqn_h_m2(self, in_p):
         """
@@ -665,7 +665,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[8]
         t_1_d = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_hb_m2(self, in_p):
         """
@@ -678,7 +678,7 @@ class ElectrolyteSolution(object):
         t_1_u = in_p[14]
         t_1_d = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
 
-        return t_0 -  t_1_u/t_1_d
+        return self.n_w*t_0 -  t_1_u/t_1_d
 
     def eqn_bjerrum(self, in_p):
         """
