@@ -300,9 +300,123 @@ class TestFreeEnergy(unittest.TestCase):
             self.assertTrue(test_cond1)
             self.assertTrue(test_cond2)
 
-    def test_hydration(self):
+    def test_hydration_dilute(self):
+
+        def f_uni(m, y, df, df1, df2):
+            return m*np.exp(df)/(1+np.exp(df)*(1-y)**2+2*np.exp(df1)*y*(1-y)+np.exp(df2)*y**2)
+        def f0(m, y, df, df1, df2):
+            return f_uni(m, y, df, df1, df2)*(1-y)**2
+        def f1(m, y, df, df1, df2):
+            return f_uni(m, y, df, df1, df2)*2*y*(1 - y)*np.exp(df1)
+        def f2(m, y, df, df1, df2):
+            return f_uni(m, y, df, df1, df2)*y**2*np.exp(df2)
+
         self.param_w['de_w'] = 1800
         self.param_w['se_w'] = 3.47
+
+        self.param_salt['de_p0'] = 1000
+        self.param_salt['ds_p0'] = 1.0
+        self.param_salt['de_p1'] = -10000.0
+        self.param_salt['ds_p1'] = 0.0
+
+        self.param_salt['de_bp0'] = 1000
+        self.param_salt['ds_bp0'] = 1.0
+        self.param_salt['de_bp1'] = -10000.0
+        self.param_salt['ds_bp1'] = 0.0
+
+        self.param_salt['de_m0'] = 1000
+        self.param_salt['ds_m0'] = 1.0
+        self.param_salt['de_m1'] = -10000.0
+        self.param_salt['ds_m1'] = 0.0
+
+        self.param_salt['de_bm0'] = 1000
+        self.param_salt['ds_bm0'] = 1.0
+        self.param_salt['de_bm1'] = -10000.0
+        self.param_salt['ds_bm1'] = 0.0
+
+        m_val = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        m_err = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        num_eq = 15
+        sol_alyt = np.zeros(num_eq)
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.75
+        ini_p[1] = 0.55
+        ini_p[2] = 0.55
+        for ind, ml in enumerate(m_val):
+            el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
+            ini_p[3] = 4.0
+            ini_p[4] = 0.0
+            ini_p[5] = 0.0
+            ini_p[6] = 3.0
+            ini_p[7] = 0.0
+            ini_p[8] = 0.0
+            ini_p[15] = 1e-14
+            sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
+            ini_p[:num_eq] = sol[:]
+            sol_alyt[:3] = sol[:3]
+            sol_alyt[3] = f0(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[4] = f1(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[5] = f2(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[6] = f0(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[7] = f1(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[8] = f2(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[9] = f0(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[10] = f1(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[11] = f2(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[12] = f0(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
+            sol_alyt[13] = f1(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
+            sol_alyt[14] = f2(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
+            test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])
+            self.assertTrue(test_cond1)
+
+    def test_hydration_concentrated(self):
+        self.param_w['de_w'] = 1800
+        self.param_w['se_w'] = 3.47
+        self.param_h['m_p'] = 9.77
+        self.param_h['m_m'] = 8.21
+        self.param_h['mb_p'] = 5.5
+        self.param_h['mb_m'] = 5.9
+
+        self.param_salt['de_p0'] = 1000
+        self.param_salt['ds_p0'] = 1.0
+        self.param_salt['de_p1'] = -10000.0
+        self.param_salt['ds_p1'] = 0.0
+
+        self.param_salt['de_bp0'] = 1000
+        self.param_salt['ds_bp0'] = 1.0
+        self.param_salt['de_bp1'] = -10000.0
+        self.param_salt['ds_bp1'] = 0.0
+
+        self.param_salt['de_m0'] = 1000
+        self.param_salt['ds_m0'] = 1.0
+        self.param_salt['de_m1'] = -10000.0
+        self.param_salt['ds_m1'] = 0.0
+
+        self.param_salt['de_bm0'] = 1000
+        self.param_salt['ds_bm0'] = 1.0
+        self.param_salt['de_bm1'] = -10000.0
+        self.param_salt['ds_bm1'] = 0.0
+
+        m_val = np.array([0.1, 0.5, 1.0, 1.5, 2.0])
+
+        num_eq = 15
+        sol_alyt = np.zeros(num_eq)
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.75
+        ini_p[1] = 0.55
+        ini_p[2] = 0.55
+        ini_p[3] = 4.0
+        ini_p[4] = 0.0
+        ini_p[5] = 0.0
+        ini_p[6] = 3.0
+        ini_p[7] = 0.0
+        ini_p[8] = 0.0
+        for ind, ml in enumerate(m_val):
+            el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
+            ini_p[15] = 1e-14
+            sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
+            ini_p[:num_eq] = sol[:]
+            print(sol)
 
 if __name__ == '__main__':
     unittest.main()

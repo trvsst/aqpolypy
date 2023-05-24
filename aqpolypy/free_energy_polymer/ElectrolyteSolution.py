@@ -160,7 +160,7 @@ class ElectrolyteSolution(object):
         self.f_bp2 = self.e_bp2/self.tp - self.s_bp2
         self.f_bm = self.e_bm/self.tp - self.s_bm
         self.f_bm1 = self.e_bm1/self.tp - self.s_bm1
-        self.f_bm2 = self.e_bp2/self.tp - self.s_bm2
+        self.f_bm2 = self.e_bm2/self.tp - self.s_bm2
 
         # define new hydration parameters
         self.h_p = self.h_p0+self.h_p1+self.h_p2
