@@ -594,7 +594,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_p-in_p[9]-in_p[10]-in_p[11])
+        t_0 = np.exp(self.f_bp+self.f_bp2)*(self.m_bp-in_p[9]-in_p[10]-in_p[11])
         t_1_u = in_p[11]
         t_1_d = in_p[1]-((1-in_p[15])*in_p[5]+in_p[15]*in_p[11])*self.r_h
 
@@ -672,8 +672,8 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_m-in_p[12]-in_p[13]-in_p[14])
-        t_1_u = in_p[8]
+        t_0 = np.exp(self.f_bm+self.f_bm2)*(self.m_bm-in_p[12]-in_p[13]-in_p[14])
+        t_1_u = in_p[14]
         t_1_d = in_p[2]-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.r_h
 
         return t_0 -  t_1_u/t_1_d
