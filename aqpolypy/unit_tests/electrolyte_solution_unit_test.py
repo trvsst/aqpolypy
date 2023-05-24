@@ -222,7 +222,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
-    def test_sol_water(self):
+    def test_sol_pure_water(self):
 
         def sol_water(df):
             y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
@@ -245,7 +245,7 @@ class TestFreeEnergy(unittest.TestCase):
             test_cond = np.allclose(sol, sol_water(el.f_w), 0, 1e-8)
             self.assertTrue(test_cond)
 
-    def test_sol_water_salt(self):
+    def test_sol_water_salt_hb(self):
         def sol_salt(y, m, h):
             r = m/55.50847203605298
             t_0 = (y**2-((h[1]+2*h[2])*y-h[2])*r+(0.25*h[1]**2-h[0]*h[2])*r**2)/(1-np.sum(h)*r)

@@ -62,7 +62,7 @@ class ElectrolyteSolution(object):
         # temperature
         self.tp = temp
 
-        # electrostatic contribution
+        # electrostatic parameter for debye-huckel
         self.b_param = b_param
 
         # reference compressibility
