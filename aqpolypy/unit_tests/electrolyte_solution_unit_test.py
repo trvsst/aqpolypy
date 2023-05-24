@@ -18,7 +18,7 @@ class TestFreeEnergy(unittest.TestCase):
         # define dict
         self.temp = 300
         self.delta_w = un.delta_w()
-        self.param_w = {'v_w': 30, 'de_w': 1330, 'se_w': 3.62, 'de_2d': 0.0, 'ds_2d': 0.0, 'de_2a': 0.0, 'ds_2a': 0.0}
+        self.param_w = {'v_w': 30, 'de_w': 1330, 'ds_w': 3.62, 'de_2d': 0.0, 'ds_2d': 0.0, 'de_2a': 0.0, 'ds_2a': 0.0}
         dict_vol = {'v_s': 30, 'v_b': 35}
         dict_p = {'de_p0': 665, 'ds_p0': 0.0, 'de_p1': -540, 'ds_p1': 0.0, 'de_p2': -10000, 'ds_p2': 0.0}
         dict_bp = {'de_bp0': 834, 'ds_bp0': 0.0, 'de_bp1': -658.0, 'ds_bp1': 0.0, 'de_bp2': -10000, 'ds_bp2': 0.0}
@@ -299,6 +299,10 @@ class TestFreeEnergy(unittest.TestCase):
             test_cond2 = np.allclose(sol[2], sol_salt(sol[0], da*ns/nw, ini_p[6:9]))
             self.assertTrue(test_cond1)
             self.assertTrue(test_cond2)
+
+    def test_hydration(self):
+        self.param_w['de_w'] = 1800
+        self.param_w['se_w'] = 3.47
 
 if __name__ == '__main__':
     unittest.main()
