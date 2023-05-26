@@ -246,10 +246,6 @@ class TestFreeEnergy(unittest.TestCase):
 
     def test_sol_pure_water(self):
 
-        def sol_water(df):
-            y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
-            return np.array([y_val, y_val**2, y_val**2])
-
         nw = 55.5
         ns = 1e-14
 
@@ -266,7 +262,7 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[2] = 0.4
             ini_p[15] = 1e-14
             sol = el.solve_eqns(ini_p, np.array([0,1,2]))
-            test_cond = np.allclose(sol, sol_water(el.f_w), 0, 1e-8)
+            test_cond = np.allclose(sol, el.solve_eqns_water_analytical(), 0, 1e-8)
             self.assertTrue(test_cond)
 
     def test_sol_water_salt_hb(self):

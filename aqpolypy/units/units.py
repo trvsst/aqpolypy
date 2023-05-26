@@ -22,6 +22,12 @@ def k_boltzmann():
     """
     return 1.380649e-23
 
+def k_bolzmann_bar_angstrom3():
+    """
+    Boltzmann constant in bar:math:`\\times\\mbox{\AA}^3`
+    """
+
+    return k_boltzmann()*1e25
 
 def avogadro():
     """

@@ -20,7 +20,7 @@ class ElectrolyteSolution(object):
     Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, ml, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-5):
+    def __init__(self, ml, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-12):
 
         """
         The constructor, with the following parameters
@@ -89,7 +89,7 @@ class ElectrolyteSolution(object):
         self.sqrt_i_str = np.sqrt(self.ml)
 
         # pressure
-        self.pvt = self.press*self.u_w/self.tp
+        self.pvt = self.press*self.u_w/(un.k_bolzmann_bar_angstrom3()*self.tp)
 
         # energies and entropies
         self.e_w = param_w['de_w']
@@ -450,6 +450,22 @@ class ElectrolyteSolution(object):
 
         return m_total
 
+    def mu_w0(self):
+        """
+        Returns the water chemical potential for pure water
+        """
+
+        in_p = np.zeros(15)
+        in_p[:3] = self.solve_eqns_water_analytical()
+
+        m_1 = self.mu_w_1(in_p)-(1-2*in_p[0])*(np.log(self.n_w)-1)
+        m_2 = 0
+        m_3 = self.pvt-(1-2*in_p[0])
+
+        m_total = m_1 + m_2 + m_3
+
+        return m_total
+
     def mu_sf(self, in_p):
         """
         Defines the free salt chemical potential
@@ -486,8 +502,8 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_m = -2*np.log(self.ml) + self.press*(2*self.u_s+self.u_b)
-        val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)+t_m
+        t_ideal = 2*np.log(self.ml) + self.pvt*(self.u_s+self.u_b)/self.u_w
+        val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)-t_ideal
 
         return 0.5*val
 
@@ -498,8 +514,8 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_m = self.press * self.u_w
-        val = (self.mu_w(in_p) -t_m)*self.delta_w/self.ml
+        t_ideal = self.pvt + self.mu_w0()
+        val = (self.mu_w(in_p)-t_ideal)*self.delta_w/self.ml
 
         return 0.5 * val
 
@@ -746,6 +762,15 @@ class ElectrolyteSolution(object):
         sol = fsolve(fun, ini_c)
 
         return sol
+
+    def solve_eqns_water_analytical(self):
+        """
+        Provides the analytical solution for the hydrogen bond quantities for pure water
+        """
+
+        df = self.f_w
+        y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
+        return np.array([y_val, y_val**2, y_val**2])
 
     @staticmethod
     def tau_debye(x):
