@@ -514,8 +514,8 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_ideal = self.pvt + self.mu_w0()
-        val = (self.mu_w(in_p)-t_ideal)*self.delta_w/self.ml
+        t_ideal = self.mu_w0()
+        val = -(self.mu_w(in_p)-t_ideal)*self.delta_w/self.ml
 
         return 0.5 * val
 
