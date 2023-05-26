@@ -455,10 +455,10 @@ class ElectrolyteSolution(object):
         Returns the water chemical potential for pure water
         """
 
-        in_p = np.zeros(15)
+        in_p = np.zeros(16)
         in_p[:3] = self.solve_eqns_water_analytical()
 
-        m_1 = self.mu_w_1(in_p)-(1-2*in_p[0])*(np.log(self.n_w)-1)
+        m_1 = self.mu_w_1(in_p)-(1-2*in_p[0])*np.log(self.n_w)
         m_2 = 0
         m_3 = self.pvt-(1-2*in_p[0])
 

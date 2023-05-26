@@ -296,6 +296,26 @@ class TestFreeEnergy(unittest.TestCase):
             self.assertTrue(test_cond1)
             self.assertTrue(test_cond2)
 
+    def test_chem_potential_pure_water(self):
+        # consider a negligible concentration
+        ml = 1e-14
+
+        mat_temp = np.array([300, 320, 340, 360, 380])
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.63
+        ini_p[1] = 0.4
+        ini_p[2] = 0.4
+        for tmp in mat_temp:
+            el = El.ElectrolyteSolution(ml, tmp, self.param_w, self.param_salt, self.param_h, b_param=1.0)
+            comp_analytical = el.mu_w0()
+            ini_p[15] = 1e-14
+            sol = el.solve_eqns(ini_p, np.array([0, 1, 2]))
+            ini_p[:3] = sol[:]
+            ini_p[3:] = 0.0
+            comp_mu_debye = el.mu_w(ini_p)
+            test_cond = np.allclose(comp_mu_debye, comp_analytical)
+            self.assertTrue(test_cond)
+
     def test_hydration_dilute(self):
 
         def f_uni(m, y, df, df1, df2):
@@ -412,7 +432,7 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[15] = 1e-14
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
-            print(sol)
+            #print(sol)
 
 if __name__ == '__main__':
     unittest.main()
