@@ -362,7 +362,7 @@ class ElectrolyteSolution(object):
         s_hm = np.sum(in_p[6:9], axis=0)
 
         t_11 = 2*np.log((1-in_p[15])*self.n_s)-s_hp*self.f_p-s_hm*self.f_m
-        t_12 = in_p[4]*self.f_p1+in_p[5]*self.f_p2+in_p[7]*self.f_m1+in_p[8]*self.f_m2
+        t_12 = -in_p[4]*self.f_p1-in_p[5]*self.f_p2-in_p[7]*self.f_m1-in_p[8]*self.f_m2
         t_1 = t_11 + t_12
 
         t_2 = -in_p[3]*np.log(1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h)
@@ -474,8 +474,8 @@ class ElectrolyteSolution(object):
         """
 
         m_1 = self.mu_sf_1(in_p)
-        m_2 = self.mu_sf_debye(in_p)
-        m_3 = self.mu_w_comp(in_p)*self.u_s/self.u_w
+        m_2 = 0.0*self.mu_sf_debye(in_p)
+        m_3 = 0.0*self.mu_w_comp(in_p)*self.u_s/self.u_w
 
         m_total = m_1 + m_2 + m_3
 
@@ -502,7 +502,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_ideal = 2*np.log(self.ml) + self.pvt*(self.u_s+self.u_b)/self.u_w
+        t_ideal = 2*np.log(self.ml) + 0.0*self.pvt*self.u_s/self.u_w
         val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)-t_ideal
 
         return 0.5*val
