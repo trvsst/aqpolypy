@@ -459,7 +459,7 @@ class ElectrolyteSolution(object):
 
         m_1 = self.mu_sf_1(in_p)
         m_2 = self.mu_sf_debye(in_p)
-        m_3 = self.mu_w_comp(in_p)*self.u_w/self.u_s
+        m_3 = self.mu_w_comp(in_p)*self.u_s/self.u_w
 
         m_total = m_1 + m_2 + m_3
 
@@ -473,11 +473,35 @@ class ElectrolyteSolution(object):
         """
 
         m_1 = self.mu_sb_1(in_p)
-        m_2 = self.mu_w_comp(in_p)*self.u_w/self.u_b
+        m_2 = self.mu_w_comp(in_p)*self.u_b/self.u_w
 
         m_total = m_1 + m_2
 
         return m_total
+
+    def c_gamma(self, in_p):
+        """
+        Defines the activity coefficient
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        t_m = -2*np.log(self.ml) + self.press*(2*self.u_s+self.u_b)
+        val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)+t_m
+
+        return 0.5*val
+
+    def c_osmotic(self, in_p):
+        """
+        Defines the osmotic coefficient
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        t_m = self.press * self.u_w
+        val = (self.mu_w(in_p) -t_m)*self.delta_w/self.ml
+
+        return 0.5 * val
 
     def eqn_y(self, in_p):
         """
