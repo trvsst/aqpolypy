@@ -408,7 +408,7 @@ class ElectrolyteSolution(object):
         s_bm = np.sum(in_p[12:15], axis=0)
 
         t_11 = np.log(in_p[15]*self.n_s)-s_bp*self.f_bp-s_bm*self.f_bm-self.f_bj
-        t_12 = in_p[10]*self.f_bp1+in_p[11]*self.f_bp2+in_p[13]*self.f_bm1+in_p[14]*self.f_bm2
+        t_12 = -in_p[10]*self.f_bp1-in_p[11]*self.f_bp2-in_p[13]*self.f_bm1-in_p[14]*self.f_bm2
         t_1 = t_11 + t_12
 
         t_2 = -in_p[9]*np.log(1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h)

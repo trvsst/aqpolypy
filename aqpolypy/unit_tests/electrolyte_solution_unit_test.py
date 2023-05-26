@@ -240,7 +240,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_mu_b_salt_1 = el_mu.mu_sb_1(self.in_p)
-        vals_comp = [-34.0143746,  -29.88621445, -18.83486116, -13.3538229]
+        vals_comp = [-30.16770793, -26.03954779, -14.9881945,  -9.50715624]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
