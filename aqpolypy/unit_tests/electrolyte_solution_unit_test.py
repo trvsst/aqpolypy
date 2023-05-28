@@ -388,10 +388,10 @@ class TestFreeEnergy(unittest.TestCase):
     def test_hydration_concentrated(self):
         self.param_w['de_w'] = 1800
         self.param_w['se_w'] = 3.47
-        self.param_h['m_p'] = 9.77
-        self.param_h['m_m'] = 8.21
-        self.param_h['mb_p'] = 5.5
-        self.param_h['mb_m'] = 5.9
+        self.param_h['m_p'] = 8.0
+        self.param_h['m_m'] = 8.0
+        self.param_h['mb_p'] = 4.0
+        self.param_h['mb_m'] = 4.0
 
         self.param_salt['de_p0'] = 1000
         self.param_salt['ds_p0'] = 1.0
@@ -427,12 +427,19 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[6] = 3.0
         ini_p[7] = 0.0
         ini_p[8] = 0.0
+        ini_p[15] = 1e-14
+        mu_s_a = np.zeros_like(m_val)
+        mu_s_op = np.zeros_like(m_val)
         for ind, ml in enumerate(m_val):
             el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
             ini_p[15] = 1e-14
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
-            #print(sol)
+            mu_s_a[ind] = el.mu_sf_1(ini_p)
+            mu_s_op[ind] = el.mu_sf_optimized(ini_p)
+
+        test_cond1 = np.allclose(mu_s_a, mu_s_op)
+        self.assertTrue(test_cond1)
 
 if __name__ == '__main__':
     unittest.main()

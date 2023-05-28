@@ -353,7 +353,7 @@ class ElectrolyteSolution(object):
 
     def mu_sf_1(self, in_p):
         """
-        Defines partial contribution to the free salt chemical potential
+        Defines association contribution to the free salt chemical potential
 
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
@@ -386,6 +386,23 @@ class ElectrolyteSolution(object):
         t_10 = t_10_1 + t_10_2
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10
+
+    def mu_sf_optimized(self, in_p):
+        """
+        Defines association to the free salt chemical potential when the values in_p are solutions to the
+        equations
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        h_p = in_p[3]+in_p[4] + in_p[5]
+        h_m = in_p[6]+in_p[7] + in_p[8]
+
+        t_0 = 2*np.log((1-in_p[15])*self.n_s)
+        t_1 = (h_p+h_m)*np.log(self.n_w)
+        t_2 = self.m_p*np.log(1-h_p/self.m_p)+self.m_m*np.log(1-h_m/self.m_m)
+
+        return  t_0 + t_1 + t_2
 
     def mu_sf_debye(self, in_p):
         """
@@ -474,8 +491,8 @@ class ElectrolyteSolution(object):
         """
 
         m_1 = self.mu_sf_1(in_p)
-        m_2 = 0.0*self.mu_sf_debye(in_p)
-        m_3 = 0.0*self.mu_w_comp(in_p)*self.u_s/self.u_w
+        m_2 = self.mu_sf_debye(in_p)
+        m_3 = self.mu_w_comp(in_p)*self.u_s/self.u_w
 
         m_total = m_1 + m_2 + m_3
 
@@ -502,7 +519,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_ideal = 2*np.log(self.ml) + 0.0*self.pvt*self.u_s/self.u_w
+        t_ideal = 2*np.log(self.ml/self.delta_w) + self.pvt*self.u_s/self.u_w
         val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)-t_ideal
 
         return 0.5*val
