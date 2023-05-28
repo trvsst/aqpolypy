@@ -318,15 +318,6 @@ class TestFreeEnergy(unittest.TestCase):
 
     def test_hydration_dilute(self):
 
-        def f_uni(m, y, df, df1, df2):
-            return m*np.exp(df)/(1+np.exp(df)*(1-y)**2+2*np.exp(df1)*y*(1-y)+np.exp(df2)*y**2)
-        def f0(m, y, df, df1, df2):
-            return f_uni(m, y, df, df1, df2)*(1-y)**2
-        def f1(m, y, df, df1, df2):
-            return f_uni(m, y, df, df1, df2)*2*y*(1 - y)*np.exp(df1)
-        def f2(m, y, df, df1, df2):
-            return f_uni(m, y, df, df1, df2)*y**2*np.exp(df2)
-
         self.param_w['de_w'] = 1800
         self.param_w['se_w'] = 3.47
 
@@ -370,22 +361,22 @@ class TestFreeEnergy(unittest.TestCase):
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
             sol_alyt[:3] = sol[:3]
-            sol_alyt[3] = f0(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
-            sol_alyt[4] = f1(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
-            sol_alyt[5] = f2(el.m_p, sol[0], el.f_p, el.f_p1, el.f_p2)
-            sol_alyt[6] = f0(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
-            sol_alyt[7] = f1(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
-            sol_alyt[8] = f2(el.m_m, sol[0], el.f_m, el.f_m1, el.f_m2)
-            sol_alyt[9] = f0(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
-            sol_alyt[10] = f1(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
-            sol_alyt[11] = f2(el.m_bp, sol[0], el.f_bp, el.f_bp1, el.f_bp2)
-            sol_alyt[12] = f0(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
-            sol_alyt[13] = f1(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
-            sol_alyt[14] = f2(el.m_bm, sol[0], el.f_bm, el.f_bm1, el.f_bm2)
+            sol_alyt[3] = el.f0(el.m_p, el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[4] = el.f1(el.m_p, el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[5] = el.f2(el.m_p, el.f_p, el.f_p1, el.f_p2)
+            sol_alyt[6] = el.f0(el.m_m, el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[7] = el.f1(el.m_m, el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[8] = el.f2(el.m_m, el.f_m, el.f_m1, el.f_m2)
+            sol_alyt[9] = el.f0(el.m_bp, el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[10] = el.f1(el.m_bp, el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[11] = el.f2(el.m_bp, el.f_bp, el.f_bp1, el.f_bp2)
+            sol_alyt[12] = el.f0(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
+            sol_alyt[13] = el.f1(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
+            sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])
             self.assertTrue(test_cond1)
 
-    def test_hydration_concentrated(self):
+    def test_chem_potential_optimized_vs_non(self):
         self.param_w['de_w'] = 1800
         self.param_w['se_w'] = 3.47
         self.param_h['m_p'] = 8.0

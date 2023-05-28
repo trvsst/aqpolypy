@@ -797,40 +797,43 @@ class ElectrolyteSolution(object):
         y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
         return np.array([y_val, y_val**2, y_val**2])
 
-    def f0(self, df, df1, df2):
+    def f0(self, mf, df, df1, df2):
         """
         Hydration layer at infinite dilution at zero hb
 
+        :param mf: maximum hydration
         :param df: free energy for zero hydration bond
         :param df1: free energy for one hydration bond
         :param df2: free energy for teo hydration bond
         """
 
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(self.m, y, df, df1, df2) * (1 - y) ** 2
+        return self.f_uni(mf, y, df, df1, df2) * (1 - y) ** 2
 
-    def f1(self, df, df1, df2):
+    def f1(self, mf, df, df1, df2):
         """
         Hydration layer at infinite dilution at one hb
 
+        :param mf: maximum hydration
         :param df: free energy for zero hydration bond
         :param df1: free energy for one hydration bond
         :param df2: free energy for teo hydration bond
         """
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(m, y, df, df1, df2) * 2 * y * (1 - y) * np.exp(df1)
+        return self.f_uni(mf, y, df, df1, df2) * 2 * y * (1 - y) * np.exp(df1)
 
-    def f2(self, df, df1, df2):
+    def f2(self, mf, df, df1, df2):
         """
         Hydration layer at infinite dilution at two hb
 
+        :param mf: maximum hydration
         :param df: free energy for zero hydration bond
         :param df1: free energy for one hydration bond
         :param df2: free energy for teo hydration bond
         """
 
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(self.m, y, df, df1, df2) * y ** 2 * np.exp(df2)
+        return self.f_uni(mf, y, df, df1, df2) * y ** 2 * np.exp(df2)
     @staticmethod
     def tau_debye(x):
         """
