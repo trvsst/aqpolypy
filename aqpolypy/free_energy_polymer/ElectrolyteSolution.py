@@ -485,7 +485,7 @@ class ElectrolyteSolution(object):
 
     def mu_sf(self, in_p):
         """
-        Defines the free salt chemical potential
+        Defines salt chemical potential
 
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
@@ -497,6 +497,14 @@ class ElectrolyteSolution(object):
         m_total = m_1 + m_2 + m_3
 
         return m_total
+
+    def mu_sf0(self):
+        """
+        Returns the salt chemical potential at inifinite dilution
+        """
+
+        in_p = np.zeros(16)
+        in_p[:3] = self.solve_eqns_water_analytical()
 
     def mu_bf(self, in_p):
         """
@@ -789,6 +797,40 @@ class ElectrolyteSolution(object):
         y_val = 1+0.25*np.exp(-df)*(1-np.sqrt(1+8*np.exp(df)))
         return np.array([y_val, y_val**2, y_val**2])
 
+    def f0(self, df, df1, df2):
+        """
+        Hydration layer at infinite dilution at zero hb
+
+        :param df: free energy for zero hydration bond
+        :param df1: free energy for one hydration bond
+        :param df2: free energy for teo hydration bond
+        """
+
+        y = self.solve_eqns_water_analytical()[0]
+        return self.f_uni(self.m, y, df, df1, df2) * (1 - y) ** 2
+
+    def f1(self, df, df1, df2):
+        """
+        Hydration layer at infinite dilution at one hb
+
+        :param df: free energy for zero hydration bond
+        :param df1: free energy for one hydration bond
+        :param df2: free energy for teo hydration bond
+        """
+        y = self.solve_eqns_water_analytical()[0]
+        return self.f_uni(m, y, df, df1, df2) * 2 * y * (1 - y) * np.exp(df1)
+
+    def f2(self, df, df1, df2):
+        """
+        Hydration layer at infinite dilution at two hb
+
+        :param df: free energy for zero hydration bond
+        :param df1: free energy for one hydration bond
+        :param df2: free energy for teo hydration bond
+        """
+
+        y = self.solve_eqns_water_analytical()[0]
+        return self.f_uni(self.m, y, df, df1, df2) * y ** 2 * np.exp(df2)
     @staticmethod
     def tau_debye(x):
         """
@@ -812,3 +854,10 @@ class ElectrolyteSolution(object):
         """
 
         return 3*(1+x-1/(1+x)-2*np.log(1+x))/x**3
+    @staticmethod
+    def f_uni(m, y, df, df1, df2):
+        """
+        Helper function to compute hydration number at infinite dilution
+        """
+
+        return m*np.exp(df)/(1+np.exp(df)*(1-y)**2+2*np.exp(df1)*y*(1-y)+np.exp(df2)*y**2)
