@@ -317,7 +317,6 @@ class TestFreeEnergy(unittest.TestCase):
             test_cond = np.allclose(comp_mu_water, comp_analytical_water)
             self.assertTrue(test_cond)
             comp_mu_salt = el.mu_sf(ini_p)
-            val = el.mu_sf_ideal_assoc_optimized(ini_p) + el.mu_w_comp(ini_p)*el.u_s/el.u_w+el.mu_sf_debye(ini_p)
             test_cond = np.allclose(comp_mu_salt, comp_analytical_salt)
             self.assertTrue(test_cond)
     def test_hydration_dilute(self):
