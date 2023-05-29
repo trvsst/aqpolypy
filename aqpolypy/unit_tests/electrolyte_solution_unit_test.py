@@ -114,7 +114,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_assoc = el_sol.f_assoc(self.in_p)
-        vals_comp = [-2.58157683, -2.10511413, -1.73227097, -1.76463206]
+        vals_comp = [-2.59476765, -2.76524927, -2.72247367, -2.75483476]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
@@ -199,7 +199,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_mu_salt_1 = el_mu.mu_sf_ideal_assoc(self.in_p)
-        vals_comp = [37.25732015, 45.39152661, 49.95608283, 56.58411032]
+        vals_comp = [-36.01767985, -27.88347339, -23.31891717, -16.69088968]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
@@ -336,8 +336,8 @@ class TestFreeEnergy(unittest.TestCase):
 
         self.param_salt['de_m0'] = 1000
         self.param_salt['ds_m0'] = 1.0
-        self.param_salt['de_m1'] = -10000.0
-        self.param_salt['ds_m1'] = 0.0
+        #self.param_salt['de_m1'] = -10000.0
+        #self.param_salt['ds_m1'] = 0.0
 
         self.param_salt['de_bm0'] = 1000
         self.param_salt['ds_bm0'] = 1.0

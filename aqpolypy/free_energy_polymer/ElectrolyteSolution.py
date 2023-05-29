@@ -152,7 +152,7 @@ class ElectrolyteSolution(object):
         self.f_p = self.e_p/self.tp - self.s_p
         self.f_p1 = self.e_p1/self.tp - self.s_p1
         self.f_p2 = self.e_p2/self.tp - self.s_p2
-        self.f_m = self.e_m/self.tp - self.m_p
+        self.f_m = self.e_m/self.tp - self.s_m
         self.f_m1 = self.e_m1/self.tp - self.s_m1
         self.f_m2 = self.e_m2/self.tp - self.s_m2
         self.f_bp = self.e_bp/self.tp - self.s_bp
