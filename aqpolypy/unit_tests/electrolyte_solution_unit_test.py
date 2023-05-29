@@ -220,7 +220,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_debye = np.allclose(comp_mu_debye, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_debye)
 
-    def test_mu_salt_bjerrum_1(self):
+    def test_mu_salt_bjerrum_ideal_assoc(self):
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
@@ -239,7 +239,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[2] = test_zd
         self.in_p[15] = test_f_b
 
-        comp_mu_b_salt_1 = el_mu.mu_sb_1(self.in_p)
+        comp_mu_b_salt_1 = el_mu.mu_sb_ideal_assoc(self.in_p)
         vals_comp = [-30.16770793, -26.03954779, -14.9881945,  -9.50715624]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)

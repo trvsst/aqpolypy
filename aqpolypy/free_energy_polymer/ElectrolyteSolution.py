@@ -415,7 +415,7 @@ class ElectrolyteSolution(object):
 
         return -2*self.a_gamma*x_val/(1+self.b_param*x_val)
 
-    def mu_sb_1(self, in_p):
+    def mu_sb_ideal_assoc(self, in_p):
         """
         Defines partial contribution to the bjerrum salt chemical potential
 
@@ -530,7 +530,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        m_1 = self.mu_sb_1(in_p)
+        m_1 = self.mu_sb_ideal_assoc(in_p)
         m_2 = self.mu_w_comp(in_p)*self.u_b/self.u_w
 
         m_total = m_1 + m_2
@@ -545,7 +545,7 @@ class ElectrolyteSolution(object):
         """
 
         t_ideal = 2*np.log(self.ml/self.delta_w)+self.mu_sf0()
-        val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)-t_ideal
+        val = (1-in_p[15]) * self.mu_sf(in_p) + in_p[15] * self.mu_sb_ideal_assoc(in_p) - t_ideal
 
         return 0.5*val
 
