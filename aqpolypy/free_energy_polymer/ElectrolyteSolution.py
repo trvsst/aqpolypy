@@ -513,7 +513,7 @@ class ElectrolyteSolution(object):
         in_p[7] = self.f0(self.m_m, self.f_m, self.f_m1, self.f_m2)
         in_p[8] = self.f1(self.m_m, self.f_m, self.f_m1, self.f_m2)
         in_p[9] = self.f2(self.m_m, self.f_m, self.f_m1, self.f_m2)
-        in_p[15] = 1e-5
+        in_p[15] = 1e-15
 
         m_1 = self.mu_sf_ideal_assoc_optimized(in_p)-2*np.log(self.n_s)
         m_2 = 0.0
@@ -825,7 +825,7 @@ class ElectrolyteSolution(object):
         """
 
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(mf, y, df, df1, df2) * (1 - y) ** 2
+        return self.f_uni(mf, y, df, df1, df2)*(1 - y) ** 2
 
     def f1(self, mf, df, df1, df2):
         """
@@ -837,7 +837,7 @@ class ElectrolyteSolution(object):
         :param df2: free energy for teo hydration bond
         """
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(mf, y, df, df1, df2)*2*y*(1 - y)*np.exp(df1)
+        return self.f_uni(mf, y, df, df1, df2)*2*y*(1-y)*np.exp(df1)
 
     def f2(self, mf, df, df1, df2):
         """
@@ -880,4 +880,4 @@ class ElectrolyteSolution(object):
         Helper function to compute hydration number at infinite dilution
         """
 
-        return m*np.exp(df)/(1+np.exp(df)*(1-y)**2+2*np.exp(df1)*y*(1-y)+np.exp(df2)*y**2)
+        return m*np.exp(df)/(1+np.exp(df)*((1-y)**2+2*np.exp(df1)*y*(1-y)+np.exp(df2)*y**2))

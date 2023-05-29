@@ -118,7 +118,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
-    def test_mu_water_1(self):
+    def test_mu_water_ideal_assoc(self):
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
@@ -179,7 +179,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_comp = np.allclose(comp_mu_c, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_comp)
 
-    def test_mu_salt_1(self):
+    def test_mu_salt_ideal_assoc(self):
 
         test_n_w = np.array([55.54, 55.0, 54.5, 54.5])
         test_n_s = np.array([0.01, 0.5, 1.0, 1.0])
@@ -310,16 +310,16 @@ class TestFreeEnergy(unittest.TestCase):
             comp_analytical_water = el.mu_w0()
             comp_analytical_salt = 2*np.log(ml/el.delta_w)+el.mu_sf0()
             ini_p[15] = 1e-14
-            sol = el.solve_eqns(ini_p, np.arange(15))
+            sol = el.solve_eqns(ini_p, np.arange(15, dtype='int'))
             ini_p[:15] = sol[:]
             ini_p[15] = 1e-14
             comp_mu_water = el.mu_w(ini_p)
             test_cond = np.allclose(comp_mu_water, comp_analytical_water)
             self.assertTrue(test_cond)
             comp_mu_salt = el.mu_sf(ini_p)
-            print(comp_mu_salt, comp_analytical_salt, el.mu_sf_ideal_assoc_optimized(ini_p))
+            val = el.mu_sf_ideal_assoc_optimized(ini_p) + el.mu_w_comp(ini_p)*el.u_s/el.u_w+el.mu_sf_debye(ini_p)
             test_cond = np.allclose(comp_mu_salt, comp_analytical_salt)
-            #self.assertTrue(test_cond)
+            self.assertTrue(test_cond)
     def test_hydration_dilute(self):
 
         self.param_w['de_w'] = 1800
@@ -327,8 +327,8 @@ class TestFreeEnergy(unittest.TestCase):
 
         self.param_salt['de_p0'] = 1000
         self.param_salt['ds_p0'] = 1.0
-        self.param_salt['de_p1'] = -10000.0
-        self.param_salt['ds_p1'] = 0.0
+        #self.param_salt['de_p1'] = -10000.0
+        #self.param_salt['ds_p1'] = 0.0
 
         self.param_salt['de_bp0'] = 1000
         self.param_salt['ds_bp0'] = 1.0
@@ -364,7 +364,7 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[15] = 1e-14
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
-            sol_alyt[:3] = sol[:3]
+            sol_alyt[:3] = el.solve_eqns_water_analytical()
             sol_alyt[3] = el.f0(el.m_p, el.f_p, el.f_p1, el.f_p2)
             sol_alyt[4] = el.f1(el.m_p, el.f_p, el.f_p1, el.f_p2)
             sol_alyt[5] = el.f2(el.m_p, el.f_p, el.f_p1, el.f_p2)
