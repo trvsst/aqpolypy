@@ -297,7 +297,7 @@ class ElectrolyteSolution(object):
 
         return f_i + f_a + f_c + f_d
 
-    def mu_w_1(self, in_p):
+    def mu_w_ideal_assoc(self, in_p):
         """
         Defines partial contribution to the water chemical potential
 
@@ -459,7 +459,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        m_1 = self.mu_w_1(in_p)
+        m_1 = self.mu_w_ideal_assoc(in_p)
         m_2 = self.mu_w_debye(in_p)
         m_3 = self.mu_w_comp(in_p)
 
@@ -475,7 +475,7 @@ class ElectrolyteSolution(object):
         in_p = np.zeros(16)
         in_p[:3] = self.solve_eqns_water_analytical()
 
-        m_1 = self.mu_w_1(in_p)-(1-2*in_p[0])*np.log(self.n_w)
+        m_1 = self.mu_w_ideal_assoc(in_p) - (1 - 2 * in_p[0]) * np.log(self.n_w)
         m_2 = 0
         m_3 = self.pvt-(1-2*in_p[0])
 

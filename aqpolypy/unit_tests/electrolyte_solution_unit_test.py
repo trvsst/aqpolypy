@@ -136,7 +136,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[1] = test_za
         self.in_p[2] = test_zd
         self.in_p[15] = test_f_b
-        comp_mu_w_1=el_mu.mu_w_1(self.in_p)
+        comp_mu_w_1=el_mu.mu_w_ideal_assoc(self.in_p)
         vals_comp = [-3.77358379, -3.81520813, -4.20616932, -4.35266624]
         test_mu_1 = np.allclose(comp_mu_w_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_1)
