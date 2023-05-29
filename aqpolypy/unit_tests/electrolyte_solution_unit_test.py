@@ -296,7 +296,7 @@ class TestFreeEnergy(unittest.TestCase):
             self.assertTrue(test_cond1)
             self.assertTrue(test_cond2)
 
-    def test_chem_potential_pure_water(self):
+    def test_chem_potential_infinite_dilution(self):
         # consider a negligible concentration
         ml = 1e-14
 
@@ -307,15 +307,19 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[2] = 0.4
         for tmp in mat_temp:
             el = El.ElectrolyteSolution(ml, tmp, self.param_w, self.param_salt, self.param_h, b_param=1.0)
-            comp_analytical = el.mu_w0()
+            comp_analytical_water = el.mu_w0()
+            comp_analytical_salt = 2*np.log(ml/el.delta_w)+el.mu_sf0()
             ini_p[15] = 1e-14
-            sol = el.solve_eqns(ini_p, np.array([0, 1, 2]))
-            ini_p[:3] = sol[:]
-            ini_p[3:] = 0.0
-            comp_mu_debye = el.mu_w(ini_p)
-            test_cond = np.allclose(comp_mu_debye, comp_analytical)
+            sol = el.solve_eqns(ini_p, np.arange(15))
+            ini_p[:15] = sol[:]
+            ini_p[15] = 1e-14
+            comp_mu_water = el.mu_w(ini_p)
+            test_cond = np.allclose(comp_mu_water, comp_analytical_water)
             self.assertTrue(test_cond)
-
+            comp_mu_salt = el.mu_sf(ini_p)
+            print(comp_mu_salt, comp_analytical_salt, el.mu_sf_optimized(ini_p))
+            test_cond = np.allclose(comp_mu_salt, comp_analytical_salt)
+            #self.assertTrue(test_cond)
     def test_hydration_dilute(self):
 
         self.param_w['de_w'] = 1800

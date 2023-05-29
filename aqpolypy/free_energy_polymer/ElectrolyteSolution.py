@@ -395,8 +395,8 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        h_p = in_p[3]+in_p[4] + in_p[5]
-        h_m = in_p[6]+in_p[7] + in_p[8]
+        h_p = in_p[3]+in_p[4]+in_p[5]
+        h_m = in_p[6]+in_p[7]+in_p[8]
 
         t_0 = 2*np.log((1-in_p[15])*self.n_s)
         t_1 = (h_p+h_m)*np.log(self.n_w)
@@ -500,11 +500,28 @@ class ElectrolyteSolution(object):
 
     def mu_sf0(self):
         """
-        Returns the salt chemical potential at inifinite dilution
+        Returns the salt chemical potential at infinite dilution
+
+        (without the :math:`2\\log(\\frac{m}{\Delta_w})` term)
         """
 
         in_p = np.zeros(16)
         in_p[:3] = self.solve_eqns_water_analytical()
+        in_p[4] = self.f0(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[5] = self.f1(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[6] = self.f2(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[7] = self.f0(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[8] = self.f1(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[9] = self.f2(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[15] = 1e-5
+
+        m_1 = self.mu_sf_optimized(in_p)-2*np.log(self.n_s)
+        m_2 = 0.0
+        m_3 = (self.pvt-(1-2*in_p[0]))*self.u_s/self.u_w
+
+        m_total = m_1 + m_2 + m_3
+
+        return m_total
 
     def mu_bf(self, in_p):
         """
@@ -527,7 +544,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_ideal = 2*np.log(self.ml/self.delta_w) + self.pvt*self.u_s/self.u_w
+        t_ideal = 2*np.log(self.ml/self.delta_w)+self.mu_sf0()
         val = (1-in_p[15])*self.mu_sf(in_p)+in_p[15]*self.mu_sb_1(in_p)-t_ideal
 
         return 0.5*val
@@ -820,7 +837,7 @@ class ElectrolyteSolution(object):
         :param df2: free energy for teo hydration bond
         """
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(mf, y, df, df1, df2) * 2 * y * (1 - y) * np.exp(df1)
+        return self.f_uni(mf, y, df, df1, df2)*2*y*(1 - y)*np.exp(df1)
 
     def f2(self, mf, df, df1, df2):
         """
@@ -833,7 +850,7 @@ class ElectrolyteSolution(object):
         """
 
         y = self.solve_eqns_water_analytical()[0]
-        return self.f_uni(mf, y, df, df1, df2) * y ** 2 * np.exp(df2)
+        return self.f_uni(mf, y, df, df1, df2)*y**2*np.exp(df2)
     @staticmethod
     def tau_debye(x):
         """
