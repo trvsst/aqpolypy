@@ -198,7 +198,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[2] = test_zd
         self.in_p[15] = test_f_b
 
-        comp_mu_salt_1 = el_mu.mu_sf_1(self.in_p)
+        comp_mu_salt_1 = el_mu.mu_sf_ideal_assoc(self.in_p)
         vals_comp = [37.25732015, 45.39152661, 49.95608283, 56.58411032]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
@@ -317,7 +317,7 @@ class TestFreeEnergy(unittest.TestCase):
             test_cond = np.allclose(comp_mu_water, comp_analytical_water)
             self.assertTrue(test_cond)
             comp_mu_salt = el.mu_sf(ini_p)
-            print(comp_mu_salt, comp_analytical_salt, el.mu_sf_optimized(ini_p))
+            print(comp_mu_salt, comp_analytical_salt, el.mu_sf_ideal_assoc_optimized(ini_p))
             test_cond = np.allclose(comp_mu_salt, comp_analytical_salt)
             #self.assertTrue(test_cond)
     def test_hydration_dilute(self):
@@ -430,8 +430,8 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[15] = 1e-14
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
-            mu_s_a[ind] = el.mu_sf_1(ini_p)
-            mu_s_op[ind] = el.mu_sf_optimized(ini_p)
+            mu_s_a[ind] = el.mu_sf_ideal_assoc(ini_p)
+            mu_s_op[ind] = el.mu_sf_ideal_assoc_optimized(ini_p)
 
         test_cond1 = np.allclose(mu_s_a, mu_s_op)
         self.assertTrue(test_cond1)
