@@ -264,24 +264,22 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[12] = 3.0
         ini_p[13] = 1.0
         ini_p[14] = 0.0
-        ini_p[15] = 1e-3
+        ini_p[15] = 1e-2
 
-        test_m = 0.1
-        l_delta = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
-        el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        print('start here')
-        mu_w = el_m_a.mu_w_ideal_assoc(ini_p)*el_m_a.u_s/el_m_a.u_w
-        print(mu_w)
-        print(el_m_a.mu_sf(ini_p))
-        print(el_m_a.mu_sb(ini_p))
-        mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
-        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
-        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
-        print(delta)
-        for d_m in l_delta:
-            el_m_b = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-            df = (el_m_b.f_total(ini_p) - el_m_a.f_total(ini_p))/d_m
-            print(el_m_b.delta_w*df, delta)
+        test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        d_m = 1e-10
+
+        for ml in test_m:
+            el_m_a = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
+            mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
+            mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
+            delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
+            el_p = El.ElectrolyteSolution(ml+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            el_m = El.ElectrolyteSolution(ml-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
+            test_cond= np.allclose(df, delta/el_p.delta_w, 0, 5e-4)
+            self.assertTrue(test_cond)
 
     def test_sol_pure_water(self):
 
