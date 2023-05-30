@@ -449,8 +449,26 @@ class ElectrolyteSolution(object):
         t_10 = t_10_1 + t_10_2
 
         t_11 = np.log(self.m_m*self.m_p)
-
+        #print(t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11)
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
+
+    def mu_sb_ideal_assoc_optimized(self, in_p):
+        """
+        Defines association to the bjerrum salt chemical potential when the values in_p are solutions to the
+        equations
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        h_bp = in_p[9] + in_p[10] + in_p[11]
+        h_bm = in_p[12] + in_p[13] + in_p[14]
+
+        t_0 = np.log(in_p[15]*self.n_s)-self.f_bj
+        t_1 = (h_bp + h_bm) * np.log(self.n_w)
+        t_2 = self.m_bp*np.log(1-h_bp/self.m_bp)+self.m_bm*np.log(1-h_bm/self.m_bm)
+        t_3 = np.log(self.m_p*self.m_m)
+
+        return t_0+t_1+t_2+t_3
 
     def mu_w(self, in_p):
         """
@@ -523,7 +541,7 @@ class ElectrolyteSolution(object):
 
         return m_total
 
-    def mu_bf(self, in_p):
+    def mu_sb(self, in_p):
         """
         Defines the bjerrum salt chemical potential
 
@@ -769,7 +787,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        return self.mu_sf(in_p)-self.mu_bf(in_p)
+        return self.mu_sf(in_p)-self.mu_sb(in_p)
 
     def eqns(self, in_p):
         """

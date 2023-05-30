@@ -244,6 +244,45 @@ class TestFreeEnergy(unittest.TestCase):
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
+    def test_mu_relation(self):
+        """
+        tests the derivative of the free energy with respect the molality
+        """
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.72
+        ini_p[1] = 0.55
+        ini_p[2] = 0.55
+        ini_p[3] = 5.0
+        ini_p[4] = 1.0
+        ini_p[5] = 0.0
+        ini_p[6] = 5.0
+        ini_p[7] = 1.0
+        ini_p[8] = 0.5
+        ini_p[9] = 3.0
+        ini_p[10] = 1.0
+        ini_p[11] = 0.0
+        ini_p[12] = 3.0
+        ini_p[13] = 1.0
+        ini_p[14] = 0.0
+        ini_p[15] = 1e-3
+
+        test_m = 0.1
+        l_delta = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3]
+        el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        print('start here')
+        mu_w = el_m_a.mu_w_ideal_assoc(ini_p)*el_m_a.u_s/el_m_a.u_w
+        print(mu_w)
+        print(el_m_a.mu_sf(ini_p))
+        print(el_m_a.mu_sb(ini_p))
+        mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
+        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
+        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
+        print(delta)
+        for d_m in l_delta:
+            el_m_b = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            df = (el_m_b.f_total(ini_p) - el_m_a.f_total(ini_p))/d_m
+            print(el_m_b.delta_w*df, delta)
+
     def test_sol_pure_water(self):
 
         nw = 55.5
@@ -376,6 +415,8 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[12] = el.f0(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[13] = el.f1(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
+            #print(sol)
+            #print(sol_alyt)
             test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])
             self.assertTrue(test_cond1)
 
@@ -421,19 +462,24 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[6] = 3.0
         ini_p[7] = 0.0
         ini_p[8] = 0.0
-        ini_p[15] = 1e-14
+        ini_p[15] = 1e-15
         mu_s_a = np.zeros_like(m_val)
         mu_s_op = np.zeros_like(m_val)
+        mu_b_a = np.zeros_like(m_val)
+        mu_b_op = np.zeros_like(m_val)
         for ind, ml in enumerate(m_val):
             el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
-            ini_p[15] = 1e-14
+            ini_p[15] = 1e-2
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
             mu_s_a[ind] = el.mu_sf_ideal_assoc(ini_p)
             mu_s_op[ind] = el.mu_sf_ideal_assoc_optimized(ini_p)
-
+            mu_b_a[ind] = el.mu_sb_ideal_assoc(ini_p)
+            mu_b_op[ind] = el.mu_sb_ideal_assoc_optimized(ini_p)
         test_cond1 = np.allclose(mu_s_a, mu_s_op)
         self.assertTrue(test_cond1)
+        test_cond2 = np.allclose(mu_b_a, mu_b_op)
+        self.assertTrue(test_cond2)
 
 if __name__ == '__main__':
     unittest.main()
