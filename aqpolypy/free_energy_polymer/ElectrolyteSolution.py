@@ -295,7 +295,7 @@ class ElectrolyteSolution(object):
         f_c = self.f_comp(in_p)
         f_d = self.f_debye(in_p)
 
-        return f_i + f_a + f_c + f_d
+        return f_i + f_a + f_d + f_c
 
     def mu_w_ideal_assoc(self, in_p):
         """

@@ -278,7 +278,7 @@ class TestFreeEnergy(unittest.TestCase):
             el_p = El.ElectrolyteSolution(ml+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
             el_m = El.ElectrolyteSolution(ml-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
             df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
-            test_cond= np.allclose(df, delta/el_p.delta_w, 0, 5e-4)
+            test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
             self.assertTrue(test_cond)
 
     def test_sol_pure_water(self):
