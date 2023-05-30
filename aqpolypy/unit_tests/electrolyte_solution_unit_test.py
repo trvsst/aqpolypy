@@ -114,7 +114,7 @@ class TestFreeEnergy(unittest.TestCase):
         self.in_p[15] = test_f_b
 
         comp_assoc = el_sol.f_assoc(self.in_p)
-        vals_comp = [-2.59476765, -2.76524927, -2.72247367, -2.75483476]
+        vals_comp = [-2.57388926, -2.72540227, -2.74349384, -2.7338146]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 

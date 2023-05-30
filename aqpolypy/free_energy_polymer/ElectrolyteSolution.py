@@ -213,7 +213,7 @@ class ElectrolyteSolution(object):
         vd1 = 2*(in_p[0]-in_p[2])*self.n_w-((1-in_p[15])*in_p[7]+ in_p[15]*in_p[13])*self.n_s
         t_9 = lg(vd1, vd1)-2*(in_p[0]-in_p[2])*self.n_w * np.log(2)
 
-        vd2 = in_p[1]*self.n_w-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.n_s
+        vd2 = in_p[2]*self.n_w-((1-in_p[15])*in_p[8]+in_p[15]*in_p[14])*self.n_s
         t_10 = lg(vd2, vd2)
 
         vdh = lg(in_p[6], in_p[6])+lg(in_p[7], in_p[7])+lg(in_p[8], in_p[8])
