@@ -413,6 +413,8 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[12] = el.f0(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[13] = el.f1(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
+            #sol_akyt[15] = el.k_bjerrum0()*ml/el.delta_w
+            print(el.k_bjerrum0()*ml/el.delta_w)
             #print(sol)
             #print(sol_alyt)
             test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])

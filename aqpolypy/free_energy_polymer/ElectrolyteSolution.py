@@ -525,12 +525,12 @@ class ElectrolyteSolution(object):
 
         in_p = np.zeros(16)
         in_p[:3] = self.solve_eqns_water_analytical()
-        in_p[4] = self.f0(self.m_p, self.f_p, self.f_p1, self.f_p2)
-        in_p[5] = self.f1(self.m_p, self.f_p, self.f_p1, self.f_p2)
-        in_p[6] = self.f2(self.m_p, self.f_p, self.f_p1, self.f_p2)
-        in_p[7] = self.f0(self.m_m, self.f_m, self.f_m1, self.f_m2)
-        in_p[8] = self.f1(self.m_m, self.f_m, self.f_m1, self.f_m2)
-        in_p[9] = self.f2(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[3] = self.f0(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[4] = self.f1(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[5] = self.f2(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[6] = self.f0(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[7] = self.f1(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[8] = self.f2(self.m_m, self.f_m, self.f_m1, self.f_m2)
         in_p[15] = 1e-15
 
         m_1 = self.mu_sf_ideal_assoc_optimized(in_p)-2*np.log(self.n_s)
@@ -554,6 +554,39 @@ class ElectrolyteSolution(object):
         m_total = m_1 + m_2
 
         return m_total
+
+    def k_bjerrum0(self):
+        """
+        Returns the bjerrum constant at infintie dilution
+        """
+
+        in_p = np.zeros(15)
+        in_p[:3] = self.solve_eqns_water_analytical()
+        in_p[3] = self.f0(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[4] = self.f1(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[5] = self.f2(self.m_p, self.f_p, self.f_p1, self.f_p2)
+        in_p[6] = self.f0(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[7] = self.f1(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[8] = self.f2(self.m_m, self.f_m, self.f_m1, self.f_m2)
+        in_p[9] = self.f0(self.m_bp, self.f_bp, self.f_bp1, self.f_bp2)
+        in_p[10] = self.f1(self.m_bp, self.f_bp, self.f_bp1, self.f_bp2)
+        in_p[11] = self.f2(self.m_bp, self.f_bp, self.f_bp1, self.f_bp2)
+        in_p[12] = self.f0(self.m_bm, self.f_bm, self.f_bm1, self.f_bm2)
+        in_p[13] = self.f1(self.m_bm, self.f_bm, self.f_bm1, self.f_bm2)
+        in_p[14] = self.f2(self.m_bm, self.f_bm, self.f_bm1, self.f_bm2)
+
+        s_hp = np.sum(in_p[3:6])
+        s_hm = np.sum(in_p[6:9])
+        s_hbp = np.sum(in_p[9:12])
+        s_hbm = np.sum(in_p[12:15])
+
+        k_0 = self.m_p*self.m_m*np.exp(self.f_bj)
+
+        val_1 = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
+        val_2 = (1-s_hbp/self.m_bp)**(self.m_bp)*(1-s_hbm/self.m_bm)**(self.m_bm)
+        k_h = val_2/val_1
+        print(k_h, k_0)
+        return k_0*k_h
 
     def c_gamma(self, in_p):
         """
