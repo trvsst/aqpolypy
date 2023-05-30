@@ -381,6 +381,8 @@ class TestFreeEnergy(unittest.TestCase):
         self.param_salt['de_bm1'] = -10000.0
         self.param_salt['ds_bm1'] = 0.0
 
+        self.param_salt['de_b'] = (-13+np.log(0.1))*self.temp
+
         m_val = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
         m_err = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
         num_eq = 15
@@ -414,7 +416,7 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[13] = el.f1(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             #sol_akyt[15] = el.k_bjerrum0()*ml/el.delta_w
-            print(el.k_bjerrum0()*ml/el.delta_w)
+            print(el.k_bjerrum0()*ml/el.delta_w, ml)
             #print(sol)
             #print(sol_alyt)
             test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])
