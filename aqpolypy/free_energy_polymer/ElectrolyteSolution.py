@@ -589,6 +589,18 @@ class ElectrolyteSolution(object):
 
         return k_0*k_h/self.delta_w
 
+    def define_bjerrum(self, k_bjerrum):
+        """
+        Define the Bjerrum constant to have a prescribed value k_bjerrum
+
+        :param k_bjerrum: desired value of the Bjerrum constant (in inverse molality units).
+        """
+
+        f_ini = self.f_bj
+        self.f_bj = np.log(k_bjerrum/self.k_bjerrum0())+f_ini
+        self.e_b = 0.0
+        self.s_b = self.f_bj
+
     def c_gamma(self, in_p):
         """
         Defines the activity coefficient
