@@ -586,8 +586,8 @@ class ElectrolyteSolution(object):
         val_t = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
 
         k_h = val_t/val_b
-        
-        return k_0*k_h
+
+        return k_0*k_h/self.delta_w
 
     def c_gamma(self, in_p):
         """
