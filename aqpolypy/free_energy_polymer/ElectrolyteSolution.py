@@ -580,12 +580,13 @@ class ElectrolyteSolution(object):
         s_hbp = np.sum(in_p[9:12])
         s_hbm = np.sum(in_p[12:15])
 
-        k_0 = self.m_p*self.m_m*np.exp(self.f_bj)
+        k_0 = np.exp(self.f_bj)/(self.m_p*self.m_m)
 
-        val_1 = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
-        val_2 = (1-s_hbp/self.m_bp)**(self.m_bp)*(1-s_hbm/self.m_bm)**(self.m_bm)
-        k_h = val_2/val_1
-        print(k_h, k_0)
+        val_b = (1 - s_hbp / self.m_bp) ** (self.m_bp) * (1 - s_hbm / self.m_bm) ** (self.m_bm)
+        val_t = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
+
+        k_h = val_t/val_b
+        
         return k_0*k_h
 
     def c_gamma(self, in_p):

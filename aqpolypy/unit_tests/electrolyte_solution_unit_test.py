@@ -362,8 +362,6 @@ class TestFreeEnergy(unittest.TestCase):
 
         self.param_salt['de_p0'] = 1000
         self.param_salt['ds_p0'] = 1.0
-        #self.param_salt['de_p1'] = -10000.0
-        #self.param_salt['ds_p1'] = 0.0
 
         self.param_salt['de_bp0'] = 1000
         self.param_salt['ds_bp0'] = 1.0
@@ -372,20 +370,18 @@ class TestFreeEnergy(unittest.TestCase):
 
         self.param_salt['de_m0'] = 1000
         self.param_salt['ds_m0'] = 1.0
-        #self.param_salt['de_m1'] = -10000.0
-        #self.param_salt['ds_m1'] = 0.0
 
         self.param_salt['de_bm0'] = 1000
         self.param_salt['ds_bm0'] = 1.0
         self.param_salt['de_bm1'] = -10000.0
         self.param_salt['ds_bm1'] = 0.0
 
-        self.param_salt['de_b'] = (-9+np.log(0.1))*self.temp
+        self.param_salt['de_b'] = (20+np.log(0.1))*self.temp
 
         m_val = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
         m_err = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
-        num_eq = 15
-        sol_alyt = np.zeros(num_eq)
+        num_eq = 16
+        sol_alyt = np.zeros(16)
         ini_p = np.zeros(16)
         ini_p[0] = 0.806
         ini_p[1] = 0.65
@@ -402,7 +398,6 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[12] = 1.64
             ini_p[15] = 1e-6
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
-            #sol = el.solve_eqns(ini_p)
             ini_p[:num_eq] = sol[:num_eq]
             sol_alyt[:3] = el.solve_eqns_water_analytical()
             sol_alyt[3] = el.f0(el.m_p, el.f_p, el.f_p1, el.f_p2)
@@ -417,13 +412,9 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[12] = el.f0(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[13] = el.f1(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
-            val = el.k_bjerrum0()*ml/el.delta_w
-            #sol_alyt[15] = val
-            #print(sol)
-            #print(sol_alyt)
-            print(val)
-            test_cond1 = np.allclose(sol, sol_alyt, 0, m_err[ind])
-            #self.assertTrue(test_cond1)
+            sol_alyt[15] = el.k_bjerrum0()*ml/el.delta_w
+            test_cond1 = np.allclose(sol, sol_alyt[:num_eq], 0, m_err[ind])
+            self.assertTrue(test_cond1)
 
     def test_chem_potential_optimized_vs_non(self):
         self.param_w['de_w'] = 1800
