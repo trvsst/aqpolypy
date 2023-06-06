@@ -406,6 +406,7 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[0] = 0.806
         ini_p[1] = 0.65
         ini_p[2] = 0.65
+        k_bjerrum = 0.2080024561114551
         for ind, ml in enumerate(m_val):
             el = El.ElectrolyteSolution(ml, self.temp, param_w, param_salt, self.param_h)
             ini_p[3] = 2.0
@@ -417,6 +418,7 @@ class TestFreeEnergy(unittest.TestCase):
             ini_p[9] = 1.5
             ini_p[12] = 1.64
             ini_p[15] = 1e-6
+            el.define_bjerrum(k_bjerrum)
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:num_eq]
             sol_alyt[:3] = el.solve_eqns_water_analytical()
