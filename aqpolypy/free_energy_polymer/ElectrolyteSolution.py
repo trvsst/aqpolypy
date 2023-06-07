@@ -131,18 +131,6 @@ class ElectrolyteSolution(object):
         self.m_m = param_h['m_m']
         self.m_bp = param_h['mb_p']
         self.m_bm = param_h['mb_m']
-        self.h_p0 = param_h['h_p0']
-        self.h_p1 = param_h['h_p1']
-        self.h_p2 = param_h['h_p2']
-        self.h_m0 = param_h['h_m0']
-        self.h_m1 = param_h['h_m1']
-        self.h_m2 = param_h['h_m2']
-        self.hb_p0 = param_h['hb_p0']
-        self.hb_p1 = param_h['hb_p1']
-        self.hb_p2 = param_h['hb_p2']
-        self.hb_m0 = param_h['hb_m0']
-        self.hb_m1 = param_h['hb_m1']
-        self.hb_m2 = param_h['hb_m2']
 
         # define free energies
         self.f_w = self.e_w/self.tp - self.s_w
@@ -161,12 +149,6 @@ class ElectrolyteSolution(object):
         self.f_bm = self.e_bm/self.tp - self.s_bm
         self.f_bm1 = self.e_bm1/self.tp - self.s_bm1
         self.f_bm2 = self.e_bm2/self.tp - self.s_bm2
-
-        # define new hydration parameters
-        self.h_p = self.h_p0+self.h_p1+self.h_p2
-        self.h_m = self.h_m0 + self.h_m1 + self.h_m2
-        self.hb_p = self.hb_p0 + self.hb_p1 + self.hb_p2
-        self.hb_m = self.hb_m0 + self.hb_m1 + self.hb_m2
 
     def f_assoc(self, in_p):
         """

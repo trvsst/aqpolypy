@@ -398,8 +398,8 @@ class TestFreeEnergy(unittest.TestCase):
 
         param_salt['de_b'] = (20+np.log(0.1))*self.temp
 
-        m_val = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
-        m_err = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        m_val = np.array([1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1])
+        m_err = np.array([1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1])
         num_eq = 16
         sol_alyt = np.zeros(16)
         ini_p = np.zeros(16)
@@ -436,6 +436,14 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[15] = el.k_bjerrum0()*ml
             test_cond1 = np.allclose(sol, sol_alyt[:num_eq], 0, m_err[ind])
+            print(ml)
+            print(self.temp)
+            print(param_w)
+            print(param_salt)
+            print(self.param_h)
+            print(sol)
+            print(sol[15])
+            print(el.f_bj)
             self.assertTrue(test_cond1)
 
     def test_chem_potential_optimized_vs_non(self):
