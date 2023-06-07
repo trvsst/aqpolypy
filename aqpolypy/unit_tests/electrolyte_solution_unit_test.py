@@ -31,7 +31,7 @@ class TestFreeEnergy(unittest.TestCase):
         dict_h_m = {'h_m0': 6.0, 'h_m1': 1.5, 'h_m2': 0.0}
         dict_h_bp = {'hb_p0': 4.0, 'hb_p1': 0.5, 'hb_p2': 0.0}
         dict_h_bm = {'hb_m0': 4.5, 'hb_m1': 1.0, 'hb_m2': 0.0}
-        self.param_h = {**dict_max, **dict_hp, **dict_h_m, **dict_h_bp, **dict_h_bm}
+        self.param_h = {**dict_max}
         self.in_p = np.zeros([16, 4])
         self.in_p[3, :] = dict_hp['h_p0']
         self.in_p[4, :] = dict_hp['h_p1']
@@ -408,7 +408,7 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[2] = 0.65
         k_bjerrum = 0.2080024561114551
         for ind, ml in enumerate(m_val):
-            el = El.ElectrolyteSolution(ml, self.temp, param_w, param_salt, self.param_h)
+            el = El.ElectrolyteSolution(ml, self.temp, param_w, param_salt, self.param_h, b_param=1.0)
             ini_p[3] = 2.0
             ini_p[4] = 3.0
             ini_p[5] = 0.0
@@ -436,14 +436,6 @@ class TestFreeEnergy(unittest.TestCase):
             sol_alyt[14] = el.f2(el.m_bm, el.f_bm, el.f_bm1, el.f_bm2)
             sol_alyt[15] = el.k_bjerrum0()*ml
             test_cond1 = np.allclose(sol, sol_alyt[:num_eq], 0, m_err[ind])
-            print(ml)
-            print(self.temp)
-            print(param_w)
-            print(param_salt)
-            print(self.param_h)
-            print(sol)
-            print(sol[15])
-            print(el.f_bj)
             self.assertTrue(test_cond1)
 
     def test_chem_potential_optimized_vs_non(self):

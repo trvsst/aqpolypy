@@ -431,7 +431,7 @@ class ElectrolyteSolution(object):
         t_10 = t_10_1 + t_10_2
 
         t_11 = np.log(self.m_m*self.m_p)
-        #print(t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8, t_9, t_10, t_11)
+        
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
     def mu_sb_ideal_assoc_optimized(self, in_p):
