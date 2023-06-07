@@ -377,7 +377,7 @@ class TestFreeEnergy(unittest.TestCase):
 
         param_w = self.param_w
         param_w['de_w'] = 1800
-        param_w['se_w'] = 3.47
+        param_w['ds_w'] = 3.47
 
         param_salt = self.param_salt
         param_salt['de_p0'] = 1000
