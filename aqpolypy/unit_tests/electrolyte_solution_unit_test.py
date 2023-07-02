@@ -287,13 +287,13 @@ class TestFreeEnergy(unittest.TestCase):
         d_m = 1e-10
 
         for ml in test_m:
-            el_m_a = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            el_m_a = El.ElectrolyteSolution(np.array([ml]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
             mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
             mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
             mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
             delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
-            el_p = El.ElectrolyteSolution(ml+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-            el_m = El.ElectrolyteSolution(ml-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            el_p = El.ElectrolyteSolution(np.array([ml+d_m]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+            el_m = El.ElectrolyteSolution(np.array([ml-d_m]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
             df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
             test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
             self.assertTrue(test_cond)
@@ -303,7 +303,7 @@ class TestFreeEnergy(unittest.TestCase):
         nw = 55.5
         ns = 1e-14
 
-        ml = self.delta_w*ns/nw
+        ml = np.array([self.delta_w*ns/nw])
 
         ini_p = np.zeros(16)
 
@@ -333,7 +333,7 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[1] = 0.4
         ini_p[2] = 0.4
         for ns in ns_mat:
-            ml = self.delta_w*ns/nw
+            ml = np.array([self.delta_w*ns/nw])
             el = El.ElectrolyteSolution(ml, self.temp, self.param_w, self.param_salt, self.param_h)
             ini_p[3] = 5.0
             ini_p[4] = 2.0
@@ -352,7 +352,7 @@ class TestFreeEnergy(unittest.TestCase):
 
     def test_chem_potential_infinite_dilution(self):
         # consider a negligible concentration
-        ml = 1e-14
+        ml = np.array([1e-14])
 
         mat_temp = np.array([300, 320, 340, 360, 380])
         ini_p = np.zeros(16)
@@ -408,7 +408,7 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[2] = 0.65
         k_bjerrum = 0.2080024561114551
         for ind, ml in enumerate(m_val):
-            el = El.ElectrolyteSolution(ml, self.temp, param_w, param_salt, self.param_h, b_param=1.0)
+            el = El.ElectrolyteSolution(np.array([ml]), self.temp, param_w, param_salt, self.param_h, b_param=1.0)
             ini_p[3] = 2.0
             ini_p[4] = 3.0
             ini_p[5] = 0.0
@@ -491,7 +491,7 @@ class TestFreeEnergy(unittest.TestCase):
         mu_b_a = np.zeros_like(m_val)
         mu_b_op = np.zeros_like(m_val)
         for ind, ml in enumerate(m_val):
-            el = El.ElectrolyteSolution(ml, self.temp, param_w, param_salt, param_h)
+            el = El.ElectrolyteSolution(np.array([ml]), self.temp, param_w, param_salt, param_h)
             ini_p[15] = 1e-2
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]

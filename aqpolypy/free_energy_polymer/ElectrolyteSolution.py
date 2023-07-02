@@ -57,6 +57,8 @@ class ElectrolyteSolution(object):
 
         # molality
         self.ml = ml
+        if not isinstance(self.ml, np.ndarray):
+            raise ValueError('molality must be provided as a numpy array')
 
         # constants
         self.delta_w = un.delta_w()
@@ -833,7 +835,7 @@ class ElectrolyteSolution(object):
 
         return eqns
 
-    def solve_eqns(self, ini_condition_p, num_eqns=np.arange(16, dtype='int')):
+    def solve_eqns(self, ini_condition_p, num_eqns=np.arange(16, dtype='int'), indx=0):
         """
         Solve the mean field equations
 
@@ -845,7 +847,7 @@ class ElectrolyteSolution(object):
         def fun(ini_p):
             ini_val = ini_condition_p
             ini_val[num_eqns] = ini_p
-            return self.eqns(ini_val)[num_eqns]
+            return self.eqns(ini_val)[num_eqns,indx]
 
         sol = fsolve(fun, ini_c)
 
