@@ -819,12 +819,31 @@ class ElectrolyteSolution(object):
 
         return self.mu_sf(in_p)-self.mu_sb(in_p)
 
-    def eqns(self, in_p):
+    def eqns(self, in_p, indx):
         """
          mean field equations
 
-        :param ini_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        :param indx: index of the molality
         """
+
+        ml_t = np.array(self.ml, copy=True)
+        rh_t = np.array(self.r_h, copy=True)
+        sq_t = np.array(self.sqrt_i_str, copy=True)
+        n_w_t = np.array(self.n_w, copy=True)
+        n_s_t = np.array(self.n_s, copy=True)
+
+        self.ml = np.zeros(1)
+        self.r_h = np.zeros(1)
+        self.sqrt_i_str = np.zeros(1)
+        self.n_w = np.zeros(1)
+        self.n_s = np.zeros(1)
+
+        self.ml[0]= ml_t[indx]
+        self.r_h[0] = rh_t[indx]
+        self.sqrt_i_str[0] = sq_t[indx]
+        self.n_w[0] = n_w_t[indx]
+        self.n_s[0] = n_s_t[indx]
 
         eqns=np.array([self.eqn_y(in_p), self.eqn_za(in_p), self.eqn_zd(in_p),
                        self.eqn_h_p0(in_p), self.eqn_h_p1(in_p), self.eqn_h_p2(in_p),
@@ -832,6 +851,12 @@ class ElectrolyteSolution(object):
                        self.eqn_hb_p0(in_p), self.eqn_hb_p1(in_p), self.eqn_hb_p2(in_p),
                        self.eqn_hb_m0(in_p), self.eqn_hb_m1(in_p), self.eqn_hb_m2(in_p),
                        self.eqn_bjerrum(in_p)])
+
+        self.ml = np.array(ml_t, copy=True)
+        self.r_h = np.array(rh_t, copy=True)
+        self.sqrt_i_str = np.array(sq_t, copy=True)
+        self.n_w = np.array(n_w_t, copy=True)
+        self.n_s = np.array(n_s_t, copy=True)
 
         return eqns
 
@@ -841,14 +866,14 @@ class ElectrolyteSolution(object):
 
         :param ini_condition_p: initial 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         :param num_eqns: indexes of the equations to solve
-        :param indx: index of the mollaity for which the equation is solved
+        :param indx: index of the molality for which the equation is solved
         """
 
         ini_c = ini_condition_p[num_eqns]
         def fun(ini_p):
-            ini_val = ini_condition_p
-            ini_val[num_eqns] = ini_p
-            return self.eqns(ini_val)[num_eqns, indx]
+            ini_val = np.array(ini_condition_p[:])
+            ini_val[num_eqns] = ini_p[:]
+            return self.eqns(ini_val, indx)[num_eqns, 0]
 
         sol = fsolve(fun, ini_c)
 
@@ -883,12 +908,12 @@ class ElectrolyteSolution(object):
         mask = np.ones(16, dtype='bool')
         mask[num_eqns] = False
 
-        for indx, ind in enumerate(m_indx):
+        for inx, ind in enumerate(m_indx):
             if ini_condition_m.ndim == 1 and ind > 0:
                 # use the previous solution as initial condition
                 ini_cond[:, ind] = sols[:, ind-1]
 
-            sl = self.solve_eqns(ini_cond[:, ind], num_eqns, indx)
+            sl = self.solve_eqns(ini_cond[:, ind], num_eqns, indx=inx)
             sols[num_eqns, ind] = sl[:]
             sols[mask, ind] = ini_condition_m[mask]
 
