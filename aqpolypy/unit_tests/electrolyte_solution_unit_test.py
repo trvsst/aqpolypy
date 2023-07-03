@@ -286,17 +286,16 @@ class TestFreeEnergy(unittest.TestCase):
         test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
         d_m = 1e-10
 
-        for ml in test_m:
-            el_m_a = El.ElectrolyteSolution(np.array([ml]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-            mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
-            mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
-            mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
-            delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
-            el_p = El.ElectrolyteSolution(np.array([ml+d_m]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-            el_m = El.ElectrolyteSolution(np.array([ml-d_m]), self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-            df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
-            test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
-            self.assertTrue(test_cond)
+        el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
+        mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
+        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
+        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
+        el_p = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        el_m = El.ElectrolyteSolution(test_m-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
+        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
+        self.assertTrue(test_cond)
 
     def test_sol_pure_water(self):
 
@@ -373,6 +372,7 @@ class TestFreeEnergy(unittest.TestCase):
             comp_mu_salt = el.mu_sf(ini_p)
             test_cond = np.allclose(comp_mu_salt, comp_analytical_salt)
             self.assertTrue(test_cond)
+
     def test_hydration_dilute(self):
 
         param_w = self.param_w
@@ -439,7 +439,7 @@ class TestFreeEnergy(unittest.TestCase):
             self.assertTrue(test_cond1)
 
     def test_chem_potential_optimized_vs_non(self):
-
+        print('vector')
         param_w = self.param_w
         param_h = self.param_h
         param_salt = self.param_salt
@@ -472,7 +472,6 @@ class TestFreeEnergy(unittest.TestCase):
         param_salt['ds_bm1'] = 0.0
 
         m_val = np.array([0.1, 0.5, 1.0, 1.5, 2.0])
-
         num_eq = 15
         sol_alyt = np.zeros(num_eq)
         ini_p = np.zeros(16)
@@ -485,20 +484,92 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[6] = 3.0
         ini_p[7] = 0.0
         ini_p[8] = 0.0
-        ini_p[15] = 1e-15
+        ini_p[15] = 1e-2
+
+        el = El.ElectrolyteSolution(m_val, self.temp, param_w, param_salt, param_h)
+        sol = el.solve_eqns_multiple(ini_p, np.arange(num_eq, dtype='int'))
+
+        mu_s_a = el.mu_sf_ideal_assoc(sol)
+        mu_s_op = el.mu_sf_ideal_assoc_optimized(sol)
+        mu_b_a = el.mu_sb_ideal_assoc(sol)
+        mu_b_op = el.mu_sb_ideal_assoc_optimized(sol)
+
+        print(sol)
+        print(mu_s_a)
+        print(mu_s_op)
+        print(mu_b_a)
+        print(mu_b_op)
+        test_cond1 = np.allclose(mu_s_a, mu_s_op)
+        self.assertTrue(test_cond1)
+        test_cond2 = np.allclose(mu_b_a, mu_b_op)
+        self.assertTrue(test_cond2)
+
+    def test_chem_potential_optimized_vs_non_scalar(self):
+        print('scalar')
+        param_w = self.param_w
+        param_h = self.param_h
+        param_salt = self.param_salt
+
+        param_w['de_w'] = 1800
+        param_w['se_w'] = 3.47
+        param_h['m_p'] = 8.0
+        param_h['m_m'] = 8.0
+        param_h['mb_p'] = 4.0
+        param_h['mb_m'] = 4.0
+
+        param_salt['de_p0'] = 1000
+        param_salt['ds_p0'] = 1.0
+        param_salt['de_p1'] = -10000.0
+        param_salt['ds_p1'] = 0.0
+
+        param_salt['de_bp0'] = 1000
+        param_salt['ds_bp0'] = 1.0
+        param_salt['de_bp1'] = -10000.0
+        param_salt['ds_bp1'] = 0.0
+
+        param_salt['de_m0'] = 1000
+        param_salt['ds_m0'] = 1.0
+        param_salt['de_m1'] = -10000.0
+        param_salt['ds_m1'] = 0.0
+
+        param_salt['de_bm0'] = 1000
+        param_salt['ds_bm0'] = 1.0
+        param_salt['de_bm1'] = -10000.0
+        param_salt['ds_bm1'] = 0.0
+
+        m_val = np.array([0.1, 0.5, 1.0, 1.5, 2.0])
+        num_eq = 15
+        sol_alyt = np.zeros(num_eq)
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.75
+        ini_p[1] = 0.55
+        ini_p[2] = 0.55
+        ini_p[3] = 4.0
+        ini_p[4] = 0.0
+        ini_p[5] = 0.0
+        ini_p[6] = 3.0
+        ini_p[7] = 0.0
+        ini_p[8] = 0.0
+        ini_p[15] = 1e-2
         mu_s_a = np.zeros_like(m_val)
         mu_s_op = np.zeros_like(m_val)
         mu_b_a = np.zeros_like(m_val)
         mu_b_op = np.zeros_like(m_val)
         for ind, ml in enumerate(m_val):
             el = El.ElectrolyteSolution(np.array([ml]), self.temp, param_w, param_salt, param_h)
-            ini_p[15] = 1e-2
             sol = el.solve_eqns(ini_p, np.arange(num_eq, dtype='int'))
             ini_p[:num_eq] = sol[:]
+            ini_p[15] = 1e-2
+            print(ini_p)
             mu_s_a[ind] = el.mu_sf_ideal_assoc(ini_p)
             mu_s_op[ind] = el.mu_sf_ideal_assoc_optimized(ini_p)
             mu_b_a[ind] = el.mu_sb_ideal_assoc(ini_p)
             mu_b_op[ind] = el.mu_sb_ideal_assoc_optimized(ini_p)
+
+        print(mu_s_a)
+        print(mu_s_op)
+        print(mu_b_a)
+        print(mu_b_op)
         test_cond1 = np.allclose(mu_s_a, mu_s_op)
         self.assertTrue(test_cond1)
         test_cond2 = np.allclose(mu_b_a, mu_b_op)

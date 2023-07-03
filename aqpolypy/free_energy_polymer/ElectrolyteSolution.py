@@ -841,17 +841,58 @@ class ElectrolyteSolution(object):
 
         :param ini_condition_p: initial 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         :param num_eqns: indexes of the equations to solve
+        :param indx: index of the mollaity for which the equation is solved
         """
 
         ini_c = ini_condition_p[num_eqns]
         def fun(ini_p):
             ini_val = ini_condition_p
             ini_val[num_eqns] = ini_p
-            return self.eqns(ini_val)[num_eqns,indx]
+            return self.eqns(ini_val)[num_eqns, indx]
 
         sol = fsolve(fun, ini_c)
 
         return sol
+
+    def solve_eqns_multiple(self, ini_condition_m, num_eqns=np.arange(16, dtype='int'), m_indx='all'):
+        """
+        provides the solution for specified molalities
+
+        :param ini_condition_p: initial 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        :param num_eqns: indexes of the equations to solve
+        :param m_indx: index of the molalities to solve
+        """
+
+        if m_indx=='all':
+            m_indx = np.arange(self.ml.shape[0], dtype='int')
+
+        if not isinstance(m_indx, np.ndarray):
+            raise ValueError('index of molalities to be computed must be provided as a numpy array')
+
+        # prepare the initial condition (if 1d then use the previous condition as initial condition for next)
+        ini_cond = np.zeros([16, m_indx.shape[0]])
+        if ini_condition_m.ndim == 1:
+            ini_cond[:, 0] = ini_condition_m[:]
+        else:
+            ini_cond[:, :] = ini_condition_m[:, :]
+
+        # store the solution to the equations here
+        sols = np.zeros([16, m_indx.shape[0]])
+
+        # define a mask for the indices that are not solved
+        mask = np.ones(16, dtype='bool')
+        mask[num_eqns] = False
+
+        for indx, ind in enumerate(m_indx):
+            if ini_condition_m.ndim == 1 and ind > 0:
+                # use the previous solution as initial condition
+                ini_cond[:, ind] = sols[:, ind-1]
+
+            sl = self.solve_eqns(ini_cond[:, ind], num_eqns, indx)
+            sols[num_eqns, ind] = sl[:]
+            sols[mask, ind] = ini_condition_m[mask]
+
+        return sols
 
     def solve_eqns_water_analytical(self):
         """
