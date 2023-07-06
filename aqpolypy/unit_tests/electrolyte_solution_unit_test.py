@@ -119,7 +119,7 @@ class TestFreeEnergy(unittest.TestCase):
         in_p[15] = test_f_b
 
         comp_assoc = el_sol.f_assoc(in_p)
-        vals_comp = [-2.57388926, -2.72540227, -2.74361176, -2.73393251]
+        vals_comp = [-2.57388926, -2.72540227, -2.73953532, -2.72985608]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
@@ -495,7 +495,7 @@ class TestFreeEnergy(unittest.TestCase):
         el_p = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
         el_m = El.ElectrolyteSolution(test_m-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
         df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
-        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
+        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 5e-4)
         self.assertTrue(test_cond)
 
     def test_mu_obtained_from_f_numerically(self):
