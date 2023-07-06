@@ -119,7 +119,7 @@ class TestFreeEnergy(unittest.TestCase):
         in_p[15] = test_f_b
 
         comp_assoc = el_sol.f_assoc(in_p)
-        vals_comp = [-2.57388926, -2.72540227, -2.74349384, -2.7338146]
+        vals_comp = [-2.57388926, -2.72540227, -2.74361176, -2.73393251]
         test_a = np.allclose(comp_assoc, vals_comp, 0, 1e-6)
         self.assertTrue(test_a)
 
@@ -260,42 +260,6 @@ class TestFreeEnergy(unittest.TestCase):
         vals_comp = [-30.16770793, -26.03954779, -14.9881945,  -9.50715624]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
-
-    def test_mu_relation(self):
-        """
-        tests the derivative of the free energy with respect the molality
-        """
-        ini_p = np.zeros(16)
-        ini_p[0] = 0.72
-        ini_p[1] = 0.55
-        ini_p[2] = 0.55
-        ini_p[3] = 5.0
-        ini_p[4] = 1.0
-        ini_p[5] = 0.0
-        ini_p[6] = 5.0
-        ini_p[7] = 1.0
-        ini_p[8] = 0.5
-        ini_p[9] = 3.0
-        ini_p[10] = 1.0
-        ini_p[11] = 0.0
-        ini_p[12] = 3.0
-        ini_p[13] = 1.0
-        ini_p[14] = 0.0
-        ini_p[15] = 1e-2
-
-        test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
-        d_m = 1e-10
-
-        el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
-        mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
-        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
-        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
-        el_p = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        el_m = El.ElectrolyteSolution(test_m-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
-        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
-        self.assertTrue(test_cond)
 
     def test_sol_pure_water(self):
 
@@ -493,11 +457,254 @@ class TestFreeEnergy(unittest.TestCase):
         mu_s_op = el.mu_sf_ideal_assoc_optimized(sol)
         mu_b_a = el.mu_sb_ideal_assoc(sol)
         mu_b_op = el.mu_sb_ideal_assoc_optimized(sol)
-
         test_cond1 = np.allclose(mu_s_a, mu_s_op)
         self.assertTrue(test_cond1)
         test_cond2 = np.allclose(mu_b_a, mu_b_op)
         self.assertTrue(test_cond2)
+
+    def test_mu_relation(self):
+        """
+        tests the derivative of the free energy with respect the molality
+        """
+        ini_p = np.zeros(16)
+        ini_p[0] = 0.72
+        ini_p[1] = 0.55
+        ini_p[2] = 0.55
+        ini_p[3] = 5.0
+        ini_p[4] = 1.0
+        ini_p[5] = 0.0
+        ini_p[6] = 5.0
+        ini_p[7] = 1.0
+        ini_p[8] = 0.5
+        ini_p[9] = 3.0
+        ini_p[10] = 1.0
+        ini_p[11] = 0.0
+        ini_p[12] = 3.0
+        ini_p[13] = 1.0
+        ini_p[14] = 0.0
+        ini_p[15] = 1e-2
+
+        test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        d_m = 1e-10
+
+        el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
+        mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
+        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
+        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
+        el_p = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        el_m = El.ElectrolyteSolution(test_m-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
+        df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
+        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 3e-4)
+        self.assertTrue(test_cond)
+
+    def test_mu_obtained_from_f_numerically(self):
+        """
+        compare the numerical evaluation of the chemical potential with the actual formula
+        """
+
+        temp = 298.15
+        v_w = 30.0
+        v_s = 27.0
+
+        de_w = 1800
+        ds_w = 3.47
+        de = 1000.0
+        d2e = -10000.0
+        mr_p, mr_m, mr_bp, mr_bm = [8.0, 8.0, 8.0, 8.0]
+
+        param_w = {'v_w': v_w, 'de_w': de_w, 'ds_w': ds_w, 'de_2d': 0.0, 'ds_2d': 0.0, 'de_2a': 0.0, 'ds_2a': 0.0}
+        dict_vol = {'v_s': v_s, 'v_b': v_s}
+        dict_p = {'de_p0': de, 'ds_p0': 0.0, 'de_p1': d2e, 'ds_p1': 0.0, 'de_p2': d2e, 'ds_p2': 0.0}
+        dict_bp = {'de_bp0': de, 'ds_bp0': 0.0, 'de_bp1': d2e, 'ds_bp1': 0.0, 'de_bp2': d2e, 'ds_bp2': 0.0}
+        dict_m = {'de_m0': de, 'ds_m0': 0.0, 'de_m1': d2e, 'ds_m1': 0.0, 'de_m2': d2e, 'ds_m2': 0.0}
+        dict_bm = {'de_bm0': de, 'ds_bm0': 0.0, 'de_bm1': d2e, 'ds_bm1': 0.0, 'de_bm2': d2e, 'ds_bm2': 0.0}
+        dict_b = {'de_b': np.log(0.7), 'ds_b': 0.0}
+        param_salt = {**dict_vol, **dict_p, **dict_bp, **dict_m, **dict_bm, **dict_b}
+        dict_max = {'m_p': mr_p, 'm_m': mr_m, 'mb_p': mr_bp, 'mb_m': mr_bm}
+        param_h = {**dict_max}
+
+        ini_val = np.array([10.0, 10.0, 922.2222222222222, 671.1111111111111, -10000.0, -10000.0, 1e-10])
+        ini_p0 = np.array([0.75, 0.55, 0.55, 4.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.0, 1e-14])
+
+        b_par = 1.0
+        param_h['m_p'] = ini_val[0]
+        param_h['m_m'] = ini_val[1]
+        param_h['mb_p'] = ini_val[0] - 1
+        param_h['mb_m'] = ini_val[1] - 1
+        param_salt['de_p0'] = ini_val[2]
+        param_salt['de_m0'] = ini_val[3]
+        param_salt['de_bp0'] = ini_val[2]
+        param_salt['de_bm0'] = ini_val[3]
+        param_salt['de_p1'] = ini_val[4]
+        param_salt['de_m1'] = ini_val[5]
+        param_salt['de_bp1'] = ini_val[4]
+        param_salt['de_bm1'] = ini_val[5]
+
+        num_pnts = 20
+        m_val = np.linspace(1e-2, 1.0, num_pnts)
+        dm = 1e-9
+
+        el_p = El.ElectrolyteSolution(m_val+dm, temp, param_w, param_salt, param_h, b_param=b_par)
+        el_p.define_bjerrum(ini_val[6])
+        el_m = El.ElectrolyteSolution(m_val-dm, temp, param_w, param_salt, param_h, b_param=b_par)
+        el_m.define_bjerrum(ini_val[6])
+        delta_w = el_p.delta_w
+
+        # redefine the variables so that the chemical potential is computed
+        el_p.n_w = np.ones_like(el_p.ml)
+        el_p.n_s = el_p.ml / delta_w
+        el_m.n_w = np.ones_like(el_m.ml)
+        el_m.n_s = el_m.ml / delta_w
+
+
+        # redefine the variables so that the chemical potential is computed
+
+        # salt chemical potential
+        delta_w = el_p.delta_w
+        el_p.n_w = np.ones_like(el_p.ml)
+        el_p.n_s = el_p.ml/delta_w
+        el_m.n_w = np.ones_like(el_m.ml)
+        el_m.n_s = el_m.ml/delta_w
+
+        sol = el_p.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
+        sol[15, :]=0.0
+
+        mu_c_assoc = delta_w*(el_p.f_assoc(sol)-el_m.f_assoc(sol))/(2*dm)
+        mu_c_ideal = delta_w*(el_p.f_ideal()-el_m.f_ideal())/(2*dm)
+        mu_c_elec = delta_w*(el_p.f_debye(sol)-el_m.f_debye(sol))/(2*dm)
+
+        mu_f_idassoc = el_p.mu_sf(sol)
+        mu_f_elec = el_p.mu_sf_debye(sol)
+        print('s electrostatic')
+        print(mu_c_elec)
+        print(mu_f_elec)
+
+        print('s ideal+assoc')
+        print(mu_c_ideal+mu_c_assoc)
+        h_val = 0.367*np.sum(sol[3:9, :], axis=0)/0.04409
+        mu_f_cor = (-h_val +h_val[2])*np.log(30)
+        print(h_val)
+        print(el_p.n_w)
+        print(mu_f_cor)
+        print(mu_f_idassoc)
+        print('diff')
+        print(mu_c_ideal+mu_c_assoc-mu_f_idassoc)
+        # water chemical potential
+        c_fac = 0.1
+        el_p.n_s = c_fac*np.ones_like(el_p.ml)
+        el_p.n_w = delta_w*el_p.n_s/el_p.ml
+
+        el_m.n_s = c_fac*np.ones_like(el_m.ml)
+        el_m.n_w = delta_w*el_m.n_s/el_m.ml
+
+        mu_c_assoc = -el_p.ml**2*(el_p.f_assoc(sol) - el_m.f_assoc(sol)) / (2*delta_w*el_p.n_s*dm)
+        mu_c_ideal = -el_p.ml**2*(el_p.f_ideal() - el_m.f_ideal()) / (2*delta_w*el_p.n_s*dm)
+        mu_c_elec = -el_p.ml**2*(el_p.f_debye(sol) - el_m.f_debye(sol)) / (2*delta_w*el_p.n_s*dm)
+
+        mu_f_idassoc = el_p.mu_w_ideal_assoc(sol)
+        mu_f_elec = el_p.mu_w_debye(sol)
+        print('w electrostatic')
+        print(mu_c_elec)
+        print(mu_f_elec)
+
+        print('w ideal+assoc')
+        print(mu_c_ideal + mu_c_assoc)
+        print(mu_f_idassoc)
+        print(mu_f_idassoc-mu_c_ideal-mu_c_assoc)
+    def test_gibbs_duhem(self):
+        """
+        Tests the Gibbs Duhem Relation
+        """
+
+        temp = 298.15
+        v_w = 30.0
+        v_s = 27.0
+
+        de_w = 1800
+        ds_w = 3.47
+        de = 1000.0
+        d2e = -10000.0
+        mr_p, mr_m, mr_bp, mr_bm = [8.0, 8.0, 8.0, 8.0]
+
+        param_w = {'v_w': v_w, 'de_w': de_w, 'ds_w': ds_w, 'de_2d': 0.0, 'ds_2d': 0.0, 'de_2a': 0.0, 'ds_2a': 0.0}
+        dict_vol = {'v_s': v_s, 'v_b': v_s}
+        dict_p = {'de_p0': de, 'ds_p0': 0.0, 'de_p1': d2e, 'ds_p1': 0.0, 'de_p2': d2e, 'ds_p2': 0.0}
+        dict_bp = {'de_bp0': de, 'ds_bp0': 0.0, 'de_bp1': d2e, 'ds_bp1': 0.0, 'de_bp2': d2e, 'ds_bp2': 0.0}
+        dict_m = {'de_m0': de, 'ds_m0': 0.0, 'de_m1': d2e, 'ds_m1': 0.0, 'de_m2': d2e, 'ds_m2': 0.0}
+        dict_bm = {'de_bm0': de, 'ds_bm0': 0.0, 'de_bm1': d2e, 'ds_bm1': 0.0, 'de_bm2': d2e, 'ds_bm2': 0.0}
+        dict_b = {'de_b': np.log(0.7), 'ds_b': 0.0}
+        param_salt = {**dict_vol, **dict_p, **dict_bp, **dict_m, **dict_bm, **dict_b}
+        dict_max = {'m_p': mr_p, 'm_m': mr_m, 'mb_p': mr_bp, 'mb_m': mr_bm}
+        param_h = {**dict_max}
+
+        ini_val = np.array([10.0, 10.0, 922.2222222222222, 671.1111111111111, -10000.0, -10000.0, 0.05])
+        ini_p0 = np.array([0.75, 0.55, 0.55, 4.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.0, 1e-14])
+
+        b_par = 1.0
+        param_h['m_p'] = ini_val[0]
+        param_h['m_m'] = ini_val[1]
+        param_h['mb_p'] = ini_val[0] - 1
+        param_h['mb_m'] = ini_val[1] - 1
+        param_salt['de_p0'] = ini_val[2]
+        param_salt['de_m0'] = ini_val[3]
+        param_salt['de_bp0'] = ini_val[2]
+        param_salt['de_bm0'] = ini_val[3]
+        param_salt['de_p1'] = ini_val[4]
+        param_salt['de_m1'] = ini_val[5]
+        param_salt['de_bp1'] = ini_val[4]
+        param_salt['de_bm1'] = ini_val[5]
+
+        num_pnts=20
+        m_val = np.linspace(1e-2, 1.0, num_pnts)
+        dm = 1e-8
+        el_p = El.ElectrolyteSolution(m_val+dm, temp, param_w, param_salt, param_h, b_param=b_par)
+        el_p.define_bjerrum(ini_val[6])
+        el_m = El.ElectrolyteSolution(m_val-dm, temp, param_w, param_salt, param_h, b_param=b_par)
+        el_m.define_bjerrum(ini_val[6])
+
+        delta_w = el_p.delta_w
+
+        sol_p = el_p.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
+        sol_m = el_m.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
+
+        der_mu_id_salt = (el_p.mu_sf_ideal_assoc(sol_p)-el_m.mu_sf_ideal_assoc(sol_m))/(2*dm)
+        der_mu_id_salt_bj = (el_p.mu_sb_ideal_assoc(sol_p)-el_m.mu_sb_ideal_assoc(sol_m))/(2*dm)
+        der_mu_id_water = (el_p.mu_w_ideal_assoc(sol_p)-el_m.mu_w_ideal_assoc(sol_m))/(2*dm)
+
+        der_mu_db_salt = (el_p.mu_sf_debye(sol_p)-el_m.mu_sf_debye(sol_m))/(2*dm)
+        der_mu_db_water = (el_p.mu_w_debye(sol_p)-el_m.mu_w_debye(sol_m))/(2*dm)
+
+        der_mu_comp_water = (el_p.mu_w_comp(sol_p) - el_m.mu_w_comp(sol_m))/(2*dm)
+        der_mu_comp_s  = der_mu_comp_water*v_s/v_w
+
+        der_mu_water = (el_p.mu_w(sol_p)-el_m.mu_w(sol_m))/(2*dm)
+        der_mu_salt_f = (el_p.mu_sf(sol_p)-el_m.mu_sf(sol_m))/(2*dm)
+        der_mu_salt_b = (el_p.mu_sb(sol_p) - el_m.mu_sb(sol_m)) / (2 * dm)
+        print('total_chem_potential')
+        r_all_1 = delta_w*der_mu_water/m_val
+        r_all_2 = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
+        difr = np.sum(sol_p[3:9, :], axis=0) * np.log(el_p.n_w) - np.sum(sol_m[3:9, :], axis=0) * np.log(el_m.n_w)
+        r_all_3 = -2*(difr / (2 * dm))
+        print(r_all_3)
+        print(r_all_1+r_all_2)
+        print(r_all_1+r_all_2+r_all_3)
+        r_id_1 = delta_w*(der_mu_id_water+der_mu_comp_water)/m_val
+        r_id_2 = (1-sol_p[15])*(der_mu_id_salt+der_mu_comp_s)+sol_p[15]*(der_mu_id_salt_bj+der_mu_comp_s)
+        print('without electro')
+        print(r_id_1+r_id_2)
+        r_db_1 = delta_w*der_mu_db_water/m_val
+        r_db_2 = (1-sol_p[15])*der_mu_db_salt
+        print('electro only')
+        print(r_db_1+r_db_2)
+        test_cond_db = np.allclose(r_db_1, -r_db_2)
+        self.assertTrue(test_cond_db)
+        print('comp only')
+        r_comp_1 = delta_w*der_mu_comp_water/m_val
+        r_comp_2 = der_mu_comp_s
+        print(r_comp_1)
+        print(r_comp_2)
+        print(r_comp_1+r_comp_2)
 
 if __name__ == '__main__':
     unittest.main()
