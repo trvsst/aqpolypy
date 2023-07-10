@@ -593,7 +593,7 @@ class ElectrolyteSolution(object):
         """
 
         t_ideal = 2*np.log(self.ml/self.delta_w)+self.mu_sf0()
-        val = (1-in_p[15]) * self.mu_sf(in_p) + in_p[15] * self.mu_sb_ideal_assoc(in_p) - t_ideal
+        val = (1-in_p[15]) * self.mu_sf(in_p) + in_p[15] * self.mu_sb(in_p) - t_ideal
 
         return 0.5*val
 

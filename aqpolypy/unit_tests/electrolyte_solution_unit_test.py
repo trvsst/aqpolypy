@@ -621,6 +621,7 @@ class TestFreeEnergy(unittest.TestCase):
 
         test_idassoc = np.allclose(mu_c_ideal+mu_c_assoc, mu_f_idassoc, 0, 5e-6)
         self.assertTrue(test_idassoc)
+
     def test_gibbs_duhem(self):
         """
         Tests the Gibbs Duhem Relation
