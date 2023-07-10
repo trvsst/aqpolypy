@@ -462,7 +462,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_cond2 = np.allclose(mu_b_a, mu_b_op)
         self.assertTrue(test_cond2)
 
-    def test_mu_g_minus_f(self):
+    def test_g_minus_f_equal_p(self):
         """
         tests the derivative of the free energy with respect the molality
         """
@@ -503,7 +503,7 @@ class TestFreeEnergy(unittest.TestCase):
         test_cond = np.allclose(dp, p_id, 0, 1e-14)
         self.assertTrue(test_cond)
 
-    def test_mu_obtained_from_f_numerically(self):
+    def test_chem_obtained_from_f_numerically(self):
         """
         compare the numerical evaluation of the chemical potential with the actual formula
         """
@@ -689,31 +689,32 @@ class TestFreeEnergy(unittest.TestCase):
 
         der_mu_water = (el_p.mu_w(sol_p)-el_m.mu_w(sol_m))/(2*dm)
         der_mu_salt_f = (el_p.mu_sf(sol_p)-el_m.mu_sf(sol_m))/(2*dm)
-        der_mu_salt_b = (el_p.mu_sb(sol_p) - el_m.mu_sb(sol_m)) / (2 * dm)
-        #print('total_chem_potential')
+        der_mu_salt_b = (el_p.mu_sb(sol_p)-el_m.mu_sb(sol_m))/(2 * dm)
+
         r_all_1 = delta_w*der_mu_water/m_val
         r_all_2 = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
-        difr = np.sum(sol_p[3:9, :], axis=0) * np.log(el_p.n_w) - np.sum(sol_m[3:9, :], axis=0) * np.log(el_m.n_w)
-        r_all_3 = -2*(difr / (2 * dm))
-        #print(r_all_3)
-        #print(r_all_1+r_all_2)
-        #print(r_all_1+r_all_2+r_all_3)
+
         r_id_1 = delta_w*(der_mu_id_water+der_mu_comp_water)/m_val
         r_id_2 = (1-sol_p[15])*(der_mu_id_salt+der_mu_comp_s)+sol_p[15]*(der_mu_id_salt_bj+der_mu_comp_s)
-        #print('without electro')
-        #print(r_id_1+r_id_2)
+
+        print(r_id_1)
+        print(r_id_2)
+
         r_db_1 = delta_w*der_mu_db_water/m_val
         r_db_2 = (1-sol_p[15])*der_mu_db_salt
-        #print('electro only')
-        #print(r_db_1+r_db_2)
         test_cond_db = np.allclose(r_db_1, -r_db_2)
         self.assertTrue(test_cond_db)
-        #print('comp only')
-        r_comp_1 = delta_w*der_mu_comp_water/m_val
-        r_comp_2 = der_mu_comp_s
-        #print(r_comp_1)
-        #print(r_comp_2)
-        #print(r_comp_1+r_comp_2)
+        print(r_db_1)
+
+        print(r_all_1)
+        print(r_all_2)
+        print(r_all_1+r_all_2)
+
+        print(el_m.mu_sf(sol_m))
+        print(el_m.mu_sb(sol_m))
+
+        print(el_p.mu_sf(sol_p))
+        print(el_p.mu_sb(sol_p))
 
 if __name__ == '__main__':
     unittest.main()
