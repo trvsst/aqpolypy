@@ -257,7 +257,7 @@ class TestFreeEnergy(unittest.TestCase):
         in_p[15] = test_f_b
 
         comp_mu_b_salt_1 = el_mu.mu_sb_ideal_assoc(in_p)
-        vals_comp = [-30.16770793, -26.03954779, -14.9881945,  -9.50715624]
+        vals_comp = [-30.16590759, -25.94904943, -14.80637131, -9.32533305]
         test_mu_b_salt_1 = np.allclose(comp_mu_b_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_b_salt_1)
 
@@ -575,6 +575,26 @@ class TestFreeEnergy(unittest.TestCase):
         self.assertTrue(test_electro)
 
         test_idassoc = np.allclose(mu_c_ideal + mu_c_assoc, mu_f_idassoc, 0, 8e-5)
+        self.assertTrue(test_idassoc)
+
+        # bjerrum chemical potential
+        solb = np.zeros(16)
+        solb[0] = 0.4
+        solb[1] = 0.2
+        solb[2] = 0.2
+        solb[9] = 4.0
+        solb[10] = 2.0
+        solb[11] = 1.0
+        solb[12] = 5.0
+        solb[13] = 3.0
+        solb[14] = 0.5
+        solb[15] = 1.0
+
+        mu_c_assoc = delta_w*(el_p.f_assoc(solb)-el_m.f_assoc(solb))/(2*dm*c_fac)
+        mu_c_ideal = delta_w*(el_p.f_ideal()-el_m.f_ideal())/(2*dm*c_fac)
+        mu_f_idassoc = el_p.mu_sb_ideal_assoc(solb)
+
+        test_idassoc = np.allclose(mu_c_ideal + mu_c_assoc, mu_f_idassoc, 0, 5e-5)
         self.assertTrue(test_idassoc)
 
         # water chemical potential

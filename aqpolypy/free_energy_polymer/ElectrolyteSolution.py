@@ -433,7 +433,7 @@ class ElectrolyteSolution(object):
         t_10_2 = self.m_bm*(lg(1-s_bm/self.m_bm, 1-s_bm/self.m_bm)+lg(s_bm/self.m_bm, s_bm/ self.m_bm))
         t_10 = t_10_1 + t_10_2
 
-        t_11 = np.log(self.m_m*self.m_p)
+        t_11 = np.log(self.m_m*self.m_p)-(s_bp+s_bm)*np.log(self.n_w)
         
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
@@ -449,11 +449,10 @@ class ElectrolyteSolution(object):
         h_bm = in_p[12] + in_p[13] + in_p[14]
 
         t_0 = np.log(in_p[15]*self.n_s)-self.f_bj
-        t_1 = (h_bp + h_bm) * np.log(self.n_w)
-        t_2 = self.m_bp*np.log(1-h_bp/self.m_bp)+self.m_bm*np.log(1-h_bm/self.m_bm)
-        t_3 = np.log(self.m_p*self.m_m)
+        t_1 = self.m_bp*np.log(1-h_bp/self.m_bp)+self.m_bm*np.log(1-h_bm/self.m_bm)
+        t_2 = np.log(self.m_p*self.m_m)
 
-        return t_0+t_1+t_2+t_3
+        return t_0+t_1+t_2
 
     def mu_w(self, in_p):
         """
