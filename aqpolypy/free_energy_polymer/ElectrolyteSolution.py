@@ -369,7 +369,9 @@ class ElectrolyteSolution(object):
         t_10_2 = self.m_m*(lg(1-s_hm/self.m_m,1-s_hm/self.m_m)+ lg(s_hm/self.m_m,s_hm/self.m_m))
         t_10 = t_10_1 + t_10_2
 
-        return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10
+        t_11 = -(s_hp+s_hm)*np.log(self.n_w)
+
+        return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10+t_11
 
     def mu_sf_ideal_assoc_optimized(self, in_p):
         """
@@ -383,10 +385,9 @@ class ElectrolyteSolution(object):
         h_m = in_p[6]+in_p[7]+in_p[8]
 
         t_0 = 2*np.log((1-in_p[15])*self.n_s)
-        t_1 = (h_p+h_m)*np.log(self.n_w)
-        t_2 = self.m_p*np.log(1-h_p/self.m_p)+self.m_m*np.log(1-h_m/self.m_m)
+        t_1 = self.m_p*np.log(1-h_p/self.m_p)+self.m_m*np.log(1-h_m/self.m_m)
 
-        return  t_0 + t_1 + t_2
+        return  t_0 + t_1
 
     def mu_sf_debye(self, in_p):
         """

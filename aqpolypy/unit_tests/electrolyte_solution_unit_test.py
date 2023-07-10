@@ -212,7 +212,7 @@ class TestFreeEnergy(unittest.TestCase):
         in_p[15] = test_f_b
 
         comp_mu_salt_1 = el_mu.mu_sf_ideal_assoc(in_p)
-        vals_comp = [-36.01767985, -27.88347339, -23.31891717, -16.69088968]
+        vals_comp = [-36.01524939, - 27.76130061, - 23.07345586, - 16.44542837]
         test_mu_salt_1 = np.allclose(comp_mu_salt_1, vals_comp, 0, 1e-6)
         self.assertTrue(test_mu_salt_1)
 
@@ -552,44 +552,31 @@ class TestFreeEnergy(unittest.TestCase):
         delta_w = el_p.delta_w
 
         # redefine the variables so that the chemical potential is computed
-        el_p.n_w = np.ones_like(el_p.ml)
-        el_p.n_s = el_p.ml / delta_w
-        el_m.n_w = np.ones_like(el_m.ml)
-        el_m.n_s = el_m.ml / delta_w
-
-
-        # redefine the variables so that the chemical potential is computed
-
+        c_fac=0.97
         # salt chemical potential
         delta_w = el_p.delta_w
-        el_p.n_w = np.ones_like(el_p.ml)
-        el_p.n_s = el_p.ml/delta_w
-        el_m.n_w = np.ones_like(el_m.ml)
-        el_m.n_s = el_m.ml/delta_w
+        el_p.n_w = c_fac*np.ones_like(el_p.ml)
+        el_p.n_s = (el_p.ml/delta_w)*el_p.n_w
+        el_m.n_w = c_fac*np.ones_like(el_m.ml)
+        el_m.n_s = (el_m.ml/delta_w)*el_m.n_w
 
         sol = el_p.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
         sol[15, :]=0.0
 
-        mu_c_assoc = delta_w*(el_p.f_assoc(sol)-el_m.f_assoc(sol))/(2*dm)
-        mu_c_ideal = delta_w*(el_p.f_ideal()-el_m.f_ideal())/(2*dm)
-        mu_c_elec = delta_w*(el_p.f_debye(sol)-el_m.f_debye(sol))/(2*dm)
+        # free salt chemical potential
+        mu_c_assoc = delta_w*(el_p.f_assoc(sol)-el_m.f_assoc(sol))/(2*dm*c_fac)
+        mu_c_ideal = delta_w*(el_p.f_ideal()-el_m.f_ideal())/(2*dm*c_fac)
+        mu_c_elec = delta_w*(el_p.f_debye(sol)-el_m.f_debye(sol))/(2*dm*c_fac)
 
-        mu_f_idassoc = el_p.mu_sf(sol)
+        mu_f_idassoc = el_p.mu_sf_ideal_assoc(sol)
         mu_f_elec = el_p.mu_sf_debye(sol)
-        print('s electrostatic')
-        print(mu_c_elec)
-        print(mu_f_elec)
 
-        print('s ideal+assoc')
-        print(mu_c_ideal+mu_c_assoc)
-        h_val = 0.367*np.sum(sol[3:9, :], axis=0)/0.04409
-        mu_f_cor = (-h_val +h_val[2])*np.log(30)
-        print(h_val)
-        print(el_p.n_w)
-        print(mu_f_cor)
-        print(mu_f_idassoc)
-        print('diff')
-        print(mu_c_ideal+mu_c_assoc-mu_f_idassoc)
+        test_electro = np.allclose(mu_c_elec, mu_f_elec, 0, 1e-5)
+        self.assertTrue(test_electro)
+
+        test_idassoc = np.allclose(mu_c_ideal + mu_c_assoc, mu_f_idassoc, 0, 8e-5)
+        self.assertTrue(test_idassoc)
+
         # water chemical potential
         c_fac = 0.1
         el_p.n_s = c_fac*np.ones_like(el_p.ml)
@@ -604,14 +591,11 @@ class TestFreeEnergy(unittest.TestCase):
 
         mu_f_idassoc = el_p.mu_w_ideal_assoc(sol)
         mu_f_elec = el_p.mu_w_debye(sol)
-        print('w electrostatic')
-        print(mu_c_elec)
-        print(mu_f_elec)
+        test_electro = np.allclose(mu_c_elec, mu_f_elec, 0, 1e-5)
+        self.assertTrue(test_electro)
 
-        print('w ideal+assoc')
-        print(mu_c_ideal + mu_c_assoc)
-        print(mu_f_idassoc)
-        print(mu_f_idassoc-mu_c_ideal-mu_c_assoc)
+        test_idassoc = np.allclose(mu_c_ideal+mu_c_assoc, mu_f_idassoc, 0, 5e-6)
+        self.assertTrue(test_idassoc)
     def test_gibbs_duhem(self):
         """
         Tests the Gibbs Duhem Relation
@@ -681,30 +665,30 @@ class TestFreeEnergy(unittest.TestCase):
         der_mu_water = (el_p.mu_w(sol_p)-el_m.mu_w(sol_m))/(2*dm)
         der_mu_salt_f = (el_p.mu_sf(sol_p)-el_m.mu_sf(sol_m))/(2*dm)
         der_mu_salt_b = (el_p.mu_sb(sol_p) - el_m.mu_sb(sol_m)) / (2 * dm)
-        print('total_chem_potential')
+        #print('total_chem_potential')
         r_all_1 = delta_w*der_mu_water/m_val
         r_all_2 = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
         difr = np.sum(sol_p[3:9, :], axis=0) * np.log(el_p.n_w) - np.sum(sol_m[3:9, :], axis=0) * np.log(el_m.n_w)
         r_all_3 = -2*(difr / (2 * dm))
-        print(r_all_3)
-        print(r_all_1+r_all_2)
-        print(r_all_1+r_all_2+r_all_3)
+        #print(r_all_3)
+        #print(r_all_1+r_all_2)
+        #print(r_all_1+r_all_2+r_all_3)
         r_id_1 = delta_w*(der_mu_id_water+der_mu_comp_water)/m_val
         r_id_2 = (1-sol_p[15])*(der_mu_id_salt+der_mu_comp_s)+sol_p[15]*(der_mu_id_salt_bj+der_mu_comp_s)
-        print('without electro')
-        print(r_id_1+r_id_2)
+        #print('without electro')
+        #print(r_id_1+r_id_2)
         r_db_1 = delta_w*der_mu_db_water/m_val
         r_db_2 = (1-sol_p[15])*der_mu_db_salt
-        print('electro only')
-        print(r_db_1+r_db_2)
+        #print('electro only')
+        #print(r_db_1+r_db_2)
         test_cond_db = np.allclose(r_db_1, -r_db_2)
         self.assertTrue(test_cond_db)
-        print('comp only')
+        #print('comp only')
         r_comp_1 = delta_w*der_mu_comp_water/m_val
         r_comp_2 = der_mu_comp_s
-        print(r_comp_1)
-        print(r_comp_2)
-        print(r_comp_1+r_comp_2)
+        #print(r_comp_1)
+        #print(r_comp_2)
+        #print(r_comp_1+r_comp_2)
 
 if __name__ == '__main__':
     unittest.main()
