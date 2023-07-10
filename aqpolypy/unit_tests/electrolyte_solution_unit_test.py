@@ -462,14 +462,14 @@ class TestFreeEnergy(unittest.TestCase):
         test_cond2 = np.allclose(mu_b_a, mu_b_op)
         self.assertTrue(test_cond2)
 
-    def test_mu_relation(self):
+    def test_mu_g_minus_f(self):
         """
         tests the derivative of the free energy with respect the molality
         """
         ini_p = np.zeros(16)
-        ini_p[0] = 0.72
-        ini_p[1] = 0.55
-        ini_p[2] = 0.55
+        ini_p[0] = 0.4
+        ini_p[1] = 0.1
+        ini_p[2] = 0.1
         ini_p[3] = 5.0
         ini_p[4] = 1.0
         ini_p[5] = 0.0
@@ -482,20 +482,25 @@ class TestFreeEnergy(unittest.TestCase):
         ini_p[12] = 3.0
         ini_p[13] = 1.0
         ini_p[14] = 0.0
-        ini_p[15] = 1e-2
+        ini_p[15] = 1e-1
 
-        test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
-        d_m = 1e-10
+        test_m = np.array([1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1, 1.4, 2.0])
 
         el_m_a = El.ElectrolyteSolution(test_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        mu_w = el_m_a.mu_w_ideal_assoc(ini_p) * el_m_a.u_s / el_m_a.u_w
+        mu_w = el_m_a.mu_w_ideal_assoc(ini_p)
         mu_sf = el_m_a.mu_sf_ideal_assoc(ini_p)
-        mu_bf = el_m_a.mu_sb_ideal_assoc(ini_p)
-        delta = el_m_a.n_w**2*((1-ini_p[15])*mu_sf+ini_p[15]*mu_bf-mu_w)
-        el_p = El.ElectrolyteSolution(test_m+d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        el_m = El.ElectrolyteSolution(test_m-d_m, self.temp, self.param_w, self.param_salt, self.param_h, b_param=1)
-        df = (el_p.f_ideal()+el_p.f_assoc(ini_p)-el_m.f_ideal()-el_m.f_assoc(ini_p))/(2*d_m)
-        test_cond= np.allclose(df, delta/el_p.delta_w, 0, 5e-4)
+        mu_sb = el_m_a.mu_sb_ideal_assoc(ini_p)
+
+        g_en = el_m_a.n_w*mu_w+el_m_a.n_s*((1-ini_p[15])*mu_sf+ini_p[15]*mu_sb)
+        f_en = el_m_a.f_ideal()+el_m_a.f_assoc(ini_p)
+
+        p_id_1 = el_m_a.n_w+2*(1-ini_p[15])*el_m_a.n_s+ini_p[15]*el_m_a.n_s
+        p_id_2 = -2*ini_p[0]*el_m_a.n_w
+        p_id_3 = -((1-ini_p[15])*np.sum(ini_p[3:9])+ini_p[15]*np.sum(ini_p[9:15]))*el_m_a.n_s
+        p_id = p_id_1+p_id_2+p_id_3
+
+        dp = g_en-f_en
+        test_cond = np.allclose(dp, p_id, 0, 1e-14)
         self.assertTrue(test_cond)
 
     def test_mu_obtained_from_f_numerically(self):
