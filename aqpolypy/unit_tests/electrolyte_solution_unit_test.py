@@ -665,8 +665,8 @@ class TestFreeEnergy(unittest.TestCase):
         param_salt['de_bm1'] = ini_val[5]
 
         num_pnts=20
-        m_val = np.linspace(1e-2, 1.0, num_pnts)
-        dm = 1e-8
+        m_val = np.linspace(1e-2, 2.0, num_pnts)
+        dm = 1e-7
         el_p = El.ElectrolyteSolution(m_val+dm, temp, param_w, param_salt, param_h, b_param=b_par)
         el_p.define_bjerrum(ini_val[6])
         el_m = El.ElectrolyteSolution(m_val-dm, temp, param_w, param_salt, param_h, b_param=b_par)
@@ -677,44 +677,38 @@ class TestFreeEnergy(unittest.TestCase):
         sol_p = el_p.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
         sol_m = el_m.solve_eqns_multiple(ini_p0, np.arange(16, dtype='int'))
 
-        der_mu_id_salt = (el_p.mu_sf_ideal_assoc(sol_p)-el_m.mu_sf_ideal_assoc(sol_m))/(2*dm)
-        der_mu_id_salt_bj = (el_p.mu_sb_ideal_assoc(sol_p)-el_m.mu_sb_ideal_assoc(sol_m))/(2*dm)
-        der_mu_id_water = (el_p.mu_w_ideal_assoc(sol_p)-el_m.mu_w_ideal_assoc(sol_m))/(2*dm)
-
-        der_mu_db_salt = (el_p.mu_sf_debye(sol_p)-el_m.mu_sf_debye(sol_m))/(2*dm)
-        der_mu_db_water = (el_p.mu_w_debye(sol_p)-el_m.mu_w_debye(sol_m))/(2*dm)
-
-        der_mu_comp_water = (el_p.mu_w_comp(sol_p) - el_m.mu_w_comp(sol_m))/(2*dm)
-        der_mu_comp_s  = der_mu_comp_water*v_s/v_w
+        mu_s_p = (1-sol_p[15])*el_p.mu_sf(sol_p)+sol_p[15]*el_p.mu_sb(sol_p)
+        mu_s_m = (1-sol_m[15])*el_m.mu_sf(sol_m)+sol_m[15]*el_m.mu_sb(sol_m)
 
         der_mu_water = (el_p.mu_w(sol_p)-el_m.mu_w(sol_m))/(2*dm)
         der_mu_salt_f = (el_p.mu_sf(sol_p)-el_m.mu_sf(sol_m))/(2*dm)
-        der_mu_salt_b = (el_p.mu_sb(sol_p)-el_m.mu_sb(sol_m))/(2 * dm)
+        der_mu_salt_b = (el_p.mu_sb(sol_p)-el_m.mu_sb(sol_m))/(2*dm)
 
-        r_all_1 = delta_w*der_mu_water/m_val
-        r_all_2 = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
+        der_f = (el_p.f_total(sol_p)-el_m.f_total(sol_m))/(2*dm)
+        der_w = (el_p.n_w-el_m.n_w)/(2*dm)
+        der_s  = (el_p.n_s-el_m.n_s)/(2*dm)
 
-        r_id_1 = delta_w*(der_mu_id_water+der_mu_comp_water)/m_val
-        r_id_2 = (1-sol_p[15])*(der_mu_id_salt+der_mu_comp_s)+sol_p[15]*(der_mu_id_salt_bj+der_mu_comp_s)
+        der_w_cons = delta_w*der_mu_water/m_val
+        der_mu_s_p = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
+        der_mu_s_m = (1-sol_m[15])*der_mu_salt_f+sol_m[15]*der_mu_salt_b
 
-        print(r_id_1)
-        print(r_id_2)
+        dp_1 = -der_f+el_p.mu_w(sol_p)*der_w+mu_s_p*der_s
+        dm_1 = -der_f+el_m.mu_w(sol_m)*der_w+mu_s_m*der_s
 
-        r_db_1 = delta_w*der_mu_db_water/m_val
-        r_db_2 = (1-sol_p[15])*der_mu_db_salt
-        test_cond_db = np.allclose(r_db_1, -r_db_2)
-        self.assertTrue(test_cond_db)
-        print(r_db_1)
+        # first identity
+        test_first = np.allclose(dp_1, 0.0, 0.0, 3e-3)
+        self.assertTrue(test_first)
 
-        print(r_all_1)
-        print(r_all_2)
-        print(r_all_1+r_all_2)
+        dp_2 = der_mu_water*el_p.n_w+ der_mu_s_p*el_p.n_s
+        dm_2 = der_mu_water*el_m.n_w+ der_mu_s_m*el_m.n_s
 
-        print(el_m.mu_sf(sol_m))
-        print(el_m.mu_sb(sol_m))
+        # second identity
+        test_second = np.allclose(dp_2, 0.0, 0.0, 3e-3)
+        self.assertTrue(test_second)
 
-        print(el_p.mu_sf(sol_p))
-        print(el_p.mu_sb(sol_p))
+        # pressure
+        test_pressure = np.allclose((dp_2+dm_2+dp_1+dm_1)*0.5, 0.0, 0.0, 1e-7)
+        self.assertTrue(test_pressure)
 
 if __name__ == '__main__':
     unittest.main()
