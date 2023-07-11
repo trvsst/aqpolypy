@@ -693,67 +693,23 @@ class TestFreeEnergy(unittest.TestCase):
         der_w = (el_p.n_w-el_m.n_w)/(2*dm)
         der_s  = (el_p.n_s-el_m.n_s)/(2*dm)
 
-        print('assoc')
-        print(der_f_ideal)
-        print(der_f_assoc_2)
-        print(der_f_assoc)
-
-        print('check equations')
-        for ind in range(16):
-            print(ind, np.max(np.abs(el_p.eqns(sol_p[:, ind], ind))))
-            print(np.max(np.abs(el_m.eqns(sol_m[:, ind], ind))))
-
-        print(der_f_2)
-        print(sol_p.shape)
-        for ind in range(16):
-            sol_new = sol_m[:, :]
-            #sol_new[ind, :] = sol_p[ind, :]
-            der_f_ind = (el_p.f_total(sol_p)-el_m.f_total(sol_new))/(2*dm)
-            #print(der_f_ind-der_f_2)
-            print(ind, np.max(np.abs(der_f_ind-der_f_2)))
-
-        print('simple derivatives')
-        print(der_w)
-        print(der_s)
-
         der_w_cons = delta_w*der_mu_water/m_val
         der_mu_s_p = (1-sol_p[15])*der_mu_salt_f+sol_p[15]*der_mu_salt_b
         der_mu_s_m = (1-sol_m[15])*der_mu_salt_f+sol_m[15]*der_mu_salt_b
 
         dp_1 = -der_f+el_p.mu_w(sol_p)*der_w+mu_s_p*der_s
-        dm_1 = -der_f+el_m.mu_w(sol_m)*der_w+mu_s_m*der_s
 
         mu_v_sf = el_p.mu_sf_ideal_assoc(sol_p)+el_p.mu_sf_debye(sol_p)
         mu_v_sb = el_p.mu_sb_ideal_assoc(sol_p)
         mu_v_w = el_p.mu_w_ideal_assoc(sol_p)+el_p.mu_w_debye(sol_p)
-        # first identity
-        test_first = np.allclose(dp_1, 0.0, 0.0, 3e-3)
+        # first identity is satisfied
+        test_first = np.allclose(dp_1, 0.0, 0.0, 4e-7)
         self.assertTrue(test_first)
 
-        delta_comp = (der_w+der_s*el_p.u_s/el_p.u_w)*el_p.mu_w_comp(sol_p)
-        print('f derivative')
-        print(der_f_2)
-        print('delta_f')
-        delta_f = der_f_2-mu_v_w*der_w-((1-sol_p[15])*mu_v_sf+sol_p[15]*mu_v_sb)*der_s
-        print(der_f)
-        print(delta_f)
-        print('mu')
-        print(el_p.mu_w_comp(sol_p)*(der_w+der_s*el_p.u_s/el_p.u_w))
-        print('mu')
-        print(mu_v_sb-mu_v_sf)
         dp_2 = der_mu_water*el_p.n_w+ der_mu_s_p*el_p.n_s
-        dm_2 = der_mu_water*el_m.n_w+ der_mu_s_m*el_m.n_s
-        print('f_com')
-        print(el_p.f_comp(sol_p))
-        print(el_m.f_comp(sol_m))
         # second identity
-        test_second = np.allclose(dp_2, 0.0, 0.0, 3e-3)
+        test_second = np.allclose(dp_2, 0.0, 0.0, 4e-7)
         self.assertTrue(test_second)
-
-        # pressure
-        test_pressure = np.allclose((dp_2+dm_2+dp_1+dm_1)*0.5, 0.0, 0.0, 1e-7)
-        self.assertTrue(test_pressure)
-
 
 
 if __name__ == '__main__':

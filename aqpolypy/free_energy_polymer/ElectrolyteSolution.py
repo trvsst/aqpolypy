@@ -616,7 +616,7 @@ class ElectrolyteSolution(object):
         :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         """
 
-        t_0 = 8*in_p[0]*np.exp(self.f_w)
+        t_0 = 8*in_p[0]*np.exp(self.f_w)*self.n_w
         t_1_u = 2*(in_p[0]-in_p[1])-((1-in_p[15])*in_p[4]+in_p[15]*in_p[10])*self.r_h
         t_1_d = 1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h
         t_2_u = 2*(in_p[0]-in_p[2])-((1-in_p[15])*in_p[7]+in_p[15]*in_p[13])*self.r_h
