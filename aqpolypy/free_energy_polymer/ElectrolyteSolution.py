@@ -860,7 +860,7 @@ class ElectrolyteSolution(object):
 
         return eqns
 
-    def solve_eqns(self, ini_condition_p, num_eqns=np.arange(16, dtype='int'), indx=0):
+    def solve_eqns(self, ini_condition_p, num_eqns=np.arange(16, dtype='int'), indx=0, xtol=1.49012e-08):
         """
         Solve the mean field equations
 
@@ -875,17 +875,18 @@ class ElectrolyteSolution(object):
             ini_val[num_eqns] = ini_p[:]
             return self.eqns(ini_val, indx)[num_eqns, 0]
 
-        sol = fsolve(fun, ini_c)
+        sol = fsolve(fun, ini_c, xtol=xtol)
 
         return sol
 
-    def solve_eqns_multiple(self, ini_condition_m, num_eqns=np.arange(16, dtype='int'), m_indx='all'):
+    def solve_eqns_multiple(self, ini_condition_m, num_eqns=np.arange(16, dtype='int'), m_indx='all', dtol=1.49012e-08):
         """
         provides the solution for specified molalities
 
         :param ini_condition_p: initial 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
         :param num_eqns: indexes of the equations to solve
         :param m_indx: index of the molalities to solve
+        :param d_tol: tolerance of the solution
         """
 
         if m_indx=='all':
@@ -913,7 +914,7 @@ class ElectrolyteSolution(object):
                 # use the previous solution as initial condition
                 ini_cond[:, ind] = sols[:, ind-1]
 
-            sl = self.solve_eqns(ini_cond[:, ind], num_eqns, indx=inx)
+            sl = self.solve_eqns(ini_cond[:, ind], num_eqns, indx=inx, xtol=dtol)
             sols[num_eqns, ind] = sl[:]
             sols[mask, ind] = ini_condition_m[mask]
 
