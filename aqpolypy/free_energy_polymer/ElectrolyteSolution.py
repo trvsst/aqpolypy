@@ -308,6 +308,22 @@ class ElectrolyteSolution(object):
 
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7
 
+    def mu_w_ideal_assoc_optimized(self, in_p):
+        """
+        Defines association water chemical potential when the values in_p are solutions to the
+        equations
+
+        :param in_p: 16 parameters, [y,za,zd,h+..h-..hb+..hb-,fb]
+        """
+
+        t_1 = np.log(self.n_w)
+
+        t_2 = np.log(1-2*in_p[0]+in_p[1]-((1-in_p[15])*in_p[3]+in_p[15]*in_p[9])*self.r_h)
+
+        t_3 = np.log(1-2*in_p[0]+in_p[2]-((1-in_p[15])*in_p[6]+in_p[15]*in_p[12])*self.r_h)
+
+        return t_1+t_2+t_3
+
     def mu_w_debye(self, in_p):
         """
         Defines the Electrostatic chemical potential

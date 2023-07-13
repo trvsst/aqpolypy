@@ -453,10 +453,15 @@ class TestFreeEnergy(unittest.TestCase):
         el = El.ElectrolyteSolution(m_val, self.temp, param_w, param_salt, param_h)
         sol = el.solve_eqns_multiple(ini_p, np.arange(num_eq, dtype='int'))
 
+        mu_w_a = el.mu_w_ideal_assoc(sol)
+        mu_w_op = el.mu_w_ideal_assoc_optimized(sol)
         mu_s_a = el.mu_sf_ideal_assoc(sol)
         mu_s_op = el.mu_sf_ideal_assoc_optimized(sol)
         mu_b_a = el.mu_sb_ideal_assoc(sol)
         mu_b_op = el.mu_sb_ideal_assoc_optimized(sol)
+
+        test_cond_w = np.allclose(mu_w_a, mu_w_op)
+        self.assertTrue(test_cond_w)
         test_cond1 = np.allclose(mu_s_a, mu_s_op)
         self.assertTrue(test_cond1)
         test_cond2 = np.allclose(mu_b_a, mu_b_op)
