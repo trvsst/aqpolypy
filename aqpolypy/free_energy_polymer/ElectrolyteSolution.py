@@ -218,7 +218,7 @@ class ElectrolyteSolution(object):
         t_14_4 = self.n_s*self.m_bm*in_p[15]*lg(s_bm/self.m_bm, s_bm/self.m_bm)
         t_14 = t_14_1 + t_14_2 + t_14_3 + t_14_4
 
-        t_15_1 = self.n_s*in_p[15]*np.log(self.m_m*self.m_p)-2*lg(in_p[0]*self.n_w, in_p[0]*self.n_w)
+        t_15_1 = -self.n_s*in_p[15]*np.log(self.m_m*self.m_p)-2*lg(in_p[0]*self.n_w, in_p[0]*self.n_w)
         t_15_2 = 2*self.n_s*(lg(1-in_p[15], 1-in_p[15])+lg(in_p[15], in_p[15]))-lg(self.n_s*in_p[15], self.n_s*in_p[15])
         t_15 = t_15_1+t_15_2
 
@@ -433,7 +433,7 @@ class ElectrolyteSolution(object):
         t_10_2 = self.m_bm*(lg(1-s_bm/self.m_bm, 1-s_bm/self.m_bm)+lg(s_bm/self.m_bm, s_bm/ self.m_bm))
         t_10 = t_10_1 + t_10_2
 
-        t_11 = np.log(self.m_m*self.m_p)-(s_bp+s_bm)*np.log(self.n_w)
+        t_11 = -np.log(self.m_m*self.m_p)-(s_bp+s_bm)*np.log(self.n_w)
         
         return t_1 + t_2 + t_3 + t_4 + t_5 + t_6 + t_7 + t_8 + t_9 + t_10 + t_11
 
@@ -450,7 +450,7 @@ class ElectrolyteSolution(object):
 
         t_0 = np.log(in_p[15]*self.n_s)-self.f_bj
         t_1 = self.m_bp*np.log(1-h_bp/self.m_bp)+self.m_bm*np.log(1-h_bm/self.m_bm)
-        t_2 = np.log(self.m_p*self.m_m)
+        t_2 = -np.log(self.m_p*self.m_m)
 
         return t_0+t_1+t_2
 
@@ -564,12 +564,12 @@ class ElectrolyteSolution(object):
         s_hbp = np.sum(in_p[9:12])
         s_hbm = np.sum(in_p[12:15])
 
-        k_0 = np.exp(self.f_bj)/(self.m_p*self.m_m)
+        k_0 = np.exp(self.f_bj)
 
         val_b = (1 - s_hbp / self.m_bp) ** (self.m_bp) * (1 - s_hbm / self.m_bm) ** (self.m_bm)
         val_t = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
 
-        k_h = val_t/val_b
+        k_h = self.m_p*self.m_m*val_t/val_b
 
         return k_0*k_h/self.delta_w
 
