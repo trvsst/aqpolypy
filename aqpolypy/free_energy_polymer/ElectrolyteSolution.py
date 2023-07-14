@@ -555,9 +555,11 @@ class ElectrolyteSolution(object):
 
         return m_total
 
-    def k_bjerrum0(self):
+    def k_bjerrum0(self, r_separate_contributions=False):
         """
         Returns the bjerrum constant at infintie dilution
+
+        :param r_separate_contributions: if True return :math:`(K_0^H, \\exp(-\\frac{\delta F_B}{k_B T}), K_0^B)`
         """
 
         in_p = np.zeros(15)
@@ -580,14 +582,20 @@ class ElectrolyteSolution(object):
         s_hbp = np.sum(in_p[9:12])
         s_hbm = np.sum(in_p[12:15])
 
-        k_0 = np.exp(self.f_bj)
+        k_exp = np.exp(self.f_bj)
 
         val_b = (1 - s_hbp / self.m_bp) ** (self.m_bp) * (1 - s_hbm / self.m_bm) ** (self.m_bm)
         val_t = (1-s_hp/self.m_p)**(self.m_p)*(1-s_hm/self.m_m)**(self.m_m)
 
         k_h = self.m_p*self.m_m*val_t/val_b
 
-        return k_0*k_h/self.delta_w
+        k_b = k_h*k_exp/self.delta_w
+
+        if r_separate_contributions:
+            dict_res={'k_0^H':k_h/self.delta_w, 'exp(f)':k_exp, 'bjerrum constant': k_b}
+            return dict_res
+
+        return k_b
 
     def define_bjerrum(self, k_bjerrum):
         """
