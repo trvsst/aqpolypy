@@ -111,3 +111,48 @@ class Bjerrum:
 
         bjerrum_constant = 4 * np.pi * (t1 + t2 + t3) * np.exp(z) / (6 * z)
         return bjerrum_constant
+
+    def bjerrum_constant_according_bjerrum(self, ion_size):
+        """
+        Value of Bjerrum constant according to Bjerrum
+
+        :param ion_size: Ion size (in Angstrom)
+        :return: Bjerrum constant in units of :math:`a^3` (float)
+        """
+
+        z = 1 / self.temp_star(ion_size)
+        def intgrnd(x):
+            return np.exp(x)/x**4
+
+        max_val = z
+        
+        if max_val < 2:
+            return ion_size
+
+        integral_quad = quad(intgrnd, 2, max_val)
+        val = integral_quad[0]
+
+        return 4*np.pi*z**3*val
+
+    def bjerrum_constant_mol_litre(self, ion_size, q_valence, bjerrum_original=False):
+        """
+        Value of Bjerrum constant according to Bjerrum
+
+        :param ion_size: Ion size (in Angstrom)
+        :param q_valence: tuple with the valence of both ions
+        :param bjerrum_original: if True return original Bjerrum value, if false the result by Ebeling
+        :return: Bjerrum constant in units of mols/litre (float)
+        """
+
+        q_p, q_m = q_valence
+
+        m_size = ion_size/np.abs(q_p*q_m)
+
+        if bjerrum_original:
+            kb = self.bjerrum_constant_according_bjerrum(m_size)
+        else:
+            kb = self.bjerrum_constant(m_size)
+
+        conv = 1e-3*un.mol_angstrom_2_mol_mcube(1)
+
+        return kb*(ion_size)**3/conv
