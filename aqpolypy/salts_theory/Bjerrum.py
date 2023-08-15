@@ -125,7 +125,7 @@ class Bjerrum:
             return np.exp(x)/x**4
 
         max_val = z
-        
+        print(max_val,'max_val')
         if max_val < 2:
             return ion_size
 
@@ -154,5 +154,5 @@ class Bjerrum:
             kb = self.bjerrum_constant(m_size)
 
         conv = 1e-3*un.mol_angstrom_2_mol_mcube(1)
-
+        
         return kb*(ion_size)**3/conv
