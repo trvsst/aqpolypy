@@ -15,6 +15,8 @@ often looks like this::
 Paragraphs are separated by blank lines. *Italics*, **bold**,
 and ``monospace``
 
+to generate documentation in winsows go to doc directory and execure
+sphinx-build -b html  .\\source C:\\Users\\Directory where to write the documentation
 
 A Section
 =========
