@@ -90,6 +90,18 @@ class TestBjerrum(unittest.TestCase):
         self.assertTrue(test_1)
         self.assertTrue(test_2)
 
+    def test_b_parameter(self):
+
+        temp = 298.15
+
+        b_calc = 1/3.0443153743297127
+
+        obj_water_bp = wbp.WaterPropertiesFineMillero(temp)
+        obj_bj = bj.Bjerrum(obj_water_bp)
+
+        b_param = obj_bj.b_parameter()
+
+        self.assertTrue(np.abs(b_calc-b_param)< 1e-8)
 
 if __name__ == '__main__':
     unittest.main()

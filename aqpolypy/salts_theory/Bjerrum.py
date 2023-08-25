@@ -32,6 +32,9 @@ class Bjerrum:
         # Bjerrum length in A
         self.bjerrum_length = un.m_2_angstrom(self.e_square / (self.kbt * self.epsilon))
 
+        # molar volume
+        self.molar_volume = water_object.molar_volume()
+
     def temp_star(self, ion_size):
         """
             Dimensionless temperature according to Ebeling :cite:`Ebel:71`
@@ -156,3 +159,16 @@ class Bjerrum:
         conv = 1e-3*un.mol_angstrom_2_mol_mcube(1)
         
         return kb*(ion_size)**3/conv
+
+    def b_parameter(self):
+        """
+        This is the quantity :math:`\\kappa_0` inverse of the Debye-length at ionic strength 1
+
+        This quantity defines the size of the ion in the formula for the activity
+
+        """
+
+        v_r = 1 / (1e3 * self.molar_volume)
+        v_w = 1 / un.mol_lit_2_mol_angstrom(v_r)
+
+        return np.sqrt(8*np.pi*self.bjerrum_length/(un.delta_w()*v_w))
