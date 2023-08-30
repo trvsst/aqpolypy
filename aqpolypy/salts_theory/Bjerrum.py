@@ -128,7 +128,7 @@ class Bjerrum:
             return np.exp(x)/x**4
 
         max_val = z
-        
+
         if max_val < 2:
             return ion_size
 

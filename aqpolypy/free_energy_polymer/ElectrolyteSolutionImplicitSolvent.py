@@ -50,7 +50,12 @@ class ElectrolyteSolutionImplicit(object):
         self.k_b = k_b
 
         # interaction parameters
-        self.e_s = e_s
+        self.e_s = np.zeros(3)
+        if e_s.shape[0] == 2:
+            self.e_s[2] = 0.0
+            self.e_s[:2] = e_s[:]
+        else:
+            self.e_s[:] = e_s[:]
 
         # water model at the given temperature and pressure
         self.press = 1.01325
@@ -94,7 +99,9 @@ class ElectrolyteSolutionImplicit(object):
         sol = np.zeros([16, self.ml.shape[0]])
         sol[15] = self.fract_b
         mu_1 = self.el.mu_w_debye(sol) - (2-self.fract_b)*self.ml/un.delta_w()
-        mu_2 = - 0.5*(self.e_s[0]*(1-self.fract_b)**2 + self.e_s[1]*self.fract_b**2)*self.ml**2/un.delta_w()
+        if_b = 1-self.fract_b
+        v_fac = self.e_s[0]*if_b**2 + self.e_s[1]*self.fract_b**2+2*self.e_s[2]*self.fract_b*if_b
+        mu_2 = - 0.5*v_fac*self.ml**2/un.delta_w()
 
         return mu_1+mu_2
 
@@ -106,16 +113,17 @@ class ElectrolyteSolutionImplicit(object):
         sol = np.zeros([16, self.ml.shape[0]])
         sol[15] = self.fract_b
 
-        mu = self.el.mu_sf_debye(sol) + 2*np.log((1-self.fract_b)*self.ml) + self.e_s[0] * (1-self.fract_b)*self.ml
+        mu_1 = self.el.mu_sf_debye(sol) + 2*np.log((1-self.fract_b)*self.ml)
+        mu_2 = self.e_s[0]*(1-self.fract_b)*self.ml + self.e_s[2]*self.fract_b*self.ml
 
-        return mu
+        return mu_1+mu_2
 
     def chem_salt_bjerrum(self):
         """
         Chemical Potential of Bjerrum salt
         """
 
-        return chem_salt_bjerrum_f(self.ml, self.fract_b)
+        return self.chem_salt_bjerrum_f(self.fract_b)
 
     def chem_salt_free_f(self, f_B):
         """
@@ -137,7 +145,7 @@ class ElectrolyteSolutionImplicit(object):
         :param f_B: fraction of Bjerrum pairs
         """
 
-        mu_salt_bjerrum = np.log(f_B*self.ml) - np.log(self.k_b) + self.e_s[1]*f_B*self.ml
+        mu_salt_bjerrum = np.log(f_B*self.ml)-np.log(self.k_b)+self.e_s[1]*f_B*self.ml+self.e_s[2]*(1-f_B)*self.ml
 
         return mu_salt_bjerrum
 
