@@ -134,9 +134,10 @@ class ElectrolyteSolutionImplicit(object):
 
         sol = np.zeros(16)
         sol[15] = f_B
-        mu_salt_free = self.el.mu_sf_debye(sol) + 2*np.log((1-f_B)*self.ml) + self.e_s[0]*(1 - f_B)*self.ml
+        mu_1 = self.el.mu_sf_debye(sol)+2*np.log((1-f_B)*self.ml)
+        mu_2 = self.e_s[0]*(1-f_B)*self.ml+self.e_s[2]*f_B*self.ml
 
-        return mu_salt_free
+        return mu_1+mu_2
 
     def chem_salt_bjerrum_f(self, f_B):
         """
