@@ -9,26 +9,30 @@
 """
 
 import numpy as np
-
+import aqpolypy.water.WaterMilleroBP as fm
 
 class GibbsDuhem(object):
 
     """ Defines Gibbs Duhem relation"""
 
-    def __init__(self, m_l, osmotic_coeff, log_gamma, min_molality=1e-3):
+    def __init__(self, m_l, osmotic_coeff, log_gamma, temp):
         """
         constructor
 
         :param m_l: molality
         :param osmotic_coeff: osmotic coefficient
         :param log_gamma: activity coefficient
-        :param min_molality: check for molalities larger than min_molaity only
+        :param temp: temperature in kelvin
         """
+
+        # water model at the given temperature and pressure
+        self.press = 1.01325
+        wfm = fm.WaterPropertiesFineMillero(temp, self.press)
+        self.a_gamma = 3*wfm.a_phi()
 
         self.m_l = m_l
         self.osmotic_coeff = osmotic_coeff
         self.log_gamma = log_gamma
-        self.ind_min = np.argmin((self.m_l-min_molality)**2)
 
     def calculate_log_gamma(self):
         """
@@ -49,41 +53,32 @@ class GibbsDuhem(object):
         Helper function to compute the integral present
         """
 
-        c_int = np.zeros_like(self.m_l)
-        c_res = np.zeros_like(self.m_l)
+        delta_osm = np.zeros_like(self.m_l)
+        c_activity = np.zeros_like(self.m_l)
 
-        if self.ind_min == 0:
-            osm_0 = 1
-            gam_0 = 0.0
-        else:
-            osm_0 = self.osmotic_coeff[self.ind_min]
-            gam_0 = self.log_gamma[self.ind_min]
+        delta_osm[:] = self.osmotic_coeff[:]-1+self.a_gamma*np.sqrt(self.m_l[:])/3.0
+        c_0 = delta_osm[0]
+        for ind, ml in enumerate(self.m_l):
+            delta_p = np.trapz(delta_osm[:ind]/self.m_l[:ind], self.m_l[:ind])
+            c_activity[ind] = -self.a_gamma*np.sqrt(ml)+delta_osm[ind]+delta_p
 
-        for ind in range(self.ind_min, c_int.shape[0]):
-            m_val = self.m_l[self.ind_min:(ind+1)]
-            val1 = np.trapz((self.osmotic_coeff[:(ind+1)]-1)/self.m_l[:(ind+1)],self.m_l[:(ind+1)])
-            val2 = np.trapz((self.osmotic_coeff[:(self.ind_min+1)]-1)/self.m_l[:(self.ind_min+1)],self.m_l[:(self.ind_min+1)])
-            c_int[ind] =  val1 - val2
+        return c_activity+c_0
 
-            c_res = gam_0 + self.osmotic_coeff-osm_0+c_int
-            c_res[:self.ind_min] = self.log_gamma[:self.ind_min]
-
-            return c_res
     def _intg_lg(self):
         """
         Helper function to compute the integral present
         """
 
-        c_val = np.zeros_like(self.m_l)
-        c_act = np.zeros(self.m_l.shape[0]+1)
-        c_int = np.zeros_like(c_act)
-        c_act[1:] = self.m_l[:]
-        c_int[1:] = self.log_gamma[:]
+        delta_gamma = np.zeros_like(self.m_l)
+        c_osmotic = np.zeros_like(self.m_l)
 
-        for ind in range(1, c_int.shape[0]):
-            c_val[ind-1] =  1 + np.trapz(c_act[:(ind+1)], c_int[:(ind+1)])/self.m_l[ind-1]
+        delta_gamma[:] = self.log_gamma[:]+self.a_gamma*np.sqrt(self.m_l[:])
+        c_0=-delta_gamma[0]
+        for ind, ml in enumerate(self.m_l):
+            delta_p = np.trapz(delta_gamma[:ind], self.m_l[:ind])
+            c_osmotic[ind] =  1-self.a_gamma*np.sqrt(ml)/3.0+delta_gamma[ind]-delta_p/ml
 
-        return c_val
+        return c_osmotic+c_0
 
     def max_diff_gamma(self):
         """
