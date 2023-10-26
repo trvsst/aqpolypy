@@ -91,9 +91,6 @@ class ElectrolyteSolutionImplicit(object):
     def chem_water(self):
         """
         Water chemical potential
-
-        :param ml: molality
-        :param f_B: fraction of Bjerrum pairs
         """
 
         sol = np.zeros([16, self.ml.shape[0]])
@@ -152,7 +149,7 @@ class ElectrolyteSolutionImplicit(object):
 
     def solve_bjerrum_equation(self):
         """
-        Solves the Bjerrrum equation
+        Solves the Bjerrum equation
         """
 
         f_b = np.zeros_like(self.ml)
@@ -183,3 +180,12 @@ class ElectrolyteSolutionImplicit(object):
         """
 
         return 0.5*(self.chem_salt_free()-2*np.log(self.ml))
+
+    def gibbs_free(self):
+        """
+        Returns the Gibbs free energy normalized to the number of water molecules
+
+        return Gibbs free energy
+        """
+
+        return self.chem_water()+self.ml*self.chem_salt_free()/self.delta_w
