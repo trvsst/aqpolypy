@@ -11,7 +11,7 @@ import numpy as np
 import unittest
 
 import aqpolypy.free_energy_polymer.ElectrolyteSolutionImplicitVirial as Ev
-
+import aqpolypy.units.units as un
 
 class TestFreeEnergy(unittest.TestCase):
 
@@ -21,6 +21,10 @@ class TestFreeEnergy(unittest.TestCase):
 
         self.m_l = np.array([0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6,1.8,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0])
 
+        # constants
+        self.delta_w = un.delta_w()
+
+        # params
         b_param = 1.4
         e_s = np.array([0.0716, 0.0058])
         self.im_model = Ev.ElectrolyteSolutionVirial(self.m_l, self.temp, b_param, e_s)
@@ -41,10 +45,30 @@ class TestFreeEnergy(unittest.TestCase):
                           0.66405605, 0.66238254, 0.66134933, 0.66268778, 0.66585392, 0.67050834, 0.67642909,
                           0.69590087, 0.72115566, 0.75171468, 0.78751067, 0.82872017, 0.87569213, 0.92891775,
                           0.98902066])
+
         comp_activity = np.exp(self.im_model.log_gamma())
 
         diff1 = np.max(np.abs(coeff_activity-comp_activity))
         self.assertTrue(diff1 < 0.004)
+
+    def test_chem_pot_water(self):
+
+        mu_w = self.im_model.chem_water()
+        comp_osmotic = self.im_model.osmotic_coeff()
+
+        mu_comp = -2*self.m_l*comp_osmotic/self.delta_w
+
+        diff1 = np.max(np.abs(mu_w - mu_comp))
+        self.assertTrue(diff1 < 1e-8)
+
+    def test_chem_pot_salt(self):
+        mu_s = self.im_model.chem_salt_free()
+        comp_gam = self.im_model.log_gamma()
+
+        mu_gam = 2*np.log(self.m_l)+2*comp_gam
+
+        diff1 = np.max(np.abs(mu_s - mu_gam))
+        self.assertTrue(diff1 < 1e-8)
 
 if __name__ == '__main__':
     unittest.main()
