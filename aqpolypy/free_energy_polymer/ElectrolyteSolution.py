@@ -20,7 +20,7 @@ class ElectrolyteSolution(object):
     Class defining an electrolyte solution described by the mean field model
     """
 
-    def __init__(self, ml, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, k_r=1e-12):
+    def __init__(self, ml, temp, param_w, param_salt, param_h, press=1.01325, b_param=0, eps_rel=1, k_r=1e-12):
 
         """
         The constructor, with the following parameters
@@ -32,6 +32,7 @@ class ElectrolyteSolution(object):
         :param param_h: hydration layer parameters, see below
         :param press: pressure in bars, default is 1 atm
         :param b_param: b-parameter for debye huckel contribution
+        :param eps_rel: allows a dielectric constant different than pure water
         :param k_r: reference compressibility
 
         number density must be given in the same units as the molar volume
@@ -67,7 +68,7 @@ class ElectrolyteSolution(object):
         self.tp = temp
 
         # electrostatic parameter for debye-huckel
-        self.b_param = b_param
+        self.b_param = b_param/eps_rel**0.5
 
         # reference compressibility
         self.k_ref = k_r
@@ -75,7 +76,7 @@ class ElectrolyteSolution(object):
         # water model at the given temperature and pressure
         self.press = press
         wfm = fm.WaterPropertiesFineMillero(self.tp, self.press)
-        self.a_gamma = 3*wfm.a_phi()
+        self.a_gamma = 3*wfm.a_phi()/eps_rel**1.5
 
         # molecular volume
         self.u_w = param_w['v_w']
